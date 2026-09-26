@@ -1,0 +1,1344 @@
+<title>Archivo ojodecristi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Special+Elite&display=swap">
+<style>
+/* ============ Tokens ============ */
+:root {
+  --papel: #EFEFEA;
+  --papel-2: #E4E4DC;
+  --ficha: #FBFBF8;
+  --tinta: #1C1B19;
+  --tinta-2: #5A5852;
+  --tinta-3: #858279;
+  --linea: #D2D1C9;
+  --linea-2: #B9B8AE;
+  --renglon: #BACBDB;
+  --rojo: #BC3A2D;
+  --sello: #4A3E98;
+  --sello-suave: rgba(74, 62, 152, .09);
+  --cinta: rgba(221, 209, 173, .82);
+  --sombra: 0 1px 2px rgba(28, 27, 25, .10), 0 10px 28px rgba(28, 27, 25, .10);
+  --velo: rgba(239, 239, 234, .97);
+  --fondo-cajon: rgba(28, 27, 25, .32);
+  --boton: #1C1B19;
+  --boton-texto: #F7F7F3;
+  --mezcla: multiply;
+  --borde-muestra: rgba(0, 0, 0, .08);
+  --maquina: "Special Elite", "Courier Prime", "Courier New", Courier, monospace;
+  --texto: "Courier Prime", "Courier New", Courier, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --papel: #141412;
+    --papel-2: #1E1D1A;
+    --ficha: #201F1C;
+    --tinta: #ECEBE5;
+    --tinta-2: #ADAAA1;
+    --tinta-3: #807D74;
+    --linea: #312F2A;
+    --linea-2: #494740;
+    --renglon: #2F4356;
+    --rojo: #E4705F;
+    --sello: #AA9DF4;
+    --sello-suave: rgba(170, 157, 244, .12);
+    --cinta: rgba(196, 184, 146, .32);
+    --sombra: 0 1px 2px rgba(0, 0, 0, .5), 0 12px 32px rgba(0, 0, 0, .45);
+    --velo: rgba(20, 20, 18, .97);
+    --fondo-cajon: rgba(0, 0, 0, .55);
+    --boton: #ECEBE5;
+    --boton-texto: #141412;
+    --mezcla: screen;
+  --borde-muestra: rgba(255, 255, 255, .14);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --papel: #141412;
+  --papel-2: #1E1D1A;
+  --ficha: #201F1C;
+  --tinta: #ECEBE5;
+  --tinta-2: #ADAAA1;
+  --tinta-3: #807D74;
+  --linea: #312F2A;
+  --linea-2: #494740;
+  --renglon: #2F4356;
+  --rojo: #E4705F;
+  --sello: #AA9DF4;
+  --sello-suave: rgba(170, 157, 244, .12);
+  --cinta: rgba(196, 184, 146, .32);
+  --sombra: 0 1px 2px rgba(0, 0, 0, .5), 0 12px 32px rgba(0, 0, 0, .45);
+  --velo: rgba(20, 20, 18, .97);
+  --fondo-cajon: rgba(0, 0, 0, .55);
+  --boton: #ECEBE5;
+  --boton-texto: #141412;
+  --mezcla: screen;
+  --borde-muestra: rgba(255, 255, 255, .14);
+}
+
+/* ============ Base ============ */
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+html.sin-scroll { overflow: hidden; }
+body {
+  background: var(--papel);
+  color: var(--tinta);
+  font: 400 16px/1.6 var(--texto);
+  -webkit-font-smoothing: antialiased;
+}
+img { max-width: 100%; }
+a { color: inherit; }
+button { font: inherit; color: inherit; }
+p { margin: 0; }
+:focus-visible { outline: 2px solid var(--sello); outline-offset: 3px; }
+.envoltorio { width: 100%; max-width: 1240px; margin-inline: auto; padding-inline: clamp(16px, 4vw, 40px); }
+.recorte { overflow-x: hidden; overflow-x: clip; }
+section[id] { scroll-margin-top: 76px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+.ico { width: 18px; height: 18px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.num { font: 700 12px/1 var(--texto); color: var(--rojo); letter-spacing: .08em; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.en { font-style: italic; color: var(--tinta-2); }
+.rotulo { font: 700 12px/1.5 var(--texto); letter-spacing: .16em; text-transform: uppercase; color: var(--tinta-2); }
+h1, h2, h3 { font-weight: 400; text-wrap: balance; margin: 0; }
+h2 { font: 400 clamp(34px, 4.6vw, 54px)/1 var(--maquina); letter-spacing: -.005em; }
+
+/* Botones */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  min-height: 48px; padding: 0 22px;
+  border: 1.5px solid var(--tinta); border-radius: 3px;
+  font: 700 13px/1.2 var(--texto); letter-spacing: .1em; text-transform: uppercase;
+  text-decoration: none; cursor: pointer; text-align: center;
+  transition: transform .15s ease, background-color .15s ease, color .15s ease;
+}
+.btn:hover { transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
+.btn-tinta { background: var(--boton); border-color: var(--boton); color: var(--boton-texto); }
+.btn-linea { background: transparent; color: var(--tinta); }
+.btn-linea:hover { background: var(--ficha); }
+.btn-texto { background: none; border: 0; padding: 6px 0; cursor: pointer; font: 700 12px/1.4 var(--texto); letter-spacing: .1em; text-transform: uppercase; color: var(--tinta-2); text-decoration: underline; text-underline-offset: 4px; }
+.btn-texto:hover { color: var(--tinta); }
+
+/* Paletas */
+.paleta-tira { display: inline-flex; height: 12px; flex: none; box-shadow: 0 0 0 1px var(--borde-muestra); }
+.paleta-tira i { width: 14px; background: var(--c); }
+
+/* Cinta adhesiva */
+.cinta {
+  position: absolute; z-index: 3; width: 104px; height: 30px; pointer-events: none;
+  background: var(--cinta);
+  clip-path: polygon(3% 0, 97% 0, 100% 14%, 97% 28%, 100% 42%, 97% 57%, 100% 71%, 97% 86%, 100% 100%, 3% 100%, 0 86%, 3% 71%, 0 57%, 3% 42%, 0 28%, 3% 14%);
+}
+
+/* Sello */
+@keyframes estampar {
+  0% { opacity: 0; transform: rotate(var(--giro, -12deg)) scale(1.45); }
+  55% { opacity: 1; transform: rotate(var(--giro, -12deg)) scale(.94); }
+  100% { opacity: 1; transform: rotate(var(--giro, -12deg)) scale(1); }
+}
+
+/* ============ Aviso de maqueta ============ */
+.aviso-maqueta { background: var(--papel-2); border-bottom: 1px solid var(--linea); color: var(--tinta-2); font: 700 11px/1.45 var(--texto); letter-spacing: .12em; text-transform: uppercase; }
+.aviso-maqueta .envoltorio { padding-block: 8px; }
+.aviso-maqueta b { color: var(--sello); font-weight: 700; }
+
+/* ============ Cabecera ============ */
+.cabecera {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 30;
+  background: var(--papel);
+  background: color-mix(in srgb, var(--papel) 90%, transparent);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--linea);
+}
+.cabecera .envoltorio { position: relative; display: flex; align-items: center; gap: 20px; min-height: 64px; }
+.marca { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: var(--tinta); font: 400 21px/1 var(--maquina); }
+.marca svg { width: 32px; height: 32px; color: var(--sello); flex: none; }
+.nav { display: flex; gap: 26px; margin-left: auto; }
+.nav a { text-decoration: none; color: var(--tinta-2); font: 700 12px/1 var(--texto); letter-spacing: .14em; text-transform: uppercase; padding-block: 8px; border-bottom: 1.5px solid transparent; }
+.nav a:hover { color: var(--tinta); border-bottom-color: currentColor; }
+.btn-seleccion {
+  display: inline-flex; align-items: center; gap: 9px; min-height: 40px; padding: 0 7px 0 14px;
+  background: transparent; border: 1.5px solid var(--tinta); border-radius: 999px; cursor: pointer;
+  font: 700 12px/1 var(--texto); letter-spacing: .12em; text-transform: uppercase;
+}
+.btn-seleccion .ico { display: none; }
+.contador { min-width: 26px; height: 26px; padding: 0 7px; display: inline-grid; place-items: center; border-radius: 999px; background: var(--papel-2); color: var(--tinta-2); letter-spacing: 0; font-variant-numeric: tabular-nums; transition: background-color .2s, color .2s; }
+.btn-seleccion.con .contador { background: var(--sello); color: var(--ficha); }
+.btn-menu { display: none; min-height: 40px; padding: 0 14px; background: none; border: 1.5px solid var(--linea-2); border-radius: 999px; cursor: pointer; font: 700 12px/1 var(--texto); letter-spacing: .12em; text-transform: uppercase; }
+@media (max-width: 780px) {
+  .nav {
+    display: none; position: absolute; top: 100%; left: 0; right: 0; flex-direction: column; gap: 0; margin: 0;
+    padding: 4px clamp(16px, 4vw, 40px) 12px; background: var(--papel); border-bottom: 1px solid var(--linea);
+    box-shadow: 0 16px 24px rgba(0, 0, 0, .06);
+  }
+  .nav.abierta { display: flex; }
+  .nav a { padding-block: 16px; border-bottom: 1px solid var(--linea); }
+  .nav a:last-child { border-bottom: 0; }
+  .btn-seleccion { margin-left: auto; }
+  .btn-menu { display: inline-flex; align-items: center; }
+}
+@media (max-width: 440px) {
+  .cabecera .envoltorio { gap: 10px; }
+  .marca { font-size: 19px; gap: 8px; }
+  .marca svg { width: 28px; height: 28px; }
+  .btn-seleccion { padding-left: 10px; gap: 6px; }
+  .btn-seleccion .txt { display: none; }
+  .btn-seleccion .ico { display: block; }
+}
+
+/* ============ Portada ============ */
+.portada { padding-block: clamp(36px, 5vw, 72px) clamp(56px, 7vw, 96px); }
+.portada-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: clamp(36px, 5vw, 72px); align-items: center; }
+.portada h1 { font: 400 clamp(44px, 4.6vw, 66px)/1.02 var(--maquina); letter-spacing: -.012em; margin: 18px 0 12px; }
+.portada .traduccion { font: italic 400 clamp(18px, 2vw, 22px)/1.35 var(--texto); color: var(--tinta-2); }
+.portada .intro { max-width: 46ch; margin-top: 26px; font-size: 16.5px; }
+.acciones { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
+.datos { display: flex; flex-wrap: wrap; gap: 14px 36px; margin: 38px 0 0; padding-top: 18px; border-top: 1px dashed var(--linea-2); }
+.datos div { display: grid; gap: 6px; }
+.datos dt { font: 700 11px/1 var(--texto); letter-spacing: .14em; text-transform: uppercase; color: var(--tinta-3); }
+.datos dd { margin: 0; font: 400 24px/1.1 var(--maquina); font-variant-numeric: tabular-nums; }
+
+.tapa { position: relative; margin: 0; padding: 20px 18px 30px; width: min(100%, 640px); justify-self: center; }
+.tapa-hoja { position: relative; background: var(--ficha); padding: 14px 14px 18px; box-shadow: var(--sombra); transform: rotate(-1.4deg); transition: transform .6s cubic-bezier(.2, .7, .2, 1); }
+.tapa:hover .tapa-hoja { transform: rotate(-.5deg); }
+.tapa-grilla { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.tapa-foto { position: relative; display: block; aspect-ratio: 3 / 2; max-width: 100%; padding: 0; border: 0; overflow: hidden; cursor: zoom-in; background: var(--fondo, var(--papel-2)); }
+.tapa-foto img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .5s ease; }
+.tapa-foto:hover img { transform: scale(1.03); }
+.tapa-foto .num { position: absolute; left: 6px; bottom: 6px; padding: 4px 6px 3px; background: var(--ficha); font-size: 10.5px; }
+.tapa-pie { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin-top: 14px; padding-right: 120px; font: 700 11.5px/1.3 var(--texto); letter-spacing: .1em; text-transform: uppercase; color: var(--tinta-2); }
+.tapa .cinta-1 { top: 6px; left: 7%; transform: rotate(-7deg); }
+.tapa .cinta-2 { top: 4px; right: 7%; transform: rotate(6deg); }
+.tapa-sello {
+  --giro: -12deg;
+  position: absolute; right: -4px; bottom: -8px; z-index: 4; width: clamp(108px, 15vw, 148px); height: auto; aspect-ratio: 1;
+  color: var(--sello); mix-blend-mode: var(--mezcla); pointer-events: none;
+  transform: rotate(var(--giro));
+  animation: estampar .55s cubic-bezier(.3, .7, .2, 1) .45s both;
+}
+@media (max-width: 900px) {
+  .portada-grid { grid-template-columns: minmax(0, 1fr); }
+  .tapa { margin-top: 4px; }
+}
+@media (max-width: 480px) {
+  .tapa { padding: 16px 8px 26px; }
+  .tapa-hoja { padding: 10px 10px 14px; }
+  .tapa-grilla { gap: 6px; }
+  .tapa-pie { padding-right: 88px; }
+  .tapa-sello { width: 96px; right: -2px; }
+}
+
+/* ============ Archivo ============ */
+.archivo { padding-block: clamp(48px, 7vw, 88px); border-top: 1px solid var(--linea); }
+.seccion-cabeza { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 14px 40px; margin-bottom: 30px; }
+.seccion-nota { max-width: 50ch; color: var(--tinta-2); }
+
+.pestanas {
+  display: flex; align-items: flex-end; gap: 6px; overflow-x: auto; scrollbar-width: none; padding-top: 4px;
+  background: linear-gradient(var(--tinta), var(--tinta)) left bottom / 100% 1.5px no-repeat;
+  -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 28px), transparent);
+          mask-image: linear-gradient(90deg, #000 calc(100% - 28px), transparent);
+}
+.pestanas::-webkit-scrollbar { display: none; }
+.pestana {
+  flex: none; display: inline-flex; align-items: baseline; gap: 8px; margin-bottom: 1.5px;
+  padding: 11px 15px 10px; background: var(--papel-2); color: var(--tinta-2);
+  border: 1.5px solid var(--linea-2); border-bottom: 0; border-radius: 7px 7px 0 0; cursor: pointer;
+  font: 700 12px/1 var(--texto); letter-spacing: .1em; text-transform: uppercase; white-space: nowrap;
+  transition: background-color .15s, color .15s;
+}
+.pestana:hover { color: var(--tinta); }
+.pestana-n { font-weight: 400; font-size: 11px; color: var(--tinta-3); letter-spacing: 0; font-variant-numeric: tabular-nums; }
+.pestana.vacia { color: var(--tinta-3); }
+.pestana[aria-pressed="true"] { margin-bottom: 0; padding-bottom: 11.5px; background: var(--papel); color: var(--tinta); border-color: var(--tinta); }
+.pestana[aria-pressed="true"] .pestana-n { color: var(--rojo); }
+
+.filtro-serie { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin-top: 22px; padding: 12px 16px; background: var(--sello-suave); border-left: 3px solid var(--sello); }
+.filtro-serie strong { font: 400 18px/1.3 var(--maquina); }
+
+.grilla { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(32px, 3.6vw, 48px) clamp(18px, 2.4vw, 32px); margin-top: 34px; }
+@media (max-width: 980px) { .grilla { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 600px) { .grilla { grid-template-columns: minmax(0, 1fr); } }
+.foto { position: relative; display: grid; align-content: start; gap: 10px; }
+.foto-marco { position: relative; aspect-ratio: 3 / 2; max-width: 100%; overflow: hidden; background: var(--fondo, var(--papel-2)); }
+.foto-marco img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .6s cubic-bezier(.2, .7, .2, 1); }
+.foto:hover .foto-marco img { transform: scale(1.018); }
+.foto-abrir { position: absolute; inset: 0; z-index: 1; width: 100%; padding: 0; background: transparent; border: 0; cursor: zoom-in; }
+.foto-abrir:focus-visible { outline-offset: -4px; }
+.foto-sumar {
+  position: absolute; top: 10px; right: 10px; z-index: 2; width: 42px; height: 42px; border-radius: 50%;
+  display: grid; place-items: center; cursor: pointer;
+  background: var(--ficha); color: var(--tinta); border: 1.5px solid var(--tinta); box-shadow: 0 1px 4px rgba(0, 0, 0, .18);
+  transition: transform .15s, background-color .15s, color .15s, border-color .15s;
+}
+.foto-sumar:hover { transform: scale(1.06); }
+.foto-sumar .ico-ok, .foto-sumar[aria-pressed="true"] .ico-mas { display: none; }
+.foto-sumar[aria-pressed="true"] .ico-ok { display: block; }
+.foto-sumar[aria-pressed="true"] { background: var(--sello); border-color: var(--sello); color: var(--ficha); }
+.sello-elegida {
+  --giro: -7deg;
+  position: absolute; left: 12px; bottom: 12px; z-index: 2; pointer-events: none; opacity: 0;
+  padding: 6px 10px 5px; color: var(--sello); border: 2px solid currentColor; outline: 1px solid currentColor; outline-offset: 2px;
+  background: var(--ficha); background: color-mix(in srgb, var(--ficha) 84%, transparent);
+  font: 400 15px/1 var(--maquina); letter-spacing: .18em; text-transform: uppercase;
+  transform: rotate(var(--giro));
+}
+.foto.elegida .sello-elegida { opacity: 1; animation: estampar .38s cubic-bezier(.3, .7, .2, 1); }
+.foto-pie { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 2px; }
+.foto-titulo { font: 400 21px/1.2 var(--maquina); }
+.foto-titulo .en { display: block; margin-top: 3px; font: italic 400 14.5px/1.35 var(--texto); }
+.foto-lugar { font-size: 12.5px; line-height: 1.45; letter-spacing: .08em; text-transform: uppercase; color: var(--tinta-2); }
+
+.vacio { display: grid; justify-items: start; gap: 12px; margin-top: 34px; padding: clamp(28px, 5vw, 48px); border: 1.5px dashed var(--linea-2); }
+.vacio svg { width: 84px; height: 84px; color: var(--sello); opacity: .75; transform: rotate(-8deg); }
+.vacio-titulo { font: 400 24px/1.25 var(--maquina); max-width: 28ch; }
+.vacio p:not(.vacio-titulo) { color: var(--tinta-2); max-width: 52ch; }
+.vacio .btn { margin-top: 6px; }
+
+/* ============ Series ============ */
+.series { padding-block: clamp(48px, 7vw, 96px); border-top: 1px solid var(--linea); }
+.series-grilla { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(36px, 4vw, 56px) clamp(24px, 3.4vw, 48px); margin-top: 38px; }
+@media (max-width: 900px) { .series-grilla { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 600px) { .series-grilla { grid-template-columns: minmax(0, 1fr); } }
+.serie { display: grid; align-content: start; gap: 10px; padding: 0; background: none; border: 0; text-align: left; cursor: pointer; }
+.pila { position: relative; display: block; aspect-ratio: 4 / 3; max-width: 100%; margin: 0 6% 4px; }
+.copia { position: absolute; left: 4%; right: 4%; top: 12%; display: block; padding: 7px; background: var(--ficha); box-shadow: var(--sombra); transition: transform .5s cubic-bezier(.2, .7, .2, 1); }
+.copia img { display: block; width: 100%; height: auto; aspect-ratio: 3 / 2; object-fit: cover; background: var(--papel-2); }
+.pila .copia:nth-child(1) { transform: rotate(-5deg) translate(-3%, 4%); }
+.pila .copia:nth-child(2) { transform: rotate(4deg) translate(3%, -1%); }
+.pila .copia:last-of-type { transform: rotate(-1deg); }
+.serie:hover .copia:nth-child(1), .serie:focus-visible .copia:nth-child(1) { transform: rotate(-9deg) translate(-8%, 5%); }
+.serie:hover .copia:nth-child(2), .serie:focus-visible .copia:nth-child(2) { transform: rotate(7deg) translate(7%, -2%); }
+.serie:hover .copia:last-of-type, .serie:focus-visible .copia:last-of-type { transform: rotate(0deg) translateY(-2%); }
+.pila .cinta { top: 5%; left: 50%; width: 88px; height: 26px; transform: translateX(-50%) rotate(-3deg); }
+.serie-meta { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.serie-titulo { display: block; font: 400 24px/1.2 var(--maquina); }
+.serie-titulo .en { display: block; margin-top: 3px; font: italic 400 15px/1.35 var(--texto); }
+.serie-texto { display: block; color: var(--tinta-2); font-size: 15px; }
+.serie-ir { display: inline-flex; align-items: center; gap: 8px; font: 700 12px/1 var(--texto); letter-spacing: .12em; text-transform: uppercase; color: var(--sello); }
+.serie:hover .serie-ir .ico { transform: translateX(3px); }
+.serie-ir .ico { width: 16px; height: 16px; transition: transform .2s; }
+
+/* ============ Fichas (tarjeta de fichero) ============ */
+.ficha { position: relative; background: var(--ficha); box-shadow: var(--sombra); padding: 18px 22px 44px; }
+.ficha::after { content: ""; position: absolute; left: 50%; bottom: 14px; width: 14px; height: 14px; border-radius: 50%; transform: translateX(-50%); background: var(--papel); box-shadow: inset 0 1px 2px rgba(0, 0, 0, .28); }
+.ficha-cabeza { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding-bottom: 9px; border-bottom: 2px solid var(--rojo); font: 700 11.5px/1 var(--texto); letter-spacing: .16em; text-transform: uppercase; color: var(--tinta-2); }
+
+/* ============ Cuadros ============ */
+.cuadros { padding-block: clamp(48px, 7vw, 96px); border-top: 1px solid var(--linea); }
+.cuadros-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: clamp(32px, 5vw, 72px); align-items: start; }
+.cuadros-texto { display: grid; gap: 20px; justify-items: start; }
+.cuadros-texto p { max-width: 44ch; color: var(--tinta-2); font-size: 16.5px; }
+.pasos { list-style: none; margin: 0; padding: 0; }
+.pasos li { display: grid; grid-template-columns: 34px 1fr; gap: 10px; padding: 16px 0 15px; border-bottom: 1px solid var(--renglon); }
+.paso-n { font: 400 24px/1 var(--maquina); color: var(--rojo); }
+.pasos strong { display: block; font: 400 20px/1.25 var(--maquina); margin-bottom: 4px; }
+.pasos p { color: var(--tinta-2); font-size: 15px; }
+@media (max-width: 860px) { .cuadros-grid { grid-template-columns: minmax(0, 1fr); } }
+
+/* ============ Sobre mí ============ */
+.sobre { padding-block: clamp(48px, 7vw, 96px); border-top: 1px solid var(--linea); }
+.sobre-grid { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: clamp(32px, 5vw, 72px); align-items: start; }
+.sobre-texto { display: grid; gap: 18px; justify-items: start; }
+.sobre-texto p { max-width: 58ch; font-size: 16.5px; }
+.enlace { display: inline-flex; align-items: center; gap: 8px; font: 700 13px/1.4 var(--texto); letter-spacing: .1em; text-transform: uppercase; text-decoration: none; border-bottom: 1.5px solid currentColor; padding-bottom: 3px; }
+.enlace:hover { color: var(--sello); }
+.encargo { display: grid; gap: 14px; justify-items: start; padding: 24px; border: 1.5px solid var(--tinta); }
+.encargo h3 { font: 400 26px/1.15 var(--maquina); }
+.encargo p { color: var(--tinta-2); }
+@media (max-width: 860px) { .sobre-grid { grid-template-columns: minmax(0, 1fr); } }
+
+/* ============ Pie ============ */
+.pie { padding-block: clamp(40px, 6vw, 72px) calc(clamp(40px, 6vw, 72px) + 64px); border-top: 1.5px solid var(--tinta); }
+.pie-grid { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 24px 40px; align-items: start; }
+.pie-sello { width: 128px; height: 128px; color: var(--sello); transform: rotate(-9deg); mix-blend-mode: var(--mezcla); }
+.pie-marca { font: 400 28px/1 var(--maquina); margin-bottom: 10px; }
+.pie-legal { margin-top: 10px; max-width: 60ch; font-size: 13px; color: var(--tinta-2); }
+.pie-enlaces { display: grid; gap: 12px; }
+.pie-enlaces a { font: 700 12px/1.4 var(--texto); letter-spacing: .12em; text-transform: uppercase; text-decoration: none; color: var(--tinta-2); }
+.pie-enlaces a:hover { color: var(--tinta); }
+@media (max-width: 760px) { .pie-grid { grid-template-columns: minmax(0, 1fr); } .pie-sello { width: 104px; height: 104px; } }
+
+/* ============ Visor (ficha de cada foto) ============ */
+.visor {
+  position: fixed; inset: 0; z-index: 60; overflow-y: auto; overscroll-behavior: contain; background: var(--velo);
+  padding: calc(env(safe-area-inset-top, 0px) + 20px) clamp(16px, 3vw, 40px) calc(env(safe-area-inset-bottom, 0px) + 24px);
+  animation: aparecer .25s ease;
+}
+@keyframes aparecer { from { opacity: 0; } to { opacity: 1; } }
+.visor-caja { max-width: 1320px; min-height: 100%; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 32px; align-items: center; }
+.visor-escena { display: grid; justify-items: center; gap: 12px; min-width: 0; }
+.visor-barra { width: 100%; display: flex; justify-content: space-between; gap: 12px; font: 700 12px/1 var(--texto); letter-spacing: .12em; text-transform: uppercase; color: var(--tinta-2); }
+.visor-lamina {
+  position: relative; max-width: 100%; aspect-ratio: var(--ar, 1.5); background: var(--fondo, var(--papel-2)); box-shadow: var(--sombra);
+  width: min(100%, calc((100vh - 116px) * var(--ar, 1.5)));
+  width: min(100%, calc((100dvh - 116px) * var(--ar, 1.5)));
+  -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
+}
+.visor-lamina img { display: block; width: 100%; height: 100%; object-fit: contain; pointer-events: none; -webkit-user-drag: none; transition: opacity .25s; }
+.visor-lamina img.cargando { opacity: .35; }
+.escudo { position: absolute; inset: 0; }
+.marca-agua { position: absolute; right: 2.5%; bottom: 3.5%; width: clamp(54px, 10%, 112px); height: auto; aspect-ratio: 1; color: #fff; opacity: .6; pointer-events: none; filter: drop-shadow(0 0 1px rgba(0, 0, 0, .55)); }
+.visor-nav {
+  position: absolute; top: 50%; z-index: 2; width: 44px; height: 44px; margin-top: -22px; border-radius: 50%;
+  display: grid; place-items: center; cursor: pointer; color: var(--tinta);
+  background: var(--ficha); background: color-mix(in srgb, var(--ficha) 88%, transparent); border: 1.5px solid var(--tinta);
+}
+.visor-nav.prev { left: 12px; }
+.visor-nav.next { right: 12px; }
+.visor-cerrar {
+  position: fixed; z-index: 3; top: calc(env(safe-area-inset-top, 0px) + 12px); right: 12px;
+  display: inline-flex; align-items: center; gap: 8px; min-height: 42px; padding: 0 14px 0 12px; cursor: pointer;
+  background: var(--ficha); border: 1.5px solid var(--tinta); border-radius: 999px;
+  font: 700 12px/1 var(--texto); letter-spacing: .12em; text-transform: uppercase;
+}
+.visor .ficha h2 { margin: 18px 0 4px; font: 400 30px/1.12 var(--maquina); }
+.visor .ficha .en { margin-bottom: 12px; font-size: 16px; }
+.ficha-datos { margin: 0; }
+.ficha-datos div { display: grid; grid-template-columns: 86px minmax(0, 1fr); gap: 12px; padding: 8px 0 7px; border-bottom: 1px solid var(--renglon); }
+.ficha-datos dt { padding-top: 3px; font: 700 10.5px/1.4 var(--texto); letter-spacing: .14em; text-transform: uppercase; color: var(--tinta-3); }
+.ficha-datos dd { margin: 0; font-size: 15px; line-height: 1.45; }
+.ficha-paleta { margin-top: 16px; }
+.ficha-paleta ol { list-style: none; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; margin: 8px 0 0; padding: 0; }
+.ficha-paleta li { display: grid; gap: 5px; }
+.ficha-paleta .muestra { aspect-ratio: 1; background: var(--c); box-shadow: inset 0 0 0 1px var(--borde-muestra); }
+.ficha-paleta code { font: 400 10.5px/1 var(--texto); color: var(--tinta-2); text-transform: uppercase; letter-spacing: .02em; }
+.ficha-acciones { display: grid; gap: 10px; margin-top: 20px; }
+.ficha-acciones .btn { width: 100%; }
+#ficha-sumar[aria-pressed="true"] { background: var(--sello-suave); border-color: var(--sello); color: var(--sello); }
+.ficha-nota { margin-top: 12px; font-size: 13px; color: var(--tinta-2); }
+@media (max-width: 860px) {
+  .visor-caja { grid-template-columns: minmax(0, 1fr); align-items: start; gap: 22px; padding-top: 48px; }
+  .visor-lamina { width: 100%; }
+  .visor .ficha { width: 100%; max-width: 560px; justify-self: center; }
+}
+@media (max-width: 480px) {
+  .visor-nav { width: 38px; height: 38px; margin-top: -19px; }
+  .visor-nav.prev { left: 8px; }
+  .visor-nav.next { right: 8px; }
+  .ficha { padding-inline: 18px; }
+}
+
+/* ============ Selección ============ */
+.pastilla {
+  position: fixed; left: 50%; z-index: 40; bottom: calc(env(safe-area-inset-bottom, 0px) + 16px); transform: translateX(-50%);
+  display: inline-flex; align-items: center; gap: 12px; max-width: calc(100% - 32px); padding: 7px 18px 7px 8px; cursor: pointer;
+  background: var(--boton); color: var(--boton-texto); border: 0; border-radius: 999px; box-shadow: var(--sombra);
+  font: 700 12.5px/1.2 var(--texto); letter-spacing: .1em; text-transform: uppercase; white-space: nowrap;
+  animation: subir .3s cubic-bezier(.2, .7, .2, 1);
+}
+@keyframes subir { from { opacity: 0; transform: translate(-50%, 16px); } to { opacity: 1; transform: translate(-50%, 0); } }
+.pastilla-fotos { display: inline-flex; }
+.pastilla-fotos img { width: 40px; height: 28px; object-fit: cover; display: block; border: 2px solid var(--boton); border-radius: 3px; background: var(--papel-2); }
+.pastilla-fotos img + img { margin-left: -14px; }
+.pastilla-texto { overflow: hidden; text-overflow: ellipsis; }
+@media (max-width: 440px) { .pastilla-accion { display: none; } }
+
+.cajon { position: fixed; inset: 0; z-index: 70; }
+.cajon-fondo { position: absolute; inset: 0; background: var(--fondo-cajon); animation: aparecer .2s ease; }
+.cajon-panel {
+  position: absolute; top: 0; right: 0; bottom: 0; width: min(430px, 100%); overflow-y: auto; overscroll-behavior: contain;
+  display: flex; flex-direction: column; gap: 18px; background: var(--papel); border-left: 1.5px solid var(--tinta);
+  padding: calc(env(safe-area-inset-top, 0px) + 20px) 22px calc(env(safe-area-inset-bottom, 0px) + 22px);
+  animation: entrarDerecha .3s cubic-bezier(.2, .7, .2, 1);
+}
+@keyframes entrarDerecha { from { transform: translateX(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes entrarAbajo { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+.cajon-cabeza { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.cajon-cabeza h2 { font-size: 34px; }
+.btn-redondo { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 50%; background: var(--ficha); border: 1.5px solid var(--tinta); cursor: pointer; }
+.cajon-lista { list-style: none; margin: 0; padding: 0; border-top: 2px solid var(--rojo); }
+.cajon-lista li { display: grid; grid-template-columns: 78px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--renglon); }
+.cajon-lista img { width: 78px; aspect-ratio: 3 / 2; object-fit: cover; display: block; background: var(--papel-2); -webkit-user-drag: none; }
+.cajon-lista strong { display: block; font: 400 17px/1.25 var(--maquina); margin-top: 4px; }
+.cajon-lista .lugar { display: block; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--tinta-2); }
+.quitar { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 50%; background: none; border: 1px solid var(--linea-2); cursor: pointer; color: var(--tinta-2); }
+.quitar:hover { color: var(--tinta); border-color: var(--tinta); }
+.cajon-vacio { color: var(--tinta-2); padding: 18px; border: 1.5px dashed var(--linea-2); }
+.campo { display: grid; gap: 8px; }
+.campo label { font: 700 11px/1 var(--texto); letter-spacing: .14em; text-transform: uppercase; color: var(--tinta-2); }
+.campo textarea { width: 100%; min-height: 84px; resize: vertical; padding: 10px 12px; border-radius: 3px; border: 1.5px solid var(--linea-2); background: var(--ficha); color: var(--tinta); font: 400 16px/1.5 var(--texto); }
+.campo textarea:focus { outline: none; border-color: var(--sello); box-shadow: 0 0 0 3px var(--sello-suave); }
+.cajon details { font-size: 14px; color: var(--tinta-2); }
+.cajon summary { cursor: pointer; font: 700 11.5px/1.4 var(--texto); letter-spacing: .12em; text-transform: uppercase; }
+.cajon pre { margin: 10px 0 0; padding: 12px; white-space: pre-wrap; word-break: break-word; background: var(--ficha); border: 1px solid var(--linea); font: 400 13.5px/1.5 var(--texto); color: var(--tinta); }
+.cajon-acciones { display: grid; gap: 8px; justify-items: center; margin-top: auto; padding-top: 6px; }
+.cajon-acciones .btn { width: 100%; }
+.cajon-acciones .btn[aria-disabled="true"] { opacity: .45; cursor: not-allowed; transform: none; }
+.nota-maqueta { font-size: 12.5px; color: var(--sello); background: var(--sello-suave); padding: 10px 12px; }
+@media (max-width: 600px) {
+  .cajon-panel { top: auto; left: 0; width: 100%; max-height: 90%; border-left: 0; border-top: 1.5px solid var(--tinta); border-radius: 14px 14px 0 0; animation-name: entrarAbajo; }
+}
+
+/* Aviso flotante */
+.aviso {
+  position: fixed; left: 50%; z-index: 80; bottom: calc(env(safe-area-inset-bottom, 0px) + 84px); transform: translateX(-50%);
+  width: max-content; max-width: min(calc(100% - 32px), 460px);
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; padding: 12px 16px;
+  background: var(--boton); color: var(--boton-texto); border-radius: 4px; box-shadow: var(--sombra); font-size: 14px; line-height: 1.45;
+  animation: subir .25s ease;
+}
+.aviso button { padding: 7px 12px; border: 1px solid currentColor; border-radius: 3px; background: none; color: inherit; cursor: pointer; font: 700 11.5px/1 var(--texto); letter-spacing: .1em; text-transform: uppercase; }
+
+/* Protección de imágenes */
+.protegida, .protegida img, .copia, .copia img, .pastilla img, .cajon-lista img {
+  -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
+}
+.protegida img, .copia img { pointer-events: none; -webkit-user-drag: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <path id="sello-arco" d="M32 100 a68 68 0 1 1 136 0 a68 68 0 1 1 -136 0"/>
+    <filter id="tinta" x="-6%" y="-6%" width="112%" height="112%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency=".45" numOctaves="2" seed="4" result="grano"/>
+      <feColorMatrix in="grano" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -5 3.3" result="mascara"/>
+      <feComposite in="SourceGraphic" in2="mascara" operator="in" result="entintado"/>
+      <feTurbulence type="fractalNoise" baseFrequency=".03" numOctaves="2" seed="9" result="ondas"/>
+      <feDisplacementMap in="entintado" in2="ondas" scale="2.6" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+  </defs>
+  <symbol id="sello" viewBox="0 0 200 200">
+    <circle cx="100" cy="100" r="95" fill="none" stroke="currentColor" stroke-width="4"/>
+    <circle cx="100" cy="100" r="88.5" fill="none" stroke="currentColor" stroke-width="1.3"/>
+    <circle cx="100" cy="100" r="58" fill="none" stroke="currentColor" stroke-width="1.6"/>
+    <text fill="currentColor" font-family="'Special Elite', 'Courier Prime', monospace" font-size="14.5"><textPath href="#sello-arco" textLength="421" lengthAdjust="spacing">OJODECRISTI · ARCHIVO FOTOGRÁFICO · MAR DEL PLATA ·</textPath></text>
+    <path d="M55 100 Q100 64 145 100 Q100 136 55 100 Z" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linejoin="round"/>
+    <circle cx="100" cy="100" r="16" fill="none" stroke="currentColor" stroke-width="2.6"/>
+    <path d="M100 92.5L106.5 96.2L106.5 103.8L100 107.5L93.5 103.8L93.5 96.2Z" fill="currentColor"/>
+    <path d="M100 92.5L113.6 91.5M106.5 96.2L114.1 107.5M106.5 103.8L100.6 116M100 107.5L86.4 108.5M93.5 103.8L85.9 92.5M93.5 96.2L99.4 84" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="ojo" viewBox="0 0 48 48">
+    <circle cx="24" cy="24" r="21.5" fill="none" stroke="currentColor" stroke-width="2.4"/>
+    <path d="M9.5 24 Q24 12 38.5 24 Q24 36 9.5 24 Z" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/>
+    <circle cx="24" cy="24" r="5.6" fill="currentColor"/>
+  </symbol>
+  <symbol id="i-mas" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-ok" viewBox="0 0 24 24"><path d="M5 12.5l4.3 4.3L19 7"/></symbol>
+  <symbol id="i-cerrar" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+  <symbol id="i-izq" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></symbol>
+  <symbol id="i-der" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></symbol>
+  <symbol id="i-flecha" viewBox="0 0 24 24"><path d="M4 12h15M13 6l6 6-6 6"/></symbol>
+  <symbol id="i-abajo" viewBox="0 0 24 24"><path d="M12 4v15M6 13l6 6 6-6"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 5h16v11H10l-6 4z"/><path d="M8.5 10.5h7"/></symbol>
+  <symbol id="i-copias" viewBox="0 0 24 24"><rect x="3" y="8" width="13" height="10" rx="1"/><path d="M7.5 5H21v10"/></symbol>
+</svg>
+
+<div class="aviso-maqueta">
+  <div class="envoltorio"><b>Maqueta</b> · Los títulos, lugares y fechas de las fotos son de ejemplo</div>
+</div>
+
+<header class="cabecera">
+  <div class="envoltorio">
+    <a class="marca" href="#inicio" aria-label="ojodecristi, ir al inicio">
+      <svg viewBox="0 0 48 48" aria-hidden="true"><use href="#ojo"/></svg>
+      <span>ojodecristi</span>
+    </a>
+    <nav class="nav" id="nav" aria-label="Secciones">
+      <a href="#archivo">Archivo</a>
+      <a href="#series">Series</a>
+      <a href="#cuadros">Cuadros</a>
+      <a href="#sobre-mi">Sobre mí</a>
+    </nav>
+    <button type="button" class="btn-seleccion" id="btn-seleccion" aria-haspopup="dialog">
+      <svg class="ico" aria-hidden="true"><use href="#i-copias"/></svg>
+      <span class="txt">Selección</span>
+      <span class="contador" id="contador">0</span>
+      <span class="sr">fotos elegidas</span>
+    </button>
+    <button type="button" class="btn-menu" id="btn-menu" aria-expanded="false" aria-controls="nav">Menú</button>
+  </div>
+</header>
+
+<main>
+  <section class="portada recorte" id="inicio">
+    <div class="envoltorio portada-grid">
+      <div class="portada-texto">
+        <p class="rotulo">Archivo fotográfico · Mar del Plata, Argentina</p>
+        <h1>Un archivo de lo que miro.</h1>
+        <p class="traduccion">An archive of what I see.</p>
+        <p class="intro">Soy Cristian Torrecillas, fotógrafo de Mar del Plata. Fotografío paisajes, naturaleza y escenas de todos los días. Cada foto de este archivo tiene su número, su lugar y su paleta de colores, y cualquiera se puede pedir como cuadro.</p>
+        <div class="acciones">
+          <a class="btn btn-tinta" href="#archivo"><svg class="ico" aria-hidden="true"><use href="#i-abajo"/></svg>Ver el archivo</a>
+          <a class="btn btn-linea" href="#cuadros">Cómo pedir un cuadro</a>
+        </div>
+        <dl class="datos">
+          <div><dt>Fotografías</dt><dd id="dato-fotos">—</dd></div>
+          <div><dt>Series</dt><dd id="dato-series">—</dd></div>
+          <div><dt>Cuadros</dt><dd>Por encargo</dd></div>
+        </dl>
+      </div>
+      <figure class="tapa" id="tapa">
+        <div class="tapa-hoja">
+          <div class="tapa-grilla" id="tapa-grilla"></div>
+          <figcaption class="tapa-pie">
+            <span class="num" id="tapa-num"></span>
+            <span id="tapa-lugar"></span>
+            <span class="paleta-tira" id="tapa-paleta" aria-hidden="true"></span>
+          </figcaption>
+        </div>
+        <span class="cinta cinta-1" aria-hidden="true"></span>
+        <span class="cinta cinta-2" aria-hidden="true"></span>
+        <svg class="tapa-sello" viewBox="0 0 200 200" aria-hidden="true"><use href="#sello" filter="url(#tinta)"/></svg>
+      </figure>
+    </div>
+  </section>
+
+  <section class="archivo" id="archivo" aria-labelledby="archivo-titulo">
+    <div class="envoltorio">
+      <div class="seccion-cabeza">
+        <h2 id="archivo-titulo">Archivo</h2>
+        <p class="seccion-nota">Tocá una foto para ver su ficha. Con ＋ la sumás a tu selección, y desde ahí me la mandás por WhatsApp.</p>
+      </div>
+      <div class="pestanas" id="pestanas" role="toolbar" aria-label="Categorías del archivo"></div>
+      <div class="filtro-serie" id="filtro-serie" hidden>
+        <span class="rotulo">Serie</span>
+        <strong id="filtro-serie-nombre"></strong>
+        <button type="button" class="btn-texto" data-cat="todo">Ver todo el archivo</button>
+      </div>
+      <div class="grilla" id="grilla"></div>
+      <div class="vacio" id="vacio" hidden>
+        <svg viewBox="0 0 200 200" aria-hidden="true"><use href="#sello" filter="url(#tinta)"/></svg>
+        <p class="vacio-titulo">Esta parte del archivo todavía se está revelando.</p>
+        <p>Pronto va a haber fotos acá. Mientras tanto, mirá el archivo completo.</p>
+        <button type="button" class="btn btn-linea" data-cat="todo">Ver todo el archivo</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="series recorte" id="series" aria-labelledby="series-titulo">
+    <div class="envoltorio">
+      <div class="seccion-cabeza">
+        <h2 id="series-titulo">Series</h2>
+        <p class="seccion-nota">Grupos de fotos que comparten un tema o un recorrido.</p>
+      </div>
+      <div class="series-grilla" id="series-grilla"></div>
+    </div>
+  </section>
+
+  <section class="cuadros" id="cuadros" aria-labelledby="cuadros-titulo">
+    <div class="envoltorio cuadros-grid">
+      <div class="cuadros-texto">
+        <h2 id="cuadros-titulo">Cómo pedir un cuadro</h2>
+        <p>Todas las fotos del archivo se pueden pedir impresas. El pedido se arma acá y se coordina por WhatsApp, sin pagos en la web.</p>
+        <a class="btn btn-tinta" data-wa="general" href="#" target="_blank" rel="noopener"><svg class="ico" aria-hidden="true"><use href="#i-chat"/></svg>Escribime por WhatsApp</a>
+      </div>
+      <div class="ficha">
+        <div class="ficha-cabeza"><span>Pedido de cuadro</span><span class="num">3 pasos</span></div>
+        <ol class="pasos">
+          <li><span class="paso-n">1</span><div><strong>Elegí tus fotos</strong><p>Tocá ＋ en las que te gusten. Podés sumar varias a tu selección.</p></div></li>
+          <li><span class="paso-n">2</span><div><strong>Mandame la lista</strong><p>Desde tu selección se arma un mensaje de WhatsApp con el número de cada foto. Lo revisás y lo enviás.</p></div></li>
+          <li><span class="paso-n">3</span><div><strong>Coordinamos los detalles</strong><p>Te paso tamaños, papel, marco y precio, y acordamos la entrega.</p></div></li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="sobre" id="sobre-mi" aria-labelledby="sobre-titulo">
+    <div class="envoltorio sobre-grid">
+      <div class="sobre-texto">
+        <h2 id="sobre-titulo">Sobre mí</h2>
+        <p>Soy Cristian Torrecillas y vivo en Mar del Plata. Salgo a fotografiar la costa, la ciudad y lo que aparece en el camino: un cartel de playa, un perro al sol, un reloj de estación.</p>
+        <p>Ordeno todo como un archivo de campo. Cada foto lleva su número, el lugar donde la saqué y la paleta de colores que la define.</p>
+        <a class="enlace" href="https://www.instagram.com/ojodecristi/" target="_blank" rel="noopener">@ojodecristi en Instagram<svg class="ico" aria-hidden="true"><use href="#i-flecha"/></svg></a>
+      </div>
+      <aside class="encargo" aria-labelledby="encargo-titulo">
+        <p class="rotulo">Trabajos</p>
+        <h3 id="encargo-titulo">Hoteles, cabañas y turismo</h3>
+        <p>Si tenés un hotel, una cabaña o un proyecto de turismo, puedo fotografiar tu lugar para tu web y tus redes. También hago sesiones de fotos.</p>
+        <a class="btn btn-tinta" data-wa="trabajo" href="#" target="_blank" rel="noopener"><svg class="ico" aria-hidden="true"><use href="#i-chat"/></svg>Consultar por un trabajo</a>
+      </aside>
+    </div>
+  </section>
+</main>
+
+<footer class="pie">
+  <div class="envoltorio pie-grid">
+    <svg class="pie-sello" viewBox="0 0 200 200" aria-hidden="true"><use href="#sello" filter="url(#tinta)"/></svg>
+    <div>
+      <p class="pie-marca">ojodecristi</p>
+      <p>Fotografías de Cristian Torrecillas. Mar del Plata, Argentina.</p>
+      <p class="pie-legal">Las fotos se muestran en baja resolución y con marca de agua. © 2026, todos los derechos reservados. Para usar o imprimir una imagen, escribime.</p>
+    </div>
+    <nav class="pie-enlaces" aria-label="Contacto">
+      <a data-wa="general" href="#" target="_blank" rel="noopener">WhatsApp</a>
+      <a href="https://www.instagram.com/ojodecristi/" target="_blank" rel="noopener">Instagram</a>
+      <a href="#archivo">Volver al archivo</a>
+    </nav>
+  </div>
+</footer>
+
+<button type="button" class="pastilla" id="pastilla" hidden>
+  <span class="pastilla-fotos" id="pastilla-fotos" aria-hidden="true"></span>
+  <span class="pastilla-texto"><span id="pastilla-cuenta"></span><span class="pastilla-accion"> · Consultar</span></span>
+  <svg class="ico" aria-hidden="true"><use href="#i-flecha"/></svg>
+</button>
+
+<div class="visor" id="visor" role="dialog" aria-modal="true" aria-labelledby="ficha-titulo" hidden>
+  <button type="button" class="visor-cerrar" id="visor-cerrar"><svg class="ico" aria-hidden="true"><use href="#i-cerrar"/></svg>Cerrar</button>
+  <div class="visor-caja">
+    <div class="visor-escena">
+      <div class="visor-barra"><span id="visor-contador"></span><span id="visor-lugar"></span></div>
+      <div class="visor-lamina protegida" id="visor-lamina">
+        <img id="visor-img" alt="" draggable="false">
+        <svg class="marca-agua" viewBox="0 0 200 200" aria-hidden="true"><use href="#sello"/></svg>
+        <div class="escudo" aria-hidden="true"></div>
+        <button type="button" class="visor-nav prev" id="visor-prev" aria-label="Foto anterior"><svg class="ico" aria-hidden="true"><use href="#i-izq"/></svg></button>
+        <button type="button" class="visor-nav next" id="visor-next" aria-label="Foto siguiente"><svg class="ico" aria-hidden="true"><use href="#i-der"/></svg></button>
+      </div>
+    </div>
+    <aside class="ficha">
+      <div class="ficha-cabeza"><span>Ficha</span><span class="num" id="ficha-num"></span></div>
+      <h2 id="ficha-titulo"></h2>
+      <p class="en" id="ficha-en"></p>
+      <dl class="ficha-datos">
+        <div><dt>Lugar</dt><dd id="ficha-lugar"></dd></div>
+        <div><dt>Año</dt><dd id="ficha-anio"></dd></div>
+        <div><dt>Soporte</dt><dd id="ficha-soporte"></dd></div>
+        <div><dt>Serie</dt><dd id="ficha-serie"></dd></div>
+        <div><dt>Archivo</dt><dd id="ficha-cats"></dd></div>
+      </dl>
+      <div class="ficha-paleta">
+        <p class="rotulo">Paleta</p>
+        <ol id="ficha-paleta"></ol>
+      </div>
+      <div class="ficha-acciones">
+        <button type="button" class="btn btn-linea" id="ficha-sumar" aria-pressed="false"><svg class="ico" aria-hidden="true"><use href="#i-mas"/></svg><span class="txt">Sumar a mi selección</span></button>
+        <a class="btn btn-tinta" id="ficha-wa" href="#" target="_blank" rel="noopener"><svg class="ico" aria-hidden="true"><use href="#i-chat"/></svg>Consultar por WhatsApp</a>
+      </div>
+      <p class="ficha-nota">Disponible como cuadro. Tamaños y terminaciones a consultar.</p>
+    </aside>
+  </div>
+</div>
+
+<div class="cajon" id="cajon" role="dialog" aria-modal="true" aria-labelledby="cajon-titulo" hidden>
+  <div class="cajon-fondo" data-cerrar-cajon></div>
+  <div class="cajon-panel">
+    <div class="cajon-cabeza">
+      <h2 id="cajon-titulo">Tu selección</h2>
+      <button type="button" class="btn-redondo" id="cajon-cerrar" data-cerrar-cajon aria-label="Cerrar la selección"><svg class="ico" aria-hidden="true"><use href="#i-cerrar"/></svg></button>
+    </div>
+    <ol class="cajon-lista" id="cajon-lista"></ol>
+    <p class="cajon-vacio" id="cajon-vacio">Todavía no elegiste fotos. Tocá ＋ en las que te gusten.</p>
+    <div class="campo">
+      <label for="cajon-nota">Comentario (opcional)</label>
+      <textarea id="cajon-nota" rows="3" placeholder="Ej.: es para el living, algo de 40 × 60 cm."></textarea>
+    </div>
+    <details>
+      <summary>Ver el mensaje que se envía</summary>
+      <pre id="cajon-mensaje"></pre>
+    </details>
+    <div class="cajon-acciones">
+      <a class="btn btn-tinta" id="cajon-wa" href="#" target="_blank" rel="noopener"><svg class="ico" aria-hidden="true"><use href="#i-chat"/></svg>Consultar por WhatsApp</a>
+      <button type="button" class="btn-texto" id="cajon-vaciar">Vaciar selección</button>
+    </div>
+    <p class="nota-maqueta" id="nota-numero" hidden>Maqueta: todavía no está cargado tu número, así que WhatsApp va a pedir elegir un contacto.</p>
+  </div>
+</div>
+
+<div class="aviso" id="aviso" role="status" aria-live="polite" hidden>
+  <span id="aviso-texto"></span>
+  <button type="button" id="aviso-accion" hidden></button>
+</div>
+<p class="sr" id="anuncio" aria-live="polite"></p>
+
+<script>
+(() => {
+"use strict";
+
+/* ==============================================================
+   CONFIGURACIÓN · editá acá
+   ============================================================== */
+const CONFIG = {
+  nombre: "Cristian",
+  whatsapp: "",   // Tu número con código de país, sin + ni espacios. Ej.: 5492231234567
+  sitio: ""       // Cuando tengas dominio, por ejemplo "https://ojodecristi.com.ar"
+};
+
+/* Categorías del archivo (el orden es el de las pestañas) */
+const CATEGORIAS = [
+  { id: "mar-del-plata", nombre: "Mar del Plata" },
+  { id: "argentina", nombre: "Argentina" },
+  { id: "blanco-y-negro", nombre: "Blanco y negro" },
+  { id: "paisaje", nombre: "Paisaje" },
+  { id: "flores", nombre: "Flores" },
+  { id: "nubes", nombre: "Nubes" },
+  { id: "ciudad", nombre: "Ciudad" },
+  { id: "animales", nombre: "Animales" }
+];
+
+const SERIES = [
+  { id: "mirar-hacia-arriba", titulo: "Mirar hacia arriba", title: "Looking Up", texto: "Edificios, cielo y lo que queda en el medio cuando levantás la cabeza." },
+  { id: "tiempo-de-estacion", titulo: "Tiempo de estación", title: "Station Time", texto: "Relojes y andenes de Buenos Aires, entre un tren y el siguiente." },
+  { id: "perros-de-barrio", titulo: "Perros de barrio", title: "Neighborhood Dogs", texto: "Los dueños de la vereda." }
+];
+
+/* Fotos de la portada (4, como la tapa de un carrusel) */
+const TAPA = ["004", "005", "006", "009"];
+
+/* Cada foto usa fotos/mini/NNN.jpg (800 px) y fotos/web/NNN.jpg (1600 px).
+   Si una foto no tiene "paleta", el sitio la calcula solo. */
+const FOTOS = [
+  { n: "001", titulo: "Estrellas de viento", title: "Wind Stars", lugar: "Mar del Plata", anio: "2026", soporte: "Película 35 mm",
+    categorias: ["mar-del-plata", "nubes"], serie: "mirar-hacia-arriba",
+    alt: "Molinetes con forma de estrella contra un cielo celeste con nubes",
+    paleta: ["#b0cad8", "#e1dedb", "#6a929e", "#cec2a3", "#bba36a"] },
+  { n: "002", titulo: "Despegue", title: "Liftoff", lugar: "Mar del Plata", anio: "2026", soporte: "Película 35 mm",
+    categorias: ["mar-del-plata", "ciudad", "nubes"], serie: "mirar-hacia-arriba",
+    alt: "Torre redonda de departamentos vista desde abajo, contra el cielo",
+    paleta: ["#d4d7da", "#8ab0c1", "#3f7c8e", "#b69e62", "#776531"] },
+  { n: "003", titulo: "La proa", title: "The Prow", lugar: "Mar del Plata", anio: "2026", soporte: "Película 35 mm",
+    categorias: ["mar-del-plata", "ciudad"], serie: "mirar-hacia-arriba",
+    alt: "Esquina de un edificio claro vista desde abajo, contra un cielo azul",
+    paleta: ["#eeebe4", "#89b6cb", "#3a8197", "#d4c39c", "#77713d"] },
+  { n: "004", titulo: "Rayas de domingo", title: "Sunday Stripes", lugar: "Mar del Plata", anio: "2026", soporte: "Película 35 mm",
+    categorias: ["mar-del-plata", "ciudad"], serie: null,
+    alt: "Frente de una cafetería con toldo a rayas y un cerco de madera celeste",
+    paleta: ["#ecedee", "#a28e5a", "#3d3a18", "#f6bba0", "#81471b"] },
+  { n: "005", titulo: "El mar todo lo cura", title: "The Sea Heals All", lugar: "Playa Constitución, Mar del Plata", anio: "2026", soporte: "Película 35 mm",
+    categorias: ["mar-del-plata", "paisaje"], serie: null,
+    alt: "Poste con carteles de madera pintados frente a la Playa Constitución",
+    paleta: ["#c8cdd1", "#756e47", "#d1b883", "#363817", "#f0c963"] },
+  { n: "006", titulo: "Siesta al sol", title: "Sun Nap", lugar: "Mar del Plata", anio: "2026", soporte: "Película 35 mm",
+    categorias: ["mar-del-plata", "animales"], serie: "perros-de-barrio",
+    alt: "Perro de pelo claro echado al sol sobre el pasto",
+    paleta: ["#d3d3d5", "#406823", "#8eaa62", "#c7af7e", "#bb7c44"] },
+  { n: "007", titulo: "El dueño de casa", title: "Head of the House", lugar: "Mar del Plata", anio: "2026", soporte: "Película 35 mm",
+    categorias: ["mar-del-plata", "animales"], serie: "perros-de-barrio",
+    alt: "Casa de ladrillo con techo de tejas y un perro blanco y negro en la entrada",
+    paleta: ["#374b1b", "#2e3517", "#857950", "#caba93", "#9fb867"] },
+  { n: "008", titulo: "Vecinos", title: "Neighbors", lugar: "Mar del Plata", anio: "2026", soporte: "Película 35 mm",
+    categorias: ["mar-del-plata", "ciudad"], serie: "mirar-hacia-arriba",
+    alt: "Dos edificios altos, uno espejado, vistos desde abajo",
+    paleta: ["#91bad0", "#4a481f", "#f5f2ed", "#9f9158", "#cdbc95"] },
+  { n: "009", titulo: "Otoño en punto", title: "Autumn O'Clock", lugar: "Buenos Aires", anio: "2026", soporte: "Película 35 mm",
+    categorias: ["argentina", "ciudad"], serie: "tiempo-de-estacion",
+    alt: "Torre con reloj y cúpula verde junto a un árbol de otoño",
+    paleta: ["#d9e5e5", "#a5a395", "#6d5d43", "#95835f", "#462f14"] },
+  { n: "010", titulo: "Antes del tren", title: "Before the Train", lugar: "Buenos Aires", anio: "2026", soporte: "Película 35 mm",
+    categorias: ["argentina", "ciudad"], serie: "tiempo-de-estacion",
+    alt: "Hall de una estación de tren con boletería de azulejos verdes",
+    paleta: ["#172523", "#4c4831", "#a69a68", "#8a7143", "#f4f2e3"] },
+  { n: "011", titulo: "La hora de todos", title: "Everyone's Time", lugar: "Buenos Aires", anio: "2026", soporte: "Película 35 mm",
+    categorias: ["argentina", "ciudad"], serie: "tiempo-de-estacion",
+    alt: "Reloj de cuatro caras colgado del techo de una estación",
+    paleta: ["#d8c677", "#142226", "#a49051", "#685d39", "#afb289"] }
+];
+
+/* ==============================================================
+   De acá para abajo no hace falta tocar nada
+   ============================================================== */
+const $ = (s, el = document) => el.querySelector(s);
+const $$ = (s, el = document) => Array.from(el.querySelectorAll(s));
+const esc = (t) => String(t == null ? "" : t).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const pocoMovimiento = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const porNumero = new Map(FOTOS.map((f) => [f.n, f]));
+const rutaMini = (f) => "fotos/mini/" + f.n + ".jpg";
+const rutaWeb = (f) => "fotos/web/" + f.n + ".jpg";
+const nombreCat = (id) => (CATEGORIAS.find((c) => c.id === id) || { nombre: id }).nombre;
+const serieDe = (f) => SERIES.find((s) => s.id === f.serie);
+const ciudad = (lugar) => String(lugar || "").split(",").pop().trim();
+const textoAlt = (f) => (f.alt ? f.alt + ". " : "") + "N.° " + f.n + ", " + f.titulo + ".";
+
+document.documentElement.lang = "es";
+
+const estado = { filtro: { tipo: "todo" }, lista: FOTOS.slice(), visorLista: FOTOS, indice: -1 };
+
+/* ---------- Guardado local (solo comodidad para quien visita) ---------- */
+const CLAVE = "ojodecristi-seleccion";
+function leerLocal(clave, porDefecto) {
+  try { const v = localStorage.getItem(clave); return v == null ? porDefecto : JSON.parse(v); } catch (_) { return porDefecto; }
+}
+function guardarLocal(clave, valor) { try { localStorage.setItem(clave, JSON.stringify(valor)); } catch (_) {} }
+let seleccion = leerLocal(CLAVE, []).filter((n) => porNumero.has(n));
+
+/* ---------- Paleta ---------- */
+function tiraPaleta(colores, n) {
+  const s = document.createElement("span");
+  s.className = "paleta-tira";
+  s.setAttribute("aria-hidden", "true");
+  if (n) s.dataset.paleta = n;
+  (colores || []).forEach((c) => { const i = document.createElement("i"); i.style.setProperty("--c", c); s.append(i); });
+  return s;
+}
+
+/* Si una foto no trae paleta, se calcula a partir de la miniatura */
+function extraerPaleta(img, k) {
+  k = k || 5;
+  const w = 64, h = Math.max(1, Math.round(64 * img.naturalHeight / img.naturalWidth));
+  const lienzo = document.createElement("canvas");
+  lienzo.width = w; lienzo.height = h;
+  const ctx = lienzo.getContext("2d", { willReadFrequently: true });
+  ctx.drawImage(img, 0, 0, w, h);
+  const d = ctx.getImageData(0, 0, w, h).data;
+  const px = [];
+  for (let i = 0; i < d.length; i += 4) px.push([d[i], d[i + 1], d[i + 2]]);
+  const dist = (a, b) => (a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2 + (a[2] - b[2]) ** 2;
+  let cent = [px.reduce((a, p) => [a[0] + p[0] / px.length, a[1] + p[1] / px.length, a[2] + p[2] / px.length], [0, 0, 0])];
+  while (cent.length < 9) {
+    let mejor = px[0], md = -1;
+    for (const p of px) { let m = Infinity; for (const c of cent) m = Math.min(m, dist(p, c)); if (m > md) { md = m; mejor = p; } }
+    cent.push(mejor.slice());
+  }
+  const asig = new Array(px.length).fill(0);
+  for (let it = 0; it < 12; it++) {
+    const suma = cent.map(() => [0, 0, 0, 0]);
+    px.forEach((p, i) => {
+      let b = 0, bd = Infinity;
+      cent.forEach((c, j) => { const dd = dist(p, c); if (dd < bd) { bd = dd; b = j; } });
+      asig[i] = b; const s = suma[b]; s[0] += p[0]; s[1] += p[1]; s[2] += p[2]; s[3]++;
+    });
+    cent = suma.map((s, j) => (s[3] ? [s[0] / s[3], s[1] / s[3], s[2] / s[3]] : cent[j]));
+  }
+  const cuenta = cent.map(() => 0);
+  asig.forEach((a) => cuenta[a]++);
+  const sat = (c) => { const mx = Math.max(c[0], c[1], c[2]), mn = Math.min(c[0], c[1], c[2]); return mx ? (mx - mn) / mx : 0; };
+  const grupos = cent.map((c, j) => ({ c: c, n: cuenta[j], puntaje: Math.sqrt(cuenta[j] / px.length) * (1 + 1.6 * sat(c)) }))
+    .filter((g) => g.n > px.length * 0.01)
+    .sort((a, b) => b.puntaje - a.puntaje);
+  const elegidos = [];
+  for (const g of grupos) { if (elegidos.length === k) break; if (elegidos.every((e) => dist(e.c, g.c) > 900)) elegidos.push(g); }
+  for (const g of grupos) { if (elegidos.length === k) break; if (elegidos.indexOf(g) < 0) elegidos.push(g); }
+  const hex = (v) => Math.round(v).toString(16).padStart(2, "0");
+  return elegidos.sort((a, b) => b.n - a.n).map((g) => "#" + hex(g.c[0]) + hex(g.c[1]) + hex(g.c[2]));
+}
+function paletaAutomatica(f, img) {
+  const correr = () => {
+    if (f.paleta) return;
+    try { f.paleta = extraerPaleta(img); } catch (_) { return; }
+    $$('[data-paleta="' + f.n + '"]').forEach((el) => el.replaceWith(tiraPaleta(f.paleta, f.n)));
+    $$('.foto[data-n="' + f.n + '"] .foto-marco').forEach((m) => m.style.setProperty("--fondo", f.paleta[0]));
+  };
+  if (img.complete && img.naturalWidth) correr(); else img.addEventListener("load", correr, { once: true });
+}
+
+/* ---------- Portada ---------- */
+/* Qué tan "vivo" se ve un color: saturado y ni muy oscuro ni muy claro */
+function vivo(hex) {
+  const r = parseInt(hex.slice(1, 3), 16) / 255, g = parseInt(hex.slice(3, 5), 16) / 255, b = parseInt(hex.slice(5, 7), 16) / 255;
+  const mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2, d = mx - mn;
+  const s = d === 0 ? 0 : d / (1 - Math.abs(2 * l - 1));
+  return s * (1 - Math.abs(l - 0.55) * 1.2);
+}
+/* Paleta de la tapa: el color más vivo de cada foto, en el orden de la grilla, más uno extra */
+function paletaConjunta(fotos, k) {
+  const rgb = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+  const lejos = (a, c) => { const x = rgb(a), y = rgb(c); return Math.hypot(x[0] - y[0], x[1] - y[1], x[2] - y[2]) > 40; };
+  const elegidos = [];
+  const resto = [];
+  fotos.forEach((f) => {
+    const orden = (f.paleta || []).slice().sort((a, b) => vivo(b) - vivo(a));
+    if (orden[0] && elegidos.every((e) => lejos(e, orden[0]))) elegidos.push(orden[0]);
+    resto.push.apply(resto, orden.slice(1));
+  });
+  resto.sort((a, b) => vivo(b) - vivo(a)).forEach((c) => { if (elegidos.length < k && elegidos.every((e) => lejos(e, c))) elegidos.push(c); });
+  return elegidos.slice(0, k);
+}
+function renderTapa() {
+  const fotos = TAPA.map((n) => porNumero.get(n)).filter(Boolean);
+  if (!fotos.length) { $("#tapa").hidden = true; return; }
+  $("#tapa-grilla").innerHTML = fotos.map((f) =>
+    '<button type="button" class="tapa-foto protegida" data-abrir="' + f.n + '" style="--fondo:' + esc((f.paleta || [])[0] || "") + '" aria-label="Ver la ficha de N.° ' + f.n + ', ' + esc(f.titulo) + '">' +
+      '<img src="' + rutaMini(f) + '" alt="" width="800" height="530" draggable="false">' +
+      '<span class="num">N.° ' + f.n + '</span>' +
+    '</button>').join("");
+  $("#tapa-num").textContent = "N.° " + fotos[0].n + " — " + fotos[fotos.length - 1].n;
+  $("#tapa-lugar").textContent = Array.from(new Set(fotos.map((f) => ciudad(f.lugar)))).join(" · ");
+  const tira = $("#tapa-paleta");
+  tira.innerHTML = "";
+  paletaConjunta(fotos, 5).forEach((c) => { const i = document.createElement("i"); i.style.setProperty("--c", c); tira.append(i); });
+}
+
+/* ---------- Pestañas y grilla ---------- */
+function renderPestanas() {
+  const items = [{ id: "todo", nombre: "Todo", cuenta: FOTOS.length }].concat(
+    CATEGORIAS.map((c) => ({ id: c.id, nombre: c.nombre, cuenta: FOTOS.filter((f) => f.categorias.indexOf(c.id) >= 0).length })));
+  $("#pestanas").innerHTML = items.map((it) =>
+    '<button type="button" class="pestana' + (it.cuenta ? "" : " vacia") + '" data-cat="' + it.id + '" aria-pressed="false">' +
+      esc(it.nombre) + '<span class="pestana-n">' + it.cuenta + '</span></button>').join("");
+}
+
+function tarjeta(f, i) {
+  const el = document.createElement("article");
+  const elegida = seleccion.indexOf(f.n) >= 0;
+  el.className = "foto" + (elegida ? " elegida" : "");
+  el.dataset.n = f.n;
+  el.innerHTML =
+    '<div class="foto-marco protegida" style="--fondo:' + esc((f.paleta || [])[0] || "") + '">' +
+      '<img src="' + rutaMini(f) + '" alt="' + esc(textoAlt(f)) + '" width="800" height="530" loading="' + (i < 3 ? "eager" : "lazy") + '" decoding="async" draggable="false">' +
+      '<button type="button" class="foto-abrir" data-abrir="' + f.n + '" aria-label="Ver la ficha de N.° ' + f.n + ', ' + esc(f.titulo) + '"></button>' +
+      '<span class="sello-elegida" aria-hidden="true">Elegida</span>' +
+    '</div>' +
+    '<button type="button" class="foto-sumar" data-sumar="' + f.n + '" aria-pressed="' + elegida + '" aria-label="' + etiquetaSumar(f, elegida) + '">' +
+      '<svg class="ico ico-mas" aria-hidden="true"><use href="#i-mas"/></svg><svg class="ico ico-ok" aria-hidden="true"><use href="#i-ok"/></svg>' +
+    '</button>' +
+    '<div class="foto-pie"><span class="num">N.° ' + f.n + '</span></div>' +
+    '<h3 class="foto-titulo">' + esc(f.titulo) + '<span class="en">' + esc(f.title) + '</span></h3>' +
+    '<p class="foto-lugar">' + esc(f.lugar) + (f.anio ? " · " + esc(f.anio) : "") + '</p>';
+  $(".foto-pie", el).append(tiraPaleta(f.paleta, f.n));
+  if (!f.paleta) paletaAutomatica(f, $("img", el));
+  return el;
+}
+function etiquetaSumar(f, elegida) {
+  return elegida ? "Quitar N.° " + f.n + " de tu selección" : "Sumar N.° " + f.n + " a tu selección";
+}
+
+function aplicarFiltro(filtro, opciones) {
+  opciones = opciones || {};
+  estado.filtro = filtro;
+  if (filtro.tipo === "cat") estado.lista = FOTOS.filter((f) => f.categorias.indexOf(filtro.id) >= 0);
+  else if (filtro.tipo === "serie") estado.lista = FOTOS.filter((f) => f.serie === filtro.id);
+  else estado.lista = FOTOS.slice();
+
+  $$(".pestana").forEach((b) => {
+    const activa = (filtro.tipo === "todo" && b.dataset.cat === "todo") || (filtro.tipo === "cat" && b.dataset.cat === filtro.id);
+    b.setAttribute("aria-pressed", String(activa));
+  });
+  const fs = $("#filtro-serie");
+  if (filtro.tipo === "serie") {
+    const s = SERIES.find((x) => x.id === filtro.id);
+    $("#filtro-serie-nombre").textContent = s ? s.titulo + " / " + s.title : "";
+    fs.hidden = false;
+  } else fs.hidden = true;
+
+  const grilla = $("#grilla");
+  grilla.innerHTML = "";
+  estado.lista.forEach((f, i) => grilla.append(tarjeta(f, i)));
+  $("#vacio").hidden = estado.lista.length > 0;
+
+  if (opciones.hash !== false) ponerHash(filtro.tipo === "todo" ? "archivo" : filtro.id);
+  if (opciones.desplazar) $("#archivo").scrollIntoView({ behavior: pocoMovimiento ? "auto" : "smooth", block: "start" });
+  if (opciones.anunciar) anunciar(estado.lista.length === 1 ? "1 foto" : estado.lista.length + " fotos");
+}
+
+/* ---------- Series ---------- */
+function renderSeries() {
+  const html = SERIES.map((s) => {
+    const fotos = FOTOS.filter((f) => f.serie === s.id);
+    if (!fotos.length) return "";
+    const pila = fotos.slice(0, 3).reverse();
+    return '<button type="button" class="serie" data-serie="' + s.id + '">' +
+      '<span class="pila" aria-hidden="true">' +
+        pila.map((f) => '<span class="copia"><img src="' + rutaMini(f) + '" alt="" width="800" height="530" loading="lazy" draggable="false"></span>').join("") +
+        '<span class="cinta"></span>' +
+      '</span>' +
+      '<span class="serie-meta"><span class="num">Serie · ' + fotos.length + ' fotos</span><span data-tira-serie="' + s.id + '"></span></span>' +
+      '<span class="serie-titulo">' + esc(s.titulo) + '<span class="en">' + esc(s.title) + '</span></span>' +
+      '<span class="serie-texto">' + esc(s.texto) + '</span>' +
+      '<span class="serie-ir">Ver la serie<svg class="ico" aria-hidden="true"><use href="#i-flecha"/></svg></span>' +
+    '</button>';
+  }).join("");
+  $("#series-grilla").innerHTML = html;
+  SERIES.forEach((s) => {
+    const hueco = $('[data-tira-serie="' + s.id + '"]');
+    if (!hueco) return;
+    const colores = [];
+    FOTOS.filter((f) => f.serie === s.id).forEach((f) => (f.paleta || []).slice(0, 2).forEach((c) => { if (colores.length < 5 && colores.indexOf(c) < 0) colores.push(c); }));
+    hueco.replaceWith(tiraPaleta(colores));
+  });
+  $("#series").hidden = !html;
+  $("#dato-series").textContent = SERIES.filter((s) => FOTOS.some((f) => f.serie === s.id)).length;
+}
+
+/* ---------- Visor ---------- */
+let focoPrevio = null;
+function abrirVisor(n, lista) {
+  const L = lista || (estado.lista.some((f) => f.n === n) ? estado.lista : FOTOS);
+  const i = L.findIndex((f) => f.n === n);
+  if (i < 0) return;
+  estado.visorLista = L;
+  estado.indice = i;
+  if ($("#visor").hidden) focoPrevio = document.activeElement;
+  $("#visor").hidden = false;
+  document.documentElement.classList.add("sin-scroll");
+  mostrarEnVisor();
+  $("#visor-cerrar").focus({ preventScroll: true });
+}
+function fotoActual() { return estado.visorLista[estado.indice]; }
+function mostrarEnVisor() {
+  const f = fotoActual();
+  const L = estado.visorLista;
+  const img = $("#visor-img");
+  const lamina = $("#visor-lamina");
+  lamina.style.setProperty("--fondo", (f.paleta || [])[0] || "");
+  img.classList.add("cargando");
+  img.onload = () => {
+    img.classList.remove("cargando");
+    if (img.naturalWidth && img.naturalHeight) lamina.style.setProperty("--ar", (img.naturalWidth / img.naturalHeight).toFixed(4));
+  };
+  img.src = rutaWeb(f);
+  img.alt = textoAlt(f);
+  $("#ficha-num").textContent = "N.° " + f.n;
+  $("#ficha-titulo").textContent = f.titulo;
+  $("#ficha-en").textContent = f.title || "";
+  fila("#ficha-lugar", f.lugar);
+  fila("#ficha-anio", f.anio);
+  fila("#ficha-soporte", f.soporte);
+  const s = serieDe(f);
+  fila("#ficha-serie", s ? s.titulo + " / " + s.title : "");
+  fila("#ficha-cats", f.categorias.map(nombreCat).join(" · "));
+  $("#ficha-paleta").innerHTML = (f.paleta || []).map((c) => '<li><span class="muestra" style="--c:' + esc(c) + '"></span><code>' + esc(c) + '</code></li>').join("");
+  $(".ficha-paleta").hidden = !(f.paleta && f.paleta.length);
+  $("#visor-contador").textContent = String(estado.indice + 1).padStart(2, "0") + " / " + String(L.length).padStart(2, "0");
+  $("#visor-lugar").textContent = ciudad(f.lugar);
+  $("#visor-prev").hidden = $("#visor-next").hidden = L.length < 2;
+  actualizarFicha();
+  ponerHash("foto-" + f.n);
+  [estado.indice + 1, estado.indice - 1].forEach((j) => { const g = L[(j + L.length) % L.length]; if (g) { const p = new Image(); p.src = rutaWeb(g); } });
+}
+function fila(sel, valor) { const dd = $(sel); dd.textContent = valor || ""; dd.parentElement.hidden = !valor; }
+function actualizarFicha() {
+  if ($("#visor").hidden) return;
+  const f = fotoActual();
+  const elegida = seleccion.indexOf(f.n) >= 0;
+  const b = $("#ficha-sumar");
+  b.setAttribute("aria-pressed", String(elegida));
+  $(".txt", b).textContent = elegida ? "En tu selección · Quitar" : "Sumar a mi selección";
+  $("use", b).setAttribute("href", elegida ? "#i-ok" : "#i-mas");
+  $("#ficha-wa").href = enlaceWhatsApp(mensajeFoto(f));
+}
+function mover(paso) {
+  const L = estado.visorLista;
+  estado.indice = (estado.indice + paso + L.length) % L.length;
+  mostrarEnVisor();
+}
+function cerrarVisor() {
+  $("#visor").hidden = true;
+  if ($("#cajon").hidden) document.documentElement.classList.remove("sin-scroll");
+  ponerHash(estado.filtro.tipo === "todo" ? "archivo" : estado.filtro.id);
+  const n = fotoActual() && fotoActual().n;
+  const destino = n && $('.foto[data-n="' + n + '"] .foto-abrir');
+  if (destino) destino.focus({ preventScroll: false });
+  else if (focoPrevio && document.contains(focoPrevio)) focoPrevio.focus({ preventScroll: true });
+}
+
+/* Deslizar con el dedo en el visor */
+(() => {
+  let inicio = null;
+  const lamina = $("#visor-lamina");
+  lamina.addEventListener("touchstart", (e) => { const t = e.changedTouches[0]; inicio = { x: t.clientX, y: t.clientY }; }, { passive: true });
+  lamina.addEventListener("touchend", (e) => {
+    if (!inicio) return;
+    const t = e.changedTouches[0], dx = t.clientX - inicio.x, dy = t.clientY - inicio.y;
+    if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.3) mover(dx < 0 ? 1 : -1);
+    inicio = null;
+  }, { passive: true });
+})();
+
+/* ---------- Selección ---------- */
+function alternar(n) {
+  const i = seleccion.indexOf(n);
+  if (i >= 0) seleccion.splice(i, 1); else seleccion.push(n);
+  guardarLocal(CLAVE, seleccion);
+  const f = porNumero.get(n);
+  anunciar(i >= 0 ? "N.° " + n + " quitada de tu selección" : "N.° " + n + " sumada a tu selección");
+  $$('.foto[data-n="' + n + '"]').forEach((card) => {
+    const elegida = seleccion.indexOf(n) >= 0;
+    card.classList.toggle("elegida", elegida);
+    const b = $(".foto-sumar", card);
+    b.setAttribute("aria-pressed", String(elegida));
+    b.setAttribute("aria-label", etiquetaSumar(f, elegida));
+  });
+  refrescarSeleccion();
+}
+function refrescarSeleccion() {
+  const k = seleccion.length;
+  $("#contador").textContent = k;
+  $("#btn-seleccion").classList.toggle("con", k > 0);
+  const p = $("#pastilla");
+  p.hidden = k === 0;
+  $("#pastilla-cuenta").textContent = k === 1 ? "1 foto elegida" : k + " fotos elegidas";
+  p.setAttribute("aria-label", "Ver tu selección (" + k + ") y consultar por WhatsApp");
+  $("#pastilla-fotos").innerHTML = seleccion.slice(-3).map((n) => { const f = porNumero.get(n); return f ? '<img src="' + rutaMini(f) + '" alt="" draggable="false">' : ""; }).join("");
+  renderCajon();
+  actualizarFicha();
+}
+function renderCajon() {
+  const fotos = seleccion.map((n) => porNumero.get(n)).filter(Boolean);
+  $("#cajon-lista").innerHTML = fotos.map((f) =>
+    '<li><img src="' + rutaMini(f) + '" alt="" draggable="false">' +
+      '<div><span class="num">N.° ' + f.n + '</span><strong>' + esc(f.titulo) + '</strong><span class="lugar">' + esc(f.lugar) + '</span></div>' +
+      '<button type="button" class="quitar" data-quitar="' + f.n + '" aria-label="Quitar N.° ' + f.n + ' de tu selección"><svg class="ico" aria-hidden="true"><use href="#i-cerrar"/></svg></button>' +
+    '</li>').join("");
+  $("#cajon-lista").hidden = !fotos.length;
+  $("#cajon-vacio").hidden = fotos.length > 0;
+  const wa = $("#cajon-wa");
+  if (fotos.length) { wa.href = enlaceWhatsApp(mensajeSeleccion()); wa.removeAttribute("aria-disabled"); }
+  else { wa.href = "#"; wa.setAttribute("aria-disabled", "true"); }
+  $("#cajon-mensaje").textContent = fotos.length ? mensajeSeleccion() : "(Elegí al menos una foto)";
+  $("#cajon-vaciar").hidden = !fotos.length;
+}
+let focoCajon = null;
+function abrirCajon() {
+  focoCajon = document.activeElement;
+  renderCajon();
+  $("#cajon").hidden = false;
+  document.documentElement.classList.add("sin-scroll");
+  setTimeout(() => $("#cajon-cerrar").focus({ preventScroll: true }), 20);
+}
+function cerrarCajon() {
+  $("#cajon").hidden = true;
+  if ($("#visor").hidden) document.documentElement.classList.remove("sin-scroll");
+  if (focoCajon && document.contains(focoCajon)) focoCajon.focus({ preventScroll: true });
+}
+
+/* ---------- WhatsApp ---------- */
+function lineaFoto(f) { return "• N.° " + f.n + " — " + f.titulo + " (" + f.lugar + ")"; }
+function mensajeSeleccion() {
+  const fotos = seleccion.map((n) => porNumero.get(n)).filter(Boolean);
+  const nota = $("#cajon-nota").value.trim();
+  let m = "¡Hola " + CONFIG.nombre + "! Vi tu archivo y me interesan " + (fotos.length === 1 ? "esta foto" : "estas fotos") + " como cuadro:\n\n" + fotos.map(lineaFoto).join("\n");
+  if (nota) m += "\n\nComentario: " + nota;
+  m += "\n\n¿Me pasás tamaños y precios?";
+  return m;
+}
+function mensajeFoto(f) {
+  let m = "¡Hola " + CONFIG.nombre + "! Vi en tu archivo la foto N.° " + f.n + " — " + f.titulo + " (" + f.lugar + ") y me interesa como cuadro. ¿Me pasás tamaños y precios?";
+  if (CONFIG.sitio) m += "\n" + CONFIG.sitio.replace(/\/$/, "") + "/#foto-" + f.n;
+  return m;
+}
+const MENSAJES = {
+  general: () => "¡Hola " + CONFIG.nombre + "! Vi tu archivo de fotos y quería hacerte una consulta.",
+  trabajo: () => "¡Hola " + CONFIG.nombre + "! Vi tu web y quería consultarte por un trabajo de fotos."
+};
+function enlaceWhatsApp(texto) {
+  const numero = String(CONFIG.whatsapp || "").replace(/\D/g, "");
+  return "https://wa.me/" + numero + "?text=" + encodeURIComponent(texto);
+}
+
+/* ---------- Avisos ---------- */
+let temporizador = null;
+function avisar(texto, accion) {
+  const a = $("#aviso"), b = $("#aviso-accion");
+  $("#aviso-texto").textContent = texto;
+  if (accion) { b.hidden = false; b.textContent = accion.texto; b.onclick = () => { accion.fn(); a.hidden = true; }; }
+  else { b.hidden = true; b.onclick = null; }
+  a.hidden = false;
+  clearTimeout(temporizador);
+  temporizador = setTimeout(() => { a.hidden = true; }, accion ? 5500 : 3200);
+}
+function anunciar(texto) { const r = $("#anuncio"); r.textContent = ""; setTimeout(() => { r.textContent = texto; }, 30); }
+
+/* ---------- Dirección (#archivo, #mar-del-plata, #foto-005…) ---------- */
+function ponerHash(token) { try { history.replaceState(null, "", "#" + token); } catch (_) {} }
+function leerHash() {
+  let h = "";
+  try { h = decodeURIComponent(location.hash.slice(1)); } catch (_) {}
+  if (!h) return;
+  if (h.indexOf("foto-") === 0) { const n = h.slice(5); if (porNumero.has(n)) abrirVisor(n, FOTOS); return; }
+  if (CATEGORIAS.some((c) => c.id === h)) { aplicarFiltro({ tipo: "cat", id: h }, { desplazar: true, hash: false }); return; }
+  if (SERIES.some((s) => s.id === h)) aplicarFiltro({ tipo: "serie", id: h }, { desplazar: true, hash: false });
+}
+
+/* ---------- Eventos ---------- */
+document.addEventListener("click", (e) => {
+  const t = e.target;
+  const abrir = t.closest("[data-abrir]");
+  if (abrir) { abrirVisor(abrir.dataset.abrir); return; }
+  const sumar = t.closest("[data-sumar]");
+  if (sumar) { alternar(sumar.dataset.sumar); return; }
+  const cat = t.closest("[data-cat]");
+  if (cat) {
+    const id = cat.dataset.cat;
+    aplicarFiltro(id === "todo" ? { tipo: "todo" } : { tipo: "cat", id: id }, { anunciar: true, desplazar: !cat.classList.contains("pestana") });
+    if (cat.classList.contains("pestana")) cat.scrollIntoView({ block: "nearest", inline: "nearest", behavior: pocoMovimiento ? "auto" : "smooth" });
+    return;
+  }
+  const serie = t.closest("[data-serie]");
+  if (serie) { aplicarFiltro({ tipo: "serie", id: serie.dataset.serie }, { desplazar: true, anunciar: true }); return; }
+  const quitar = t.closest("[data-quitar]");
+  if (quitar) { alternar(quitar.dataset.quitar); return; }
+  if (t.closest("[data-cerrar-cajon]")) { cerrarCajon(); return; }
+});
+
+$("#btn-seleccion").addEventListener("click", abrirCajon);
+$("#pastilla").addEventListener("click", abrirCajon);
+$("#visor-cerrar").addEventListener("click", cerrarVisor);
+$("#visor-prev").addEventListener("click", () => mover(-1));
+$("#visor-next").addEventListener("click", () => mover(1));
+$("#visor").addEventListener("click", (e) => { if (e.target === $("#visor") || e.target.classList.contains("visor-caja")) cerrarVisor(); });
+$("#ficha-sumar").addEventListener("click", () => alternar(fotoActual().n));
+$("#cajon-vaciar").addEventListener("click", () => {
+  const antes = seleccion.slice();
+  seleccion = [];
+  guardarLocal(CLAVE, seleccion);
+  antes.forEach((n) => $$('.foto[data-n="' + n + '"]').forEach((card) => {
+    card.classList.remove("elegida");
+    const b = $(".foto-sumar", card);
+    b.setAttribute("aria-pressed", "false");
+    b.setAttribute("aria-label", etiquetaSumar(porNumero.get(n), false));
+  }));
+  refrescarSeleccion();
+  avisar("Vaciaste tu selección.", { texto: "Deshacer", fn: () => { seleccion = antes; guardarLocal(CLAVE, seleccion); aplicarFiltro(estado.filtro, { hash: false }); refrescarSeleccion(); } });
+});
+$("#cajon-wa").addEventListener("click", (e) => {
+  if (!seleccion.length) { e.preventDefault(); avisar("Elegí al menos una foto para consultar."); }
+});
+const nota = $("#cajon-nota");
+nota.value = leerLocal(CLAVE + "-nota", "");
+nota.addEventListener("input", () => { guardarLocal(CLAVE + "-nota", nota.value); renderCajon(); });
+
+$("#btn-menu").addEventListener("click", () => {
+  const abierta = $("#nav").classList.toggle("abierta");
+  $("#btn-menu").setAttribute("aria-expanded", String(abierta));
+});
+$("#nav").addEventListener("click", (e) => {
+  if (e.target.closest("a")) { $("#nav").classList.remove("abierta"); $("#btn-menu").setAttribute("aria-expanded", "false"); }
+});
+
+function focoAtrapado(e, contenedor) {
+  const foco = $$('a[href], button:not([disabled]), textarea, summary, [tabindex]:not([tabindex="-1"])', contenedor)
+    .filter((el) => !el.closest("[hidden]") && el.getClientRects().length > 0);
+  if (!foco.length) return;
+  const primero = foco[0], ultimo = foco[foco.length - 1];
+  if (e.shiftKey && document.activeElement === primero) { e.preventDefault(); ultimo.focus(); }
+  else if (!e.shiftKey && document.activeElement === ultimo) { e.preventDefault(); primero.focus(); }
+}
+document.addEventListener("keydown", (e) => {
+  if (!$("#cajon").hidden) {
+    if (e.key === "Escape") cerrarCajon();
+    else if (e.key === "Tab") focoAtrapado(e, $("#cajon"));
+    return;
+  }
+  if (!$("#visor").hidden) {
+    if (e.key === "Escape") cerrarVisor();
+    else if (e.key === "ArrowRight") mover(1);
+    else if (e.key === "ArrowLeft") mover(-1);
+    else if (e.key === "Tab") focoAtrapado(e, $("#visor"));
+  }
+});
+
+/* Protección: sin menú de "guardar imagen" ni arrastre */
+document.addEventListener("contextmenu", (e) => {
+  const zona = e.target.closest(".protegida, .copia, .pastilla, .cajon-lista, .tapa-foto");
+  if (!zona && e.target.tagName !== "IMG") return;
+  e.preventDefault();
+  let n = null;
+  const card = e.target.closest("[data-n]");
+  if (card) n = card.dataset.n;
+  else if (e.target.closest("#visor")) n = fotoActual().n;
+  else { const ab = e.target.closest("[data-abrir]"); if (ab) n = ab.dataset.abrir; }
+  if (n && seleccion.indexOf(n) < 0) avisar("Las fotos están protegidas. Si te gusta esta, sumala a tu selección y pedila como cuadro.", { texto: "Sumar N.° " + n, fn: () => alternar(n) });
+  else avisar("Las fotos están protegidas. Para imprimir o usar una imagen, escribime.");
+});
+document.addEventListener("dragstart", (e) => { if (e.target.tagName === "IMG") e.preventDefault(); });
+
+/* ---------- Inicio ---------- */
+$$("[data-wa]").forEach((a) => { a.href = enlaceWhatsApp(MENSAJES[a.dataset.wa]()); });
+$("#nota-numero").hidden = !!String(CONFIG.whatsapp || "").replace(/\D/g, "");
+$("#dato-fotos").textContent = FOTOS.length;
+renderPestanas();
+renderTapa();
+renderSeries();
+aplicarFiltro({ tipo: "todo" }, { hash: false });
+refrescarSeleccion();
+window.addEventListener("hashchange", leerHash);
+leerHash();
+})();
+</script>
