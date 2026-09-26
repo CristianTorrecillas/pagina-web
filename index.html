@@ -3,12 +3,28 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ojodecristi · Fotografía de Cristian Torrecillas</title>
-<meta name="description" content="Fotos de Cristian Torrecillas en Mar del Plata y en el camino. Cada foto tiene su paleta de colores y se puede pedir como cuadro.">
+<!-- seo:inicio · este bloque lo reescribe el panel (admin/) al publicar -->
+<title>Cristian Torrecillas · Fotografía de autor — ojodecristi</title>
+<meta name="description" content="Fotografía de autor de Cristian Torrecillas en Mar del Plata y en el camino. Cada foto tiene su paleta de colores y se puede pedir como cuadro.">
+<link rel="canonical" href="https://cristiantorrecillas.github.io/pagina-web/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ojodecristi">
+<meta property="og:locale" content="es_AR">
+<meta property="og:title" content="Cristian Torrecillas · Fotografía de autor — ojodecristi">
+<meta property="og:description" content="Fotografía de autor de Cristian Torrecillas en Mar del Plata y en el camino. Cada foto tiene su paleta de colores y se puede pedir como cuadro.">
+<meta property="og:url" content="https://cristiantorrecillas.github.io/pagina-web/">
+<meta property="og:image" content="https://cristiantorrecillas.github.io/pagina-web/compartir.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Cristian Torrecillas · Fotografía de autor">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","name":"ojodecristi","url":"https://cristiantorrecillas.github.io/pagina-web/","inLanguage":"es-AR"},{"@type":"Person","name":"Cristian Torrecillas","jobTitle":"Fotógrafo","url":"https://cristiantorrecillas.github.io/pagina-web/","address":{"@type":"PostalAddress","addressLocality":"Mar del Plata","addressCountry":"AR"},"sameAs":["https://www.instagram.com/ojodecristi/"]}]}</script>
+<!-- seo:fin -->
 <meta name="theme-color" content="#F7D8CB">
+<link rel="icon" href="favicon.ico" sizes="32x32">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
-<link rel="icon" href="favicon.ico" sizes="any">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@1,400;1,500&family=Jost:wght@300..700&display=swap">
@@ -98,6 +114,9 @@ section[id] { scroll-margin-top: 84px; }
 .ico { width: 17px; height: 17px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .cambia { transition: background-color .45s ease, color .45s ease; }
 
+/* Textos que vienen del panel: se respetan los saltos de línea */
+[data-t], [data-t-parrafos] > p { white-space: pre-line; }
+
 /* Letras chicas en mayúscula, como los carteles de una película */
 .versal { font: 500 12px/1.4 var(--titulo); letter-spacing: .28em; text-transform: uppercase; }
 .foto-num { font: 500 11px/1 var(--titulo); letter-spacing: .3em; text-transform: uppercase; color: var(--tinta-2); font-variant-numeric: tabular-nums; }
@@ -132,28 +151,24 @@ section[id] { scroll-margin-top: 84px; }
 
 @keyframes aparecer { from { opacity: 0; } to { opacity: 1; } }
 
-/* ============ Selector de paleta de colores ============ */
-.paleta-fija {
-  position: fixed; bottom: 24px; right: 24px; z-index: 50;
-  background: var(--superficie); border: 1px solid var(--linea); border-radius: 12px;
-  padding: 12px; box-shadow: 0 4px 24px rgba(0, 0, 0, .12);
-}
-.paletas-selector { display: flex; gap: 8px; }
+/* ============ Barra de arriba: paleta del sitio ============ */
+.barra-paleta { background: var(--tinta); color: var(--superficie); font: 500 10.5px/1.4 var(--titulo); letter-spacing: .18em; text-transform: uppercase; }
+.barra-paleta .envoltorio { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 12px; padding-block: 8px; text-align: center; }
+.paletas { display: inline-flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px; }
 .paleta-btn {
-  display: inline-flex; align-items: center; justify-content: center; gap: 0;
-  width: 40px; height: 40px; padding: 0; cursor: pointer;
-  background: transparent; color: inherit; border: 1px solid var(--linea); border-radius: 50%;
-  font: inherit; transition: all .2s ease;
+  display: inline-flex; align-items: center; gap: 8px; min-height: 30px; padding: 0 10px; cursor: pointer;
+  background: transparent; color: inherit; border: 1px solid rgba(255, 255, 255, .35); font: inherit; letter-spacing: .14em; text-transform: uppercase;
+  transition: background-color .2s, color .2s, border-color .2s;
 }
-.paleta-btn:hover { border-color: var(--tinta); transform: scale(1.08); }
-.paleta-btn i { width: 8px; height: 8px; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 0.5px rgba(0, 0, 0, .15); }
-.paleta-btn i + i { margin-left: -2px; }
-.paleta-btn[aria-pressed="true"] { background: var(--acento); border-color: var(--acento); box-shadow: 0 0 0 2px var(--fondo), 0 4px 12px rgba(0, 0, 0, .15); }
-@media (max-width: 640px) {
-  .paleta-fija {
-    position: static; margin-top: 24px; margin-bottom: 24px;
-    display: flex; justify-content: center;
-  }
+.paleta-btn:hover { border-color: var(--superficie); }
+.paleta-btn > span:first-child { display: inline-flex; }
+.paleta-btn i { width: 10px; height: 10px; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 1px rgba(0, 0, 0, .2); }
+.paleta-btn i + i { margin-left: -3px; }
+.paleta-btn[aria-pressed="true"] { background: var(--superficie); color: var(--tinta); border-color: var(--superficie); }
+@media (max-width: 600px) {
+  .barra-paleta .resto { display: none; }
+  .barra-paleta .envoltorio { gap: 6px 10px; }
+  .paleta-btn { padding: 0 8px; gap: 6px; }
 }
 
 /* ============ Cabecera simétrica ============ */
@@ -168,7 +183,7 @@ section[id] { scroll-margin-top: 84px; }
 .nav a { padding-block: 9px; border-bottom: 1px solid transparent; }
 .nav a:hover { border-bottom-color: currentColor; }
 .marca { display: grid; justify-items: center; gap: 7px; text-decoration: none; color: var(--tinta); }
-.marca-nombre { font: 500 20px/1 var(--titulo); letter-spacing: .34em; margin-right: -.34em; }
+.marca-nombre { font: 500 20px/1 var(--titulo); letter-spacing: .34em; margin-right: -.34em; text-transform: uppercase; }
 .marca-sub { font: 400 9px/1 var(--titulo); letter-spacing: .5em; margin-right: -.5em; text-transform: uppercase; color: var(--tinta-2); }
 .btn-seleccion { display: inline-flex; align-items: center; gap: 10px; padding: 8px 0; background: none; border: 0; cursor: pointer; }
 .btn-seleccion .ico { display: none; }
@@ -202,7 +217,7 @@ section[id] { scroll-margin-top: 84px; }
 /* ============ Portada: cartel de título + tríptico ============ */
 .portada { padding-block: clamp(46px, 6vw, 80px) clamp(64px, 8vw, 112px); text-align: center; }
 .escudo-portada { display: block; width: 74px; height: 74px; margin: 0 auto 22px; color: var(--tinta); }
-.creditos { font: 500 12px/1.5 var(--titulo); letter-spacing: .34em; margin-right: -.34em; text-transform: uppercase; }
+.creditos { font: 500 12px/1.5 var(--titulo); letter-spacing: .34em; margin-right: -.34em; text-transform: uppercase; text-wrap: balance; }
 .portada .ornamento { margin: 18px 0 22px; color: var(--tinta); }
 .portada h1 { font: 500 clamp(46px, 8.4vw, 118px)/.95 var(--titulo); letter-spacing: .12em; margin-right: -.12em; text-transform: uppercase; }
 .traduccion { margin-top: 16px; font: italic 400 clamp(21px, 2.4vw, 28px)/1.3 var(--serif); color: var(--tinta-2); }
@@ -217,6 +232,10 @@ section[id] { scroll-margin-top: 84px; }
 }
 .cuadro-linea { display: block; padding: 5px; border: 1px solid var(--linea-fuerte); }
 .cuadro img { display: block; width: 100%; height: auto; aspect-ratio: 3 / 2; object-fit: cover; background: var(--linea); }
+/* Fotos verticales o cuadradas: el marco mantiene su forma y la ventana del paspartú se ajusta a la foto */
+.cuadro, .marco, .serie-marco { container-type: inline-size; }
+.cuadro.angosta .cuadro-linea, .foto.angosta .marco-linea, .serie.angosta .marco-linea { width: fit-content; max-width: 100%; margin-inline: auto; }
+.cuadro.angosta img { width: auto; max-width: 100%; height: calc((100cqw - 12px) / 1.5); aspect-ratio: var(--ar); }
 .cuadro:hover .cuadro-linea { border-color: var(--tinta); }
 .portada-pie { display: grid; justify-items: center; gap: 7px; margin-top: 24px; }
 .portada-titulo { font: 500 15px/1.3 var(--titulo); letter-spacing: .2em; margin-right: -.2em; text-transform: uppercase; }
@@ -281,6 +300,7 @@ section[id] { scroll-margin-top: 84px; }
 .foto:hover .marco-linea { border-color: var(--tinta); }
 .foto-marco { position: relative; aspect-ratio: 3 / 2; max-width: 100%; overflow: hidden; background: var(--fondo-foto, var(--linea)); }
 .foto-marco img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .6s cubic-bezier(.2, .7, .2, 1); }
+.foto.angosta .foto-marco { aspect-ratio: var(--ar); height: calc((100cqw - 12px) / 1.5); }
 .foto:hover .foto-marco img { transform: scale(1.025); }
 .foto-abrir { position: absolute; inset: 0; z-index: 1; width: 100%; padding: 0; background: transparent; border: 0; cursor: zoom-in; }
 .foto-abrir:focus-visible { outline-offset: -5px; }
@@ -326,6 +346,7 @@ section[id] { scroll-margin-top: 84px; }
 .serie-marco { display: block; padding: 7%; background: var(--superficie); }
 .serie-marco .marco-linea { padding: 4px; }
 .serie-marco img { display: block; width: 100%; height: auto; aspect-ratio: 3 / 2; object-fit: cover; background: var(--linea); }
+.serie.angosta .serie-marco img { width: auto; max-width: 100%; height: calc((100cqw - 10px) / 1.5); aspect-ratio: var(--ar); }
 .serie:hover .marco-linea { border-color: var(--tinta); }
 .serie-cuenta { font: 500 10.5px/1 var(--titulo); letter-spacing: .3em; text-transform: uppercase; color: var(--tinta-2); }
 .serie-titulo { font: 500 17px/1.3 var(--titulo); letter-spacing: .18em; margin-right: -.18em; text-transform: uppercase; }
@@ -358,6 +379,7 @@ section[id] { scroll-margin-top: 84px; }
 /* ============ Sobre mí ============ */
 .sobre-texto { display: grid; justify-items: center; gap: 18px; max-width: 640px; margin-inline: auto; text-align: center; }
 .sobre-texto p { font-size: 17.5px; line-height: 1.7; }
+.sobre-parrafos { display: grid; gap: 18px; }
 .enlace {
   display: inline-flex; align-items: center; gap: 10px; margin-top: 4px; padding-bottom: 5px; border-bottom: 1px solid currentColor;
   font: 500 11.5px/1 var(--titulo); letter-spacing: .24em; text-transform: uppercase; text-decoration: none;
@@ -374,7 +396,7 @@ section[id] { scroll-margin-top: 84px; }
 .pie { background: var(--pie); color: var(--pie-tinta); padding-block: clamp(56px, 7vw, 84px) calc(clamp(56px, 7vw, 84px) + 64px); text-align: center; }
 .pie .envoltorio { display: grid; justify-items: center; gap: 18px; }
 .pie-escudo { width: 92px; height: 92px; color: var(--pie-tinta); }
-.pie-marca { font: 500 22px/1 var(--titulo); letter-spacing: .34em; margin-right: -.34em; }
+.pie-marca { font: 500 22px/1 var(--titulo); letter-spacing: .34em; margin-right: -.34em; text-transform: uppercase; }
 .pie p:not(.pie-marca) { color: var(--pie-tinta-2); max-width: 56ch; }
 .pie-enlaces { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px 30px; margin-top: 4px; }
 .pie-enlaces a { font: 500 11.5px/1 var(--titulo); letter-spacing: .24em; text-transform: uppercase; text-decoration: none; color: var(--pie-tinta); padding-bottom: 5px; border-bottom: 1px solid transparent; }
@@ -431,13 +453,18 @@ section[id] { scroll-margin-top: 84px; }
 .ficha-datos dd { margin: 0; font-size: 15px; line-height: 1.45; }
 .ficha-paleta { margin-top: 20px; }
 .ficha-paleta ol { list-style: none; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; margin: 12px 0 0; padding: 0; }
-.ficha-paleta li { display: grid; justify-items: center; gap: 6px; }
-.ficha-paleta .muestra { width: 100%; max-width: 46px; aspect-ratio: 1; border-radius: 50%; background: var(--c); box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .1); }
+.ficha-paleta li { display: grid; }
+.copiar-color { display: grid; justify-items: center; gap: 6px; padding: 4px 0; background: none; border: 0; cursor: copy; color: inherit; }
+.ficha-paleta .muestra { width: 100%; max-width: 46px; aspect-ratio: 1; border-radius: 50%; background: var(--c); box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .1); transition: transform .15s ease, box-shadow .15s ease; }
+.copiar-color:hover .muestra { transform: scale(1.08); box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .1), 0 0 0 2px var(--superficie), 0 0 0 3px var(--tinta); }
 .ficha-paleta code { font: 400 10px/1 var(--titulo); letter-spacing: .04em; color: var(--tinta-2); text-transform: uppercase; }
+.ficha-paleta-ayuda { margin-top: 8px; font-size: 12.5px; color: var(--tinta-2); }
 .ficha-acciones { display: grid; gap: 10px; margin-top: 24px; }
 .ficha-acciones .btn { width: 100%; padding-inline: 16px; letter-spacing: .14em; }
 #ficha-sumar[aria-pressed="true"] { background: var(--tinta); border-color: var(--tinta); color: var(--superficie); }
 .ficha-nota { margin-top: 14px; font-size: 13.5px; color: var(--tinta-2); }
+.ficha-compartir { display: inline-flex; align-items: center; gap: 8px; margin-top: 16px; }
+.ficha-compartir .ico { width: 15px; height: 15px; }
 @media (max-width: 860px) {
   .visor-caja { grid-template-columns: minmax(0, 1fr); align-items: start; gap: 26px; padding-top: 52px; }
   .visor-lamina { width: 100%; }
@@ -502,7 +529,7 @@ section[id] { scroll-margin-top: 84px; }
 .cajon-acciones { display: grid; gap: 10px; justify-items: center; margin-top: auto; padding-top: 6px; }
 .cajon-acciones .btn { width: 100%; }
 .cajon-acciones .btn[aria-disabled="true"] { opacity: .45; cursor: not-allowed; }
-.nota-maqueta { font-size: 13px; color: var(--tinta); background: var(--bloque-2); padding: 11px 14px; text-align: center; }
+.nota-numero { font-size: 13px; color: var(--tinta); background: var(--bloque-2); padding: 11px 14px; text-align: center; }
 @media (max-width: 600px) {
   .cajon-panel { top: auto; left: 0; width: 100%; max-height: 90%; padding-top: 20px; animation-name: entrarAbajo; }
 }
@@ -552,13 +579,17 @@ section[id] { scroll-margin-top: 84px; }
   <symbol id="i-flecha" viewBox="0 0 24 24"><path d="M4 12h15M13 6l6 6-6 6"/></symbol>
   <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 5h16v11H10l-6 4z"/><path d="M8.5 10.5h7"/></symbol>
   <symbol id="i-copias" viewBox="0 0 24 24"><rect x="3" y="8" width="13" height="10"/><path d="M7.5 5H21v10"/></symbol>
+  <symbol id="i-compartir" viewBox="0 0 24 24"><path d="M12 15V3M7.5 7.5L12 3l4.5 4.5"/><path d="M5 11v10h14V11"/></symbol>
 </svg>
 
-<div class="paleta-fija">
-  <div class="paletas-selector" role="group" aria-label="Cambiar paleta de colores">
-    <button type="button" class="paleta-btn" data-paleta-sitio="rayas" aria-pressed="true" title="Rayas de domingo"><i style="--c:#F7D8CB"></i><i style="--c:#A9CFE2"></i><i style="--c:#B8404F"></i></button>
-    <button type="button" class="paleta-btn" data-paleta-sitio="mar" aria-pressed="false" title="El Mar todo lo cura"><i style="--c:#F5E2A5"></i><i style="--c:#AED6C8"></i><i style="--c:#2E6F77"></i></button>
-    <button type="button" class="paleta-btn" data-paleta-sitio="estrellas" aria-pressed="false" title="Estrellas de viento"><i style="--c:#CFE3EC"></i><i style="--c:#F4D98A"></i><i style="--c:#C4452F"></i></button>
+<div class="barra-paleta cambia">
+  <div class="envoltorio">
+    <span>Paleta<span class="resto"> del sitio</span>:</span>
+    <div class="paletas" role="group" aria-label="Paleta de colores del sitio">
+      <button type="button" class="paleta-btn" data-paleta-sitio="rayas" aria-pressed="true"><span aria-hidden="true"><i style="--c:#F7D8CB"></i><i style="--c:#A9CFE2"></i><i style="--c:#B8404F"></i></span><span>Rayas<span class="resto"> de domingo</span></span></button>
+      <button type="button" class="paleta-btn" data-paleta-sitio="mar" aria-pressed="false"><span aria-hidden="true"><i style="--c:#F5E2A5"></i><i style="--c:#AED6C8"></i><i style="--c:#2E6F77"></i></span><span><span class="resto">El </span>Mar<span class="resto"> todo lo cura</span></span></button>
+      <button type="button" class="paleta-btn" data-paleta-sitio="estrellas" aria-pressed="false"><span aria-hidden="true"><i style="--c:#CFE3EC"></i><i style="--c:#F4D98A"></i><i style="--c:#C4452F"></i></span><span>Estrellas<span class="resto"> de viento</span></span></button>
+    </div>
   </div>
 </div>
 
@@ -567,19 +598,19 @@ section[id] { scroll-margin-top: 84px; }
     <div class="lado lado-izq">
       <button type="button" class="btn-menu" id="btn-menu" aria-expanded="false" aria-controls="nav-movil"><i aria-hidden="true"></i><span class="txt">Menú</span><span class="sr">Abrir el menú</span></button>
       <nav class="nav" aria-label="Secciones">
-        <a href="#archivo">Archivo</a>
-        <a href="#series">Series</a>
-        <a href="#cuadros">Cuadros</a>
+        <a href="#archivo" data-t="menu.archivo">Archivo</a>
+        <a href="#series" data-t="menu.series">Series</a>
+        <a href="#cuadros" data-t="menu.cuadros">Cuadros</a>
       </nav>
     </div>
-    <a class="marca" href="#inicio" aria-label="ojodecristi, ir al inicio">
-      <span class="marca-nombre">OJODECRISTI</span>
-      <span class="marca-sub">Mar del Plata</span>
+    <a class="marca" href="#inicio" aria-label="Ir al inicio">
+      <span class="marca-nombre" data-t="marca.nombre">ojodecristi</span>
+      <span class="marca-sub" data-t="marca.lugar">Mar del Plata</span>
     </a>
     <div class="lado lado-der">
       <nav class="nav" aria-label="Más secciones">
-        <a href="#sobre-mi">Sobre mí</a>
-        <a href="https://www.instagram.com/ojodecristi/" target="_blank" rel="noopener">Instagram</a>
+        <a href="#sobre-mi" data-t="menu.sobre">Sobre mí</a>
+        <a href="https://www.instagram.com/ojodecristi/" target="_blank" rel="noopener" data-instagram>Instagram</a>
       </nav>
       <button type="button" class="btn-seleccion" id="btn-seleccion" aria-haspopup="dialog">
         <svg class="ico" aria-hidden="true"><use href="#i-copias"/></svg>
@@ -590,11 +621,11 @@ section[id] { scroll-margin-top: 84px; }
     </div>
   </div>
   <nav class="nav-movil" id="nav-movil" aria-label="Secciones" hidden>
-    <a href="#archivo">Archivo</a>
-    <a href="#series">Series</a>
-    <a href="#cuadros">Cuadros</a>
-    <a href="#sobre-mi">Sobre mí</a>
-    <a href="https://www.instagram.com/ojodecristi/" target="_blank" rel="noopener">Instagram</a>
+    <a href="#archivo" data-t="menu.archivo">Archivo</a>
+    <a href="#series" data-t="menu.series">Series</a>
+    <a href="#cuadros" data-t="menu.cuadros">Cuadros</a>
+    <a href="#sobre-mi" data-t="menu.sobre">Sobre mí</a>
+    <a href="https://www.instagram.com/ojodecristi/" target="_blank" rel="noopener" data-instagram>Instagram</a>
   </nav>
 </header>
 
@@ -602,18 +633,18 @@ section[id] { scroll-margin-top: 84px; }
   <section class="portada cambia" id="inicio">
     <div class="envoltorio">
       <svg class="escudo-portada" viewBox="0 0 200 200" aria-hidden="true"><use href="#escudo"/></svg>
-      <p class="creditos">Fotografías de Cristian Torrecillas</p>
+      <p class="creditos" data-t="portada.creditos">Cristian Torrecillas · Fotografía de autor</p>
       <div class="ornamento" aria-hidden="true"><span></span></div>
-      <h1>Lo que miro</h1>
-      <p class="traduccion">What I see</p>
+      <h1 data-t="portada.titulo">Ve lo que yo veo</h1>
+      <p class="traduccion" data-t="portada.traduccion">See what I see</p>
       <div class="triptico" id="triptico"></div>
       <div class="portada-pie" id="portada-pie"></div>
-      <p class="intro">Fotografío paisajes, naturaleza y escenas de todos los días, en Mar del Plata y donde me lleve el camino. Cada foto tiene su paleta de colores, y cualquiera se puede pedir como cuadro.</p>
+      <p class="intro" data-t="portada.intro">Fotografío paisajes, naturaleza y escenas de todos los días, en Mar del Plata y donde me lleve el camino. Cada foto tiene su paleta de colores, y cualquiera se puede pedir como cuadro.</p>
       <div class="acciones">
-        <a class="btn btn-lleno" href="#archivo">Ver el archivo</a>
-        <a class="btn btn-linea" href="#cuadros">Cómo pedir un cuadro</a>
+        <a class="btn btn-lleno" href="#archivo" data-t="portada.boton-archivo">Ver el archivo</a>
+        <a class="btn btn-linea" href="#cuadros" data-t="portada.boton-cuadros">Cómo pedir un cuadro</a>
       </div>
-      <p class="datos versal"><span id="dato-fotos">— fotografías</span><span id="dato-series">— series</span><span>Cuadros por encargo</span></p>
+      <p class="datos versal"><span id="dato-fotos">— fotografías</span><span id="dato-series">— series</span><span data-t="portada.dato">Cuadros por encargo</span></p>
     </div>
   </section>
 
@@ -621,9 +652,9 @@ section[id] { scroll-margin-top: 84px; }
     <div class="envoltorio">
       <div class="capitulo">
         <p class="capitulo-n">Capítulo 1</p>
-        <h2 id="archivo-titulo">El archivo</h2>
-        <p class="foto-en">The Archive</p>
-        <p class="capitulo-nota">Tocá una foto para verla grande con su paleta. Con ＋ la sumás a tu selección y después me la mandás por WhatsApp.</p>
+        <h2 id="archivo-titulo" data-t="archivo.titulo">El archivo</h2>
+        <p class="foto-en" data-t="archivo.ingles">The Archive</p>
+        <p class="capitulo-nota" data-t="archivo.nota">Tocá una foto para verla grande con su paleta. Con ＋ la sumás a tu selección y después me la mandás por WhatsApp.</p>
       </div>
       <div class="chips" id="chips" role="toolbar" aria-label="Categorías del archivo"></div>
       <div class="filtro-serie" id="filtro-serie" hidden>
@@ -634,8 +665,8 @@ section[id] { scroll-margin-top: 84px; }
       <div class="grilla" id="grilla"></div>
       <div class="vacio" id="vacio" hidden>
         <svg viewBox="0 0 200 200" aria-hidden="true"><use href="#escudo"/></svg>
-        <p class="vacio-titulo">Esta parte del archivo todavía se está revelando</p>
-        <p>Pronto va a haber fotos acá. Mientras tanto, mirá el archivo completo.</p>
+        <p class="vacio-titulo" data-t="archivo.vacio-titulo">Esta parte del archivo todavía se está revelando</p>
+        <p data-t="archivo.vacio-texto">Pronto va a haber fotos acá. Mientras tanto, mirá el archivo completo.</p>
         <button type="button" class="btn btn-linea" data-cat="todo">Ver todo el archivo</button>
       </div>
     </div>
@@ -645,9 +676,9 @@ section[id] { scroll-margin-top: 84px; }
     <div class="envoltorio">
       <div class="capitulo">
         <p class="capitulo-n">Capítulo 2</p>
-        <h2 id="series-titulo">Las series</h2>
-        <p class="foto-en">The Series</p>
-        <p class="capitulo-nota">Grupos de fotos que comparten un tema o un recorrido.</p>
+        <h2 id="series-titulo" data-t="series.titulo">Las series</h2>
+        <p class="foto-en" data-t="series.ingles">The Series</p>
+        <p class="capitulo-nota" data-t="series.nota">Grupos de fotos que comparten un tema o un recorrido.</p>
       </div>
       <div class="series-grilla" id="series-grilla"></div>
     </div>
@@ -657,29 +688,29 @@ section[id] { scroll-margin-top: 84px; }
     <div class="envoltorio">
       <div class="capitulo">
         <p class="capitulo-n">Capítulo 3</p>
-        <h2 id="cuadros-titulo">Cómo pedir un cuadro</h2>
-        <p class="foto-en">How to order a print</p>
-        <p class="capitulo-nota">Todas las fotos se pueden pedir impresas. El pedido se arma acá y se coordina por WhatsApp, sin pagos en la web.</p>
+        <h2 id="cuadros-titulo" data-t="cuadros.titulo">Cómo pedir un cuadro</h2>
+        <p class="foto-en" data-t="cuadros.ingles">How to order a print</p>
+        <p class="capitulo-nota" data-t="cuadros.nota">Todas las fotos se pueden pedir impresas. El pedido se arma acá y se coordina por WhatsApp, sin pagos en la web.</p>
       </div>
       <ol class="pasos">
         <li class="paso">
           <span class="paso-n" aria-hidden="true">1</span>
-          <strong><span class="sr">Paso 1: </span>Elegí tus fotos</strong>
-          <p>Tocá ＋ en las que te gusten. Podés sumar varias a tu selección.</p>
+          <strong><span class="sr">Paso 1: </span><span data-t="cuadros.paso1-titulo">Elegí tus fotos</span></strong>
+          <p data-t="cuadros.paso1-texto">Tocá ＋ en las que te gusten. Podés sumar varias a tu selección.</p>
         </li>
         <li class="paso">
           <span class="paso-n" aria-hidden="true">2</span>
-          <strong><span class="sr">Paso 2: </span>Mandame la lista</strong>
-          <p>Desde tu selección se arma un mensaje de WhatsApp con el número de cada foto. Lo revisás y lo enviás.</p>
+          <strong><span class="sr">Paso 2: </span><span data-t="cuadros.paso2-titulo">Mandame la lista</span></strong>
+          <p data-t="cuadros.paso2-texto">Desde tu selección se arma un mensaje de WhatsApp con el número de cada foto. Lo revisás y lo enviás.</p>
         </li>
         <li class="paso">
           <span class="paso-n" aria-hidden="true">3</span>
-          <strong><span class="sr">Paso 3: </span>Coordinamos los detalles</strong>
-          <p>Te paso tamaños, papel, marco y precio, y acordamos la entrega.</p>
+          <strong><span class="sr">Paso 3: </span><span data-t="cuadros.paso3-titulo">Coordinamos los detalles</span></strong>
+          <p data-t="cuadros.paso3-texto">Te paso tamaños, papel, marco y precio, y acordamos la entrega.</p>
         </li>
       </ol>
       <div class="cuadros-cta">
-        <a class="btn btn-lleno" data-wa="general" href="#" target="_blank" rel="noopener"><svg class="ico" aria-hidden="true"><use href="#i-chat"/></svg>Escribime por WhatsApp</a>
+        <a class="btn btn-lleno" data-wa="general" href="#" target="_blank" rel="noopener"><svg class="ico" aria-hidden="true"><use href="#i-chat"/></svg><span data-t="cuadros.boton">Escribime por WhatsApp</span></a>
       </div>
     </div>
   </section>
@@ -688,19 +719,22 @@ section[id] { scroll-margin-top: 84px; }
     <div class="envoltorio">
       <div class="capitulo">
         <p class="capitulo-n">Capítulo 4</p>
-        <h2 id="sobre-titulo">Sobre mí</h2>
-        <p class="foto-en">About me</p>
+        <h2 id="sobre-titulo" data-t="sobre.titulo">Sobre mí</h2>
+        <p class="foto-en" data-t="sobre.ingles">About me</p>
       </div>
       <div class="sobre-texto">
-        <p>Soy Cristian Torrecillas y vivo en Mar del Plata. Salgo a fotografiar la costa, la ciudad y lo que aparece en el camino: un cartel de playa, un perro al sol, un reloj de estación.</p>
-        <p>Cada foto la comparto con su título en castellano y en inglés, y con la paleta de colores que sale de la imagen.</p>
-        <a class="enlace" href="https://www.instagram.com/ojodecristi/" target="_blank" rel="noopener">@ojodecristi en Instagram<svg class="ico" aria-hidden="true"><use href="#i-flecha"/></svg></a>
+        <div class="sobre-parrafos" data-t-parrafos="sobre.texto">
+          <p>Soy Cristian Torrecillas y vivo en Mar del Plata. Salgo a fotografiar la costa, la ciudad y lo que aparece en el camino: un cartel de playa, un perro al sol, un reloj de estación.</p>
+          <p>Cada foto la comparto con su título en castellano y en inglés, y con la paleta de colores que sale de la imagen.</p>
+        </div>
+        <a class="enlace" href="https://www.instagram.com/ojodecristi/" target="_blank" rel="noopener" data-instagram><span data-instagram-texto>@ojodecristi en Instagram</span><svg class="ico" aria-hidden="true"><use href="#i-flecha"/></svg></a>
+        <a class="enlace" href="#" target="_blank" rel="noopener" data-tiktok hidden><span data-tiktok-texto>TikTok</span><svg class="ico" aria-hidden="true"><use href="#i-flecha"/></svg></a>
       </div>
       <aside class="encargo" aria-labelledby="encargo-titulo">
-        <p class="versal">Trabajos</p>
-        <h3 id="encargo-titulo">Hoteles, cabañas y turismo</h3>
-        <p>Si tenés un hotel, una cabaña o un proyecto de turismo, puedo fotografiar tu lugar para tu web y tus redes. También hago sesiones de fotos.</p>
-        <a class="btn btn-linea" data-wa="trabajo" href="#" target="_blank" rel="noopener"><svg class="ico" aria-hidden="true"><use href="#i-chat"/></svg>Consultar por un trabajo</a>
+        <p class="versal" data-t="trabajos.etiqueta">Trabajos</p>
+        <h3 id="encargo-titulo" data-t="trabajos.titulo">Hoteles, cabañas y turismo</h3>
+        <p data-t="trabajos.texto">Si tenés un hotel, una cabaña o un proyecto de turismo, puedo fotografiar tu lugar para tu web y tus redes. También hago sesiones de fotos.</p>
+        <a class="btn btn-linea" data-wa="trabajo" href="#" target="_blank" rel="noopener"><svg class="ico" aria-hidden="true"><use href="#i-chat"/></svg><span data-t="trabajos.boton">Consultar por un trabajo</span></a>
       </aside>
     </div>
   </section>
@@ -709,14 +743,15 @@ section[id] { scroll-margin-top: 84px; }
 <footer class="pie cambia">
   <div class="envoltorio">
     <svg class="pie-escudo" viewBox="0 0 200 200" aria-hidden="true"><use href="#escudo"/></svg>
-    <p class="pie-marca">OJODECRISTI</p>
-    <p>Fotografías de Cristian Torrecillas. Mar del Plata, Argentina.</p>
+    <p class="pie-marca" data-t="marca.nombre">ojodecristi</p>
+    <p data-t="pie.texto">Cristian Torrecillas · Fotografía de autor. Mar del Plata, Argentina.</p>
     <nav class="pie-enlaces" aria-label="Contacto">
       <a data-wa="general" href="#" target="_blank" rel="noopener">WhatsApp</a>
-      <a href="https://www.instagram.com/ojodecristi/" target="_blank" rel="noopener">Instagram</a>
+      <a href="https://www.instagram.com/ojodecristi/" target="_blank" rel="noopener" data-instagram>Instagram</a>
+      <a href="#" target="_blank" rel="noopener" data-tiktok hidden>TikTok</a>
       <a href="#archivo">Volver al archivo</a>
     </nav>
-    <p class="pie-legal">Las fotos se muestran en baja resolución y con marca de agua. © 2026, todos los derechos reservados. Para usar o imprimir una imagen, escribime.</p>
+    <p class="pie-legal" data-t="pie.legal">Las fotos se muestran en baja resolución y con marca de agua. © 2026, todos los derechos reservados. Para usar o imprimir una imagen, escribime.</p>
   </div>
 </footer>
 
@@ -748,18 +783,22 @@ section[id] { scroll-margin-top: 84px; }
         <div><dt>Lugar</dt><dd id="ficha-lugar"></dd></div>
         <div><dt>Año</dt><dd id="ficha-anio"></dd></div>
         <div><dt>Soporte</dt><dd id="ficha-soporte"></dd></div>
+        <div><dt>Cámara</dt><dd id="ficha-camara"></dd></div>
+        <div><dt>Técnica</dt><dd id="ficha-tecnica"></dd></div>
         <div><dt>Serie</dt><dd id="ficha-serie"></dd></div>
         <div><dt>Archivo</dt><dd id="ficha-cats"></dd></div>
       </dl>
       <div class="ficha-paleta">
         <p class="foto-num">Paleta</p>
         <ol id="ficha-paleta"></ol>
+        <p class="ficha-paleta-ayuda">Tocá un color para copiar su código.</p>
       </div>
       <div class="ficha-acciones">
         <button type="button" class="btn btn-linea" id="ficha-sumar" aria-pressed="false"><svg class="ico" aria-hidden="true"><use href="#i-mas"/></svg><span class="txt">Sumar a mi selección</span></button>
         <a class="btn btn-lleno" id="ficha-wa" href="#" target="_blank" rel="noopener"><svg class="ico" aria-hidden="true"><use href="#i-chat"/></svg>Consultar por WhatsApp</a>
       </div>
-      <p class="ficha-nota">Disponible como cuadro. Tamaños y terminaciones a consultar.</p>
+      <p class="ficha-nota" data-t="visor.nota">Disponible como cuadro. Tamaños y terminaciones a consultar.</p>
+      <button type="button" class="btn-texto ficha-compartir" id="ficha-compartir"><svg class="ico" aria-hidden="true"><use href="#i-compartir"/></svg>Compartir esta foto</button>
     </aside>
   </div>
 </div>
@@ -785,7 +824,7 @@ section[id] { scroll-margin-top: 84px; }
       <a class="btn btn-lleno" id="cajon-wa" href="#" target="_blank" rel="noopener"><svg class="ico" aria-hidden="true"><use href="#i-chat"/></svg>Consultar por WhatsApp</a>
       <button type="button" class="btn-texto" id="cajon-vaciar">Vaciar selección</button>
     </div>
-    <p class="nota-maqueta" id="nota-numero" hidden>Maqueta: todavía no está cargado tu número, así que WhatsApp va a pedir elegir un contacto.</p>
+    <p class="nota-numero" id="nota-numero" hidden>El número de WhatsApp todavía no está cargado: al enviar, WhatsApp te va a pedir que elijas a quién mandarlo.</p>
   </div>
 </div>
 
@@ -795,88 +834,443 @@ section[id] { scroll-margin-top: 84px; }
 </div>
 <p class="sr" id="anuncio" aria-live="polite"></p>
 
+<!-- Contenido del sitio: textos, fotos, categorías y series. Se edita desde el panel (admin/). -->
+<script type="application/json" id="contenido">
+{
+  "formato": 1,
+  "ajustes": {
+    "nombreCompleto": "Cristian Torrecillas",
+    "nombre": "Cristian",
+    "whatsapp": "",
+    "instagram": "ojodecristi",
+    "tiktok": "",
+    "sitio": "https://cristiantorrecillas.github.io/pagina-web/",
+    "portada": [
+      "001",
+      "004",
+      "005"
+    ],
+    "ultimoNumero": 11
+  },
+  "textos": {
+    "marca.nombre": "ojodecristi",
+    "marca.lugar": "Mar del Plata",
+    "menu.archivo": "Archivo",
+    "menu.series": "Series",
+    "menu.cuadros": "Cuadros",
+    "menu.sobre": "Sobre mí",
+    "portada.creditos": "Cristian Torrecillas · Fotografía de autor",
+    "portada.titulo": "Ve lo que yo veo",
+    "portada.traduccion": "See what I see",
+    "portada.intro": "Fotografío paisajes, naturaleza y escenas de todos los días, en Mar del Plata y donde me lleve el camino. Cada foto tiene su paleta de colores, y cualquiera se puede pedir como cuadro.",
+    "portada.boton-archivo": "Ver el archivo",
+    "portada.boton-cuadros": "Cómo pedir un cuadro",
+    "portada.dato": "Cuadros por encargo",
+    "archivo.titulo": "El archivo",
+    "archivo.ingles": "The Archive",
+    "archivo.nota": "Tocá una foto para verla grande con su paleta. Con ＋ la sumás a tu selección y después me la mandás por WhatsApp.",
+    "archivo.todo": "Todo",
+    "archivo.vacio-titulo": "Esta parte del archivo todavía se está revelando",
+    "archivo.vacio-texto": "Pronto va a haber fotos acá. Mientras tanto, mirá el archivo completo.",
+    "series.titulo": "Las series",
+    "series.ingles": "The Series",
+    "series.nota": "Grupos de fotos que comparten un tema o un recorrido.",
+    "cuadros.titulo": "Cómo pedir un cuadro",
+    "cuadros.ingles": "How to order a print",
+    "cuadros.nota": "Todas las fotos se pueden pedir impresas. El pedido se arma acá y se coordina por WhatsApp, sin pagos en la web.",
+    "cuadros.paso1-titulo": "Elegí tus fotos",
+    "cuadros.paso1-texto": "Tocá ＋ en las que te gusten. Podés sumar varias a tu selección.",
+    "cuadros.paso2-titulo": "Mandame la lista",
+    "cuadros.paso2-texto": "Desde tu selección se arma un mensaje de WhatsApp con el número de cada foto. Lo revisás y lo enviás.",
+    "cuadros.paso3-titulo": "Coordinamos los detalles",
+    "cuadros.paso3-texto": "Te paso tamaños, papel, marco y precio, y acordamos la entrega.",
+    "cuadros.boton": "Escribime por WhatsApp",
+    "sobre.titulo": "Sobre mí",
+    "sobre.ingles": "About me",
+    "sobre.texto": "Soy Cristian Torrecillas y vivo en Mar del Plata. Salgo a fotografiar la costa, la ciudad y lo que aparece en el camino: un cartel de playa, un perro al sol, un reloj de estación.\n\nCada foto la comparto con su título en castellano y en inglés, y con la paleta de colores que sale de la imagen.",
+    "trabajos.etiqueta": "Trabajos",
+    "trabajos.titulo": "Hoteles, cabañas y turismo",
+    "trabajos.texto": "Si tenés un hotel, una cabaña o un proyecto de turismo, puedo fotografiar tu lugar para tu web y tus redes. También hago sesiones de fotos.",
+    "trabajos.boton": "Consultar por un trabajo",
+    "pie.texto": "Cristian Torrecillas · Fotografía de autor. Mar del Plata, Argentina.",
+    "pie.legal": "Las fotos se muestran en baja resolución y con marca de agua. © {año}, todos los derechos reservados. Para usar o imprimir una imagen, escribime.",
+    "visor.nota": "Disponible como cuadro. Tamaños y terminaciones a consultar.",
+    "whatsapp.general": "¡Hola {nombre}! Vi tus fotos en la web y quería hacerte una consulta.",
+    "whatsapp.trabajo": "¡Hola {nombre}! Vi tu web y quería consultarte por un trabajo de fotos.",
+    "whatsapp.foto": "¡Hola {nombre}! Vi la foto N.° {n} — {titulo} ({lugar}) y me interesa como cuadro. ¿Me pasás tamaños y precios?\n{enlace}",
+    "whatsapp.seleccion": "¡Hola {nombre}! Vi tus fotos en la web y me gustaría pedir como cuadro:\n\n{lista}\n\n¿Me pasás tamaños y precios?",
+    "seo.titulo": "Cristian Torrecillas · Fotografía de autor — ojodecristi",
+    "seo.descripcion": "Fotografía de autor de Cristian Torrecillas en Mar del Plata y en el camino. Cada foto tiene su paleta de colores y se puede pedir como cuadro."
+  },
+  "categorias": [
+    {
+      "id": "mar-del-plata",
+      "nombre": "Mar del Plata"
+    },
+    {
+      "id": "argentina",
+      "nombre": "Argentina"
+    },
+    {
+      "id": "blanco-y-negro",
+      "nombre": "Blanco y negro"
+    },
+    {
+      "id": "paisaje",
+      "nombre": "Paisaje"
+    },
+    {
+      "id": "flores",
+      "nombre": "Flores"
+    },
+    {
+      "id": "nubes",
+      "nombre": "Nubes"
+    },
+    {
+      "id": "ciudad",
+      "nombre": "Ciudad"
+    },
+    {
+      "id": "animales",
+      "nombre": "Animales"
+    }
+  ],
+  "series": [
+    {
+      "id": "mirar-hacia-arriba",
+      "titulo": "Mirar hacia arriba",
+      "title": "Looking Up",
+      "texto": "Edificios, cielo y lo que queda en el medio cuando levantás la cabeza."
+    },
+    {
+      "id": "tiempo-de-estacion",
+      "titulo": "Tiempo de estación",
+      "title": "Station Time",
+      "texto": "Relojes y andenes de Buenos Aires, entre un tren y el siguiente."
+    },
+    {
+      "id": "perros-de-barrio",
+      "titulo": "Perros de barrio",
+      "title": "Neighborhood Dogs",
+      "texto": "Los dueños de la vereda."
+    }
+  ],
+  "fotos": [
+    {
+      "n": "001",
+      "titulo": "Estrellas de viento",
+      "title": "Wind Stars",
+      "lugar": "Mar del Plata",
+      "anio": "2026",
+      "soporte": "Película 35 mm",
+      "camara": "",
+      "tecnica": "",
+      "categorias": [
+        "mar-del-plata",
+        "nubes"
+      ],
+      "serie": "mirar-hacia-arriba",
+      "alt": "Molinetes con forma de estrella contra un cielo celeste con nubes",
+      "paleta": [
+        "#b0cad8",
+        "#e1dedb",
+        "#6a929e",
+        "#cec2a3",
+        "#bba36a"
+      ],
+      "ancho": 1600,
+      "alto": 1061,
+      "oculta": false
+    },
+    {
+      "n": "002",
+      "titulo": "Despegue",
+      "title": "Liftoff",
+      "lugar": "Mar del Plata",
+      "anio": "2026",
+      "soporte": "Película 35 mm",
+      "camara": "",
+      "tecnica": "",
+      "categorias": [
+        "mar-del-plata",
+        "ciudad",
+        "nubes"
+      ],
+      "serie": "mirar-hacia-arriba",
+      "alt": "Torre redonda de departamentos vista desde abajo, contra el cielo",
+      "paleta": [
+        "#d4d7da",
+        "#8ab0c1",
+        "#3f7c8e",
+        "#b69e62",
+        "#776531"
+      ],
+      "ancho": 1600,
+      "alto": 1061,
+      "oculta": false
+    },
+    {
+      "n": "003",
+      "titulo": "La proa",
+      "title": "The Prow",
+      "lugar": "Mar del Plata",
+      "anio": "2026",
+      "soporte": "Película 35 mm",
+      "camara": "",
+      "tecnica": "",
+      "categorias": [
+        "mar-del-plata",
+        "ciudad"
+      ],
+      "serie": "mirar-hacia-arriba",
+      "alt": "Esquina de un edificio claro vista desde abajo, contra un cielo azul",
+      "paleta": [
+        "#eeebe4",
+        "#89b6cb",
+        "#3a8197",
+        "#d4c39c",
+        "#77713d"
+      ],
+      "ancho": 1600,
+      "alto": 1061,
+      "oculta": false
+    },
+    {
+      "n": "004",
+      "titulo": "Rayas de domingo",
+      "title": "Sunday Stripes",
+      "lugar": "Mar del Plata",
+      "anio": "2026",
+      "soporte": "Película 35 mm",
+      "camara": "",
+      "tecnica": "",
+      "categorias": [
+        "mar-del-plata",
+        "ciudad"
+      ],
+      "serie": null,
+      "alt": "Frente de una cafetería con toldo a rayas y un cerco de madera celeste",
+      "paleta": [
+        "#ecedee",
+        "#a28e5a",
+        "#3d3a18",
+        "#f6bba0",
+        "#81471b"
+      ],
+      "ancho": 1600,
+      "alto": 1061,
+      "oculta": false
+    },
+    {
+      "n": "005",
+      "titulo": "El mar todo lo cura",
+      "title": "The Sea Heals All",
+      "lugar": "Playa Constitución, Mar del Plata",
+      "anio": "2026",
+      "soporte": "Película 35 mm",
+      "camara": "",
+      "tecnica": "",
+      "categorias": [
+        "mar-del-plata",
+        "paisaje"
+      ],
+      "serie": null,
+      "alt": "Poste con carteles de madera pintados frente a la Playa Constitución",
+      "paleta": [
+        "#c8cdd1",
+        "#756e47",
+        "#d1b883",
+        "#363817",
+        "#f0c963"
+      ],
+      "ancho": 1600,
+      "alto": 1061,
+      "oculta": false
+    },
+    {
+      "n": "006",
+      "titulo": "Siesta al sol",
+      "title": "Sun Nap",
+      "lugar": "Mar del Plata",
+      "anio": "2026",
+      "soporte": "Película 35 mm",
+      "camara": "",
+      "tecnica": "",
+      "categorias": [
+        "mar-del-plata",
+        "animales"
+      ],
+      "serie": "perros-de-barrio",
+      "alt": "Perro de pelo claro echado al sol sobre el pasto",
+      "paleta": [
+        "#d3d3d5",
+        "#406823",
+        "#8eaa62",
+        "#c7af7e",
+        "#bb7c44"
+      ],
+      "ancho": 1600,
+      "alto": 1061,
+      "oculta": false
+    },
+    {
+      "n": "007",
+      "titulo": "El dueño de casa",
+      "title": "Head of the House",
+      "lugar": "Mar del Plata",
+      "anio": "2026",
+      "soporte": "Película 35 mm",
+      "camara": "",
+      "tecnica": "",
+      "categorias": [
+        "mar-del-plata",
+        "animales"
+      ],
+      "serie": "perros-de-barrio",
+      "alt": "Casa de ladrillo con techo de tejas y un perro blanco y negro en la entrada",
+      "paleta": [
+        "#374b1b",
+        "#2e3517",
+        "#857950",
+        "#caba93",
+        "#9fb867"
+      ],
+      "ancho": 1600,
+      "alto": 1061,
+      "oculta": false
+    },
+    {
+      "n": "008",
+      "titulo": "Vecinos",
+      "title": "Neighbors",
+      "lugar": "Mar del Plata",
+      "anio": "2026",
+      "soporte": "Película 35 mm",
+      "camara": "",
+      "tecnica": "",
+      "categorias": [
+        "mar-del-plata",
+        "ciudad"
+      ],
+      "serie": "mirar-hacia-arriba",
+      "alt": "Dos edificios altos, uno espejado, vistos desde abajo",
+      "paleta": [
+        "#91bad0",
+        "#4a481f",
+        "#f5f2ed",
+        "#9f9158",
+        "#cdbc95"
+      ],
+      "ancho": 1600,
+      "alto": 1061,
+      "oculta": false
+    },
+    {
+      "n": "009",
+      "titulo": "Otoño en punto",
+      "title": "Autumn O'Clock",
+      "lugar": "Buenos Aires",
+      "anio": "2026",
+      "soporte": "Película 35 mm",
+      "camara": "",
+      "tecnica": "",
+      "categorias": [
+        "argentina",
+        "ciudad"
+      ],
+      "serie": "tiempo-de-estacion",
+      "alt": "Torre con reloj y cúpula verde junto a un árbol de otoño",
+      "paleta": [
+        "#d9e5e5",
+        "#a5a395",
+        "#6d5d43",
+        "#95835f",
+        "#462f14"
+      ],
+      "ancho": 1600,
+      "alto": 1061,
+      "oculta": false
+    },
+    {
+      "n": "010",
+      "titulo": "Antes del tren",
+      "title": "Before the Train",
+      "lugar": "Buenos Aires",
+      "anio": "2026",
+      "soporte": "Película 35 mm",
+      "camara": "",
+      "tecnica": "",
+      "categorias": [
+        "argentina",
+        "ciudad"
+      ],
+      "serie": "tiempo-de-estacion",
+      "alt": "Hall de una estación de tren con boletería de azulejos verdes",
+      "paleta": [
+        "#172523",
+        "#4c4831",
+        "#a69a68",
+        "#8a7143",
+        "#f4f2e3"
+      ],
+      "ancho": 1600,
+      "alto": 1061,
+      "oculta": false
+    },
+    {
+      "n": "011",
+      "titulo": "La hora de todos",
+      "title": "Everyone's Time",
+      "lugar": "Buenos Aires",
+      "anio": "2026",
+      "soporte": "Película 35 mm",
+      "camara": "",
+      "tecnica": "",
+      "categorias": [
+        "argentina",
+        "ciudad"
+      ],
+      "serie": "tiempo-de-estacion",
+      "alt": "Reloj de cuatro caras colgado del techo de una estación",
+      "paleta": [
+        "#d8c677",
+        "#142226",
+        "#a49051",
+        "#685d39",
+        "#afb289"
+      ],
+      "ancho": 1600,
+      "alto": 1061,
+      "oculta": false
+    }
+  ]
+}
+</script>
 <script>
 (() => {
 "use strict";
 
 /* ==============================================================
-   CONFIGURACIÓN · editá acá
+   CONTENIDO · viene del bloque <script id="contenido"> de arriba,
+   que se edita desde el panel (admin/)
    ============================================================== */
+const CONTENIDO = (() => {
+  try { return JSON.parse(document.getElementById("contenido").textContent) || {}; }
+  catch (e) { console.error("El bloque de contenido no es un JSON válido", e); return {}; }
+})();
+const AJUSTES = CONTENIDO.ajustes || {};
+const TEXTOS = CONTENIDO.textos || {};
 const CONFIG = {
-  nombre: "Cristian",
-  whatsapp: "",   // Tu número con código de país, sin + ni espacios. Ej.: 5492231234567
-  sitio: ""       // Cuando tengas dominio, por ejemplo "https://ojodecristi.com.ar"
+  nombre: AJUSTES.nombre || "",
+  whatsapp: AJUSTES.whatsapp || "",
+  sitio: AJUSTES.sitio || ""
 };
-
-/* Categorías del archivo (el orden es el de los botones) */
-const CATEGORIAS = [
-  { id: "mar-del-plata", nombre: "Mar del Plata" },
-  { id: "argentina", nombre: "Argentina" },
-  { id: "blanco-y-negro", nombre: "Blanco y negro" },
-  { id: "paisaje", nombre: "Paisaje" },
-  { id: "flores", nombre: "Flores" },
-  { id: "nubes", nombre: "Nubes" },
-  { id: "ciudad", nombre: "Ciudad" },
-  { id: "animales", nombre: "Animales" }
-];
-
-const SERIES = [
-  { id: "mirar-hacia-arriba", titulo: "Mirar hacia arriba", title: "Looking Up", texto: "Edificios, cielo y lo que queda en el medio cuando levantás la cabeza." },
-  { id: "tiempo-de-estacion", titulo: "Tiempo de estación", title: "Station Time", texto: "Relojes y andenes de Buenos Aires, entre un tren y el siguiente." },
-  { id: "perros-de-barrio", titulo: "Perros de barrio", title: "Neighborhood Dogs", texto: "Los dueños de la vereda." }
-];
-
-/* Fotos de la portada: tres cuadros, el del medio es el grande */
-const PORTADA = ["001", "004", "005"];
-
-/* Cada foto usa fotos/mini/NNN.jpg (800 px) y fotos/web/NNN.jpg (1600 px).
-   Si una foto no tiene "paleta", el sitio la calcula solo. */
-const FOTOS = [
-  { n: "001", titulo: "Estrellas de viento", title: "Wind Stars", lugar: "Mar del Plata", anio: "2026", soporte: "Película 35 mm",
-    categorias: ["mar-del-plata", "nubes"], serie: "mirar-hacia-arriba",
-    alt: "Molinetes con forma de estrella contra un cielo celeste con nubes",
-    paleta: ["#b0cad8", "#e1dedb", "#6a929e", "#cec2a3", "#bba36a"] },
-  { n: "002", titulo: "Despegue", title: "Liftoff", lugar: "Mar del Plata", anio: "2026", soporte: "Película 35 mm",
-    categorias: ["mar-del-plata", "ciudad", "nubes"], serie: "mirar-hacia-arriba",
-    alt: "Torre redonda de departamentos vista desde abajo, contra el cielo",
-    paleta: ["#d4d7da", "#8ab0c1", "#3f7c8e", "#b69e62", "#776531"] },
-  { n: "003", titulo: "La proa", title: "The Prow", lugar: "Mar del Plata", anio: "2026", soporte: "Película 35 mm",
-    categorias: ["mar-del-plata", "ciudad"], serie: "mirar-hacia-arriba",
-    alt: "Esquina de un edificio claro vista desde abajo, contra un cielo azul",
-    paleta: ["#eeebe4", "#89b6cb", "#3a8197", "#d4c39c", "#77713d"] },
-  { n: "004", titulo: "Rayas de domingo", title: "Sunday Stripes", lugar: "Mar del Plata", anio: "2026", soporte: "Película 35 mm",
-    categorias: ["mar-del-plata", "ciudad"], serie: null,
-    alt: "Frente de una cafetería con toldo a rayas y un cerco de madera celeste",
-    paleta: ["#ecedee", "#a28e5a", "#3d3a18", "#f6bba0", "#81471b"] },
-  { n: "005", titulo: "El mar todo lo cura", title: "The Sea Heals All", lugar: "Playa Constitución, Mar del Plata", anio: "2026", soporte: "Película 35 mm",
-    categorias: ["mar-del-plata", "paisaje"], serie: null,
-    alt: "Poste con carteles de madera pintados frente a la Playa Constitución",
-    paleta: ["#c8cdd1", "#756e47", "#d1b883", "#363817", "#f0c963"] },
-  { n: "006", titulo: "Siesta al sol", title: "Sun Nap", lugar: "Mar del Plata", anio: "2026", soporte: "Película 35 mm",
-    categorias: ["mar-del-plata", "animales"], serie: "perros-de-barrio",
-    alt: "Perro de pelo claro echado al sol sobre el pasto",
-    paleta: ["#d3d3d5", "#406823", "#8eaa62", "#c7af7e", "#bb7c44"] },
-  { n: "007", titulo: "El dueño de casa", title: "Head of the House", lugar: "Mar del Plata", anio: "2026", soporte: "Película 35 mm",
-    categorias: ["mar-del-plata", "animales"], serie: "perros-de-barrio",
-    alt: "Casa de ladrillo con techo de tejas y un perro blanco y negro en la entrada",
-    paleta: ["#374b1b", "#2e3517", "#857950", "#caba93", "#9fb867"] },
-  { n: "008", titulo: "Vecinos", title: "Neighbors", lugar: "Mar del Plata", anio: "2026", soporte: "Película 35 mm",
-    categorias: ["mar-del-plata", "ciudad"], serie: "mirar-hacia-arriba",
-    alt: "Dos edificios altos, uno espejado, vistos desde abajo",
-    paleta: ["#91bad0", "#4a481f", "#f5f2ed", "#9f9158", "#cdbc95"] },
-  { n: "009", titulo: "Otoño en punto", title: "Autumn O'Clock", lugar: "Buenos Aires", anio: "2026", soporte: "Película 35 mm",
-    categorias: ["argentina", "ciudad"], serie: "tiempo-de-estacion",
-    alt: "Torre con reloj y cúpula verde junto a un árbol de otoño",
-    paleta: ["#d9e5e5", "#a5a395", "#6d5d43", "#95835f", "#462f14"] },
-  { n: "010", titulo: "Antes del tren", title: "Before the Train", lugar: "Buenos Aires", anio: "2026", soporte: "Película 35 mm",
-    categorias: ["argentina", "ciudad"], serie: "tiempo-de-estacion",
-    alt: "Hall de una estación de tren con boletería de azulejos verdes",
-    paleta: ["#172523", "#4c4831", "#a69a68", "#8a7143", "#f4f2e3"] },
-  { n: "011", titulo: "La hora de todos", title: "Everyone's Time", lugar: "Buenos Aires", anio: "2026", soporte: "Película 35 mm",
-    categorias: ["argentina", "ciudad"], serie: "tiempo-de-estacion",
-    alt: "Reloj de cuatro caras colgado del techo de una estación",
-    paleta: ["#d8c677", "#142226", "#a49051", "#685d39", "#afb289"] }
-];
+const CATEGORIAS = Array.isArray(CONTENIDO.categorias) ? CONTENIDO.categorias : [];
+const SERIES = Array.isArray(CONTENIDO.series) ? CONTENIDO.series : [];
+const FOTOS = (Array.isArray(CONTENIDO.fotos) ? CONTENIDO.fotos : [])
+  .filter((f) => f && f.n && !f.oculta)
+  .map((f) => Object.assign({}, f, { categorias: Array.isArray(f.categorias) ? f.categorias : [], paleta: Array.isArray(f.paleta) && f.paleta.length ? f.paleta : null }));
 
 /* ==============================================================
    De acá para abajo no hace falta tocar nada
@@ -886,12 +1280,29 @@ const $$ = (s, el = document) => Array.from(el.querySelectorAll(s));
 const esc = (t) => String(t == null ? "" : t).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const pocoMovimiento = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const porNumero = new Map(FOTOS.map((f) => [f.n, f]));
-const rutaMini = (f) => "fotos/mini/" + f.n + ".jpg";
-const rutaWeb = (f) => "fotos/web/" + f.n + ".jpg";
+const PORTADA = (Array.isArray(AJUSTES.portada) ? AJUSTES.portada : []).filter((n) => porNumero.has(n));
+/* En la vista previa del panel, las fotos nuevas todavía no están en el servidor */
+const rutaMini = (f) => f._mini || "fotos/mini/" + f.n + ".jpg";
+const rutaWeb = (f) => f._web || "fotos/web/" + f.n + ".jpg";
 const nombreCat = (id) => (CATEGORIAS.find((c) => c.id === id) || { nombre: id }).nombre;
 const serieDe = (f) => SERIES.find((s) => s.id === f.serie);
 const ciudad = (lugar) => String(lugar || "").split(",").pop().trim();
 const textoAlt = (f) => (f.alt ? f.alt + ". " : "") + "N.° " + f.n + ", " + f.titulo + ".";
+/* Proporción de cada foto (ancho / alto). Las más angostas que 1,4 se muestran enteras dentro del marco */
+const proporcion = (f) => (f.ancho > 0 && f.alto > 0 ? f.ancho / f.alto : 1.5);
+const esAngosta = (f) => proporcion(f) < 1.4;
+function medidas(f, lado) {
+  const r = proporcion(f);
+  return r >= 1 ? [lado, Math.round(lado / r)] : [Math.round(lado * r), lado];
+}
+const texto = (clave, porDefecto) => {
+  const v = TEXTOS[clave];
+  return typeof v === "string" && v.trim() ? v : porDefecto;
+};
+const rellenar = (plantilla, datos) => String(plantilla || "").replace(/\{([a-zñ]+)\}/gi, (m, k) => {
+  if (k === "año" || k === "anio") return String(new Date().getFullYear());
+  return datos && k in datos ? String(datos[k] == null ? "" : datos[k]) : m;
+});
 
 document.documentElement.lang = "es";
 
@@ -905,16 +1316,36 @@ function leerLocal(clave, porDefecto) {
 function guardarLocal(clave, valor) { try { localStorage.setItem(clave, JSON.stringify(valor)); } catch (_) {} }
 let seleccion = leerLocal(CLAVE, []).filter((n) => porNumero.has(n));
 
-/* ---------- Paleta del sitio (solo en la maqueta) ---------- */
+/* ---------- Paleta del sitio (la elige quien visita) ---------- */
 /* Tono del fondo de cada paleta: los paspartús evitan ese color para no perderse */
 const PALETAS_SITIO = { rayas: 17, mar: 46, estrellas: 199 };
+/* Colores del sello (fondo y tinta del pie) para el ícono de la pestaña */
+const ICONO_SITIO = { rayas: ["#3A2426", "#F7D8CB"], mar: ["#1E3433", "#F5E2A5"], estrellas: ["#1B2F3D", "#CFE3EC"] };
 let tonoFondo = PALETAS_SITIO.rayas;
+let iconoBase = null;
+function iconoSegunPaleta(id) {
+  const link = $('link[rel="icon"][type="image/svg+xml"]');
+  if (!link) return;
+  if (id === "rayas") { if (iconoBase != null) link.href = "favicon.svg"; return; }
+  const poner = () => {
+    const c = ICONO_SITIO[id];
+    link.href = "data:image/svg+xml," + encodeURIComponent(iconoBase.split(ICONO_SITIO.rayas[0]).join(c[0]).split(ICONO_SITIO.rayas[1]).join(c[1]));
+  };
+  if (iconoBase != null) { poner(); return; }
+  if (!window.fetch) return;
+  fetch("favicon.svg").then((r) => (r.ok ? r.text() : Promise.reject())).then((t) => { iconoBase = t; if (paletaActual === id) poner(); }).catch(() => {});
+}
+let paletaActual = "rayas";
 function aplicarPaletaSitio(id, guardar) {
   if (!(id in PALETAS_SITIO)) id = "rayas";
+  paletaActual = id;
   if (id === "rayas") document.documentElement.removeAttribute("data-paleta");
   else document.documentElement.setAttribute("data-paleta", id);
   $$("[data-paleta-sitio]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.paletaSitio === id)));
   tonoFondo = PALETAS_SITIO[id];
+  iconoSegunPaleta(id);
+  const tema = $('meta[name="theme-color"]');
+  if (tema) tema.setAttribute("content", getComputedStyle(document.documentElement).getPropertyValue("--fondo").trim() || "#F7D8CB");
   if (guardar) {
     guardarLocal("ojodecristi-paleta", id);
     renderPortada();
@@ -1020,45 +1451,48 @@ function renderPortada() {
   const lista = fotos.length === 3 ? fotos : [fotos[0]];
   const medio = lista.length === 3 ? 1 : 0;
   t.classList.toggle("solo", lista.length !== 3);
-  t.innerHTML = lista.map((f, i) =>
-    '<button type="button" class="cuadro protegida' + (i === medio ? " cuadro-centro" : "") + '" data-abrir="' + f.n + '" style="--mat:' + colorMat(f.paleta) + '" aria-label="Ver N.° ' + f.n + ', ' + esc(f.titulo) + '">' +
-      '<span class="cuadro-linea"><img src="' + (i === medio ? rutaWeb(f) : rutaMini(f)) + '" alt="" width="' + (i === medio ? 1600 : 800) + '" height="' + (i === medio ? 1061 : 530) + '" draggable="false"></span>' +
-    '</button>').join("");
+  t.innerHTML = lista.map((f, i) => {
+    const m = medidas(f, i === medio ? 1600 : 800);
+    return '<button type="button" class="cuadro protegida' + (i === medio ? " cuadro-centro" : "") + (esAngosta(f) ? " angosta" : "") + '" data-abrir="' + esc(f.n) + '" style="--mat:' + colorMat(f.paleta) + ';--ar:' + proporcion(f).toFixed(4) + '" aria-label="Ver N.° ' + esc(f.n) + ', ' + esc(f.titulo) + '">' +
+      '<span class="cuadro-linea"><img src="' + esc(i === medio ? rutaWeb(f) : rutaMini(f)) + '" alt="" width="' + m[0] + '" height="' + m[1] + '"' + (i === medio ? ' fetchpriority="high"' : "") + ' draggable="false"></span>' +
+    '</button>';
+  }).join("");
   const f = lista[medio];
   const pie = $("#portada-pie");
-  pie.innerHTML = '<span class="foto-num">N.° ' + f.n + '</span><span class="portada-titulo">' + esc(f.titulo) + '</span><span class="foto-en">' + esc(f.title) + '</span>';
+  pie.innerHTML = '<span class="foto-num">N.° ' + esc(f.n) + '</span><span class="portada-titulo">' + esc(f.titulo) + '</span><span class="foto-en">' + esc(f.title) + '</span>';
   pie.append(crearPuntos(f.paleta, f.n));
 }
 
 /* ---------- Categorías y grilla ---------- */
 function renderChips() {
-  const items = [{ id: "todo", nombre: "Todo", cuenta: FOTOS.length }].concat(
+  const items = [{ id: "todo", nombre: texto("archivo.todo", "Todo"), cuenta: FOTOS.length }].concat(
     CATEGORIAS.map((c) => ({ id: c.id, nombre: c.nombre, cuenta: FOTOS.filter((f) => f.categorias.indexOf(c.id) >= 0).length })));
   $("#chips").innerHTML = items.map((it) =>
-    '<button type="button" class="chip' + (it.cuenta ? "" : " vacia") + '" data-cat="' + it.id + '" aria-pressed="false">' +
+    '<button type="button" class="chip' + (it.cuenta ? "" : " vacia") + '" data-cat="' + esc(it.id) + '" aria-pressed="false">' +
       esc(it.nombre) + '<span class="chip-n">' + it.cuenta + '</span></button>').join("");
 }
 
 function tarjeta(f, i) {
   const el = document.createElement("article");
   const elegida = seleccion.indexOf(f.n) >= 0;
-  el.className = "foto" + (elegida ? " elegida" : "");
+  el.className = "foto" + (elegida ? " elegida" : "") + (esAngosta(f) ? " angosta" : "");
   el.dataset.n = f.n;
+  const m = medidas(f, 800);
   el.innerHTML =
-    '<div class="marco" style="--mat:' + colorMat(f.paleta) + '">' +
+    '<div class="marco" style="--mat:' + colorMat(f.paleta) + ';--ar:' + proporcion(f).toFixed(4) + '">' +
       '<div class="marco-linea">' +
         '<div class="foto-marco protegida" style="--fondo-foto:' + esc((f.paleta || [])[0] || "") + '">' +
-          '<img src="' + rutaMini(f) + '" alt="' + esc(textoAlt(f)) + '" width="800" height="530" loading="' + (i < 3 ? "eager" : "lazy") + '" decoding="async" draggable="false">' +
-          '<button type="button" class="foto-abrir" data-abrir="' + f.n + '" aria-label="Ver N.° ' + f.n + ', ' + esc(f.titulo) + '"></button>' +
+          '<img src="' + esc(rutaMini(f)) + '" alt="' + esc(textoAlt(f)) + '" width="' + m[0] + '" height="' + m[1] + '" loading="' + (i < 3 ? "eager" : "lazy") + '" decoding="async" draggable="false">' +
+          '<button type="button" class="foto-abrir" data-abrir="' + esc(f.n) + '" aria-label="Ver N.° ' + esc(f.n) + ', ' + esc(f.titulo) + '"></button>' +
         '</div>' +
       '</div>' +
       '<span class="etiqueta-elegida" aria-hidden="true">Elegida</span>' +
     '</div>' +
-    '<button type="button" class="foto-sumar" data-sumar="' + f.n + '" aria-pressed="' + elegida + '" aria-label="' + etiquetaSumar(f, elegida) + '">' +
+    '<button type="button" class="foto-sumar" data-sumar="' + esc(f.n) + '" aria-pressed="' + elegida + '" aria-label="' + esc(etiquetaSumar(f, elegida)) + '">' +
       '<svg class="ico ico-mas" aria-hidden="true"><use href="#i-mas"/></svg><svg class="ico ico-ok" aria-hidden="true"><use href="#i-ok"/></svg>' +
     '</button>' +
     '<div class="foto-texto">' +
-      '<p class="foto-num">N.° ' + f.n + '</p>' +
+      '<p class="foto-num">N.° ' + esc(f.n) + '</p>' +
       '<h3 class="foto-titulo">' + esc(f.titulo) + '</h3>' +
       '<p class="foto-en">' + esc(f.title) + '</p>' +
       '<p class="foto-lugar">' + esc(f.lugar) + (f.anio ? " · " + esc(f.anio) : "") + '</p>' +
@@ -1106,19 +1540,20 @@ function renderSeries() {
     const fotos = FOTOS.filter((f) => f.serie === s.id);
     if (!fotos.length) return "";
     const tapa = fotos[0];
-    return '<button type="button" class="serie" data-serie="' + s.id + '">' +
-      '<span class="serie-pila" aria-hidden="true"><span class="serie-marco"><span class="marco-linea"><img src="' + rutaMini(tapa) + '" alt="" width="800" height="530" loading="lazy" draggable="false"></span></span></span>' +
+    const m = medidas(tapa, 800);
+    return '<button type="button" class="serie' + (esAngosta(tapa) ? " angosta" : "") + '" data-serie="' + esc(s.id) + '" style="--ar:' + proporcion(tapa).toFixed(4) + '">' +
+      '<span class="serie-pila" aria-hidden="true"><span class="serie-marco"><span class="marco-linea"><img src="' + esc(rutaMini(tapa)) + '" alt="" width="' + m[0] + '" height="' + m[1] + '" loading="lazy" draggable="false"></span></span></span>' +
       '<span class="serie-cuenta">Serie · ' + fotos.length + ' fotos</span>' +
       '<span class="serie-titulo">' + esc(s.titulo) + '</span>' +
       '<span class="foto-en">' + esc(s.title) + '</span>' +
       '<span class="serie-texto">' + esc(s.texto) + '</span>' +
-      '<span data-puntos-serie="' + s.id + '"></span>' +
+      '<span data-puntos-serie="' + esc(s.id) + '"></span>' +
       '<span class="serie-ir">Ver la serie<svg class="ico" aria-hidden="true"><use href="#i-flecha"/></svg></span>' +
     '</button>';
   }).join("");
   $("#series-grilla").innerHTML = html;
   SERIES.forEach((s) => {
-    const hueco = $('[data-puntos-serie="' + s.id + '"]');
+    const hueco = $$("[data-puntos-serie]").find((el) => el.dataset.puntosSerie === s.id);
     if (!hueco) return;
     const colores = [];
     FOTOS.filter((f) => f.serie === s.id).forEach((f) => (f.paleta || []).slice(0, 2).forEach((c) => { if (colores.length < 5 && colores.indexOf(c) < 0) colores.push(c); }));
@@ -1150,6 +1585,7 @@ function mostrarEnVisor(direccion) {
   const img = $("#visor-img");
   const lamina = $("#visor-lamina");
   lamina.style.setProperty("--fondo-foto", (f.paleta || [])[0] || "");
+  lamina.style.setProperty("--ar", proporcion(f).toFixed(4));
   const tono = colorPastel(f.paleta, 0.82);
   if (tono) $("#visor").style.setProperty("--tono", tono); else $("#visor").style.removeProperty("--tono");
   img.classList.remove("pan-der", "pan-izq");
@@ -1167,10 +1603,12 @@ function mostrarEnVisor(direccion) {
   fila("#ficha-lugar", f.lugar);
   fila("#ficha-anio", f.anio);
   fila("#ficha-soporte", f.soporte);
+  fila("#ficha-camara", f.camara);
+  fila("#ficha-tecnica", f.tecnica);
   const s = serieDe(f);
   fila("#ficha-serie", s ? s.titulo : "");
   fila("#ficha-cats", f.categorias.map(nombreCat).join(" · "));
-  $("#ficha-paleta").innerHTML = (f.paleta || []).map((c) => '<li><span class="muestra" style="--c:' + esc(c) + '"></span><code>' + esc(c) + '</code></li>').join("");
+  $("#ficha-paleta").innerHTML = (f.paleta || []).map((c) => '<li><button type="button" class="copiar-color" data-copiar="' + esc(c.toUpperCase()) + '" aria-label="Copiar el color ' + esc(c.toUpperCase()) + '"><span class="muestra" style="--c:' + esc(c) + '"></span><code>' + esc(c) + '</code></button></li>').join("");
   $(".ficha-paleta").hidden = !(f.paleta && f.paleta.length);
   $("#visor-contador").textContent = String(estado.indice + 1).padStart(2, "0") + " / " + String(L.length).padStart(2, "0");
   $("#visor-lugar").textContent = ciudad(f.lugar);
@@ -1242,16 +1680,16 @@ function refrescarSeleccion() {
   p.hidden = k === 0;
   $("#pastilla-cuenta").textContent = k === 1 ? "1 foto elegida" : k + " fotos elegidas";
   p.setAttribute("aria-label", "Ver tu selección (" + k + ") y consultar por WhatsApp");
-  $("#pastilla-fotos").innerHTML = seleccion.slice(-3).map((n) => { const f = porNumero.get(n); return f ? '<img src="' + rutaMini(f) + '" alt="" draggable="false">' : ""; }).join("");
+  $("#pastilla-fotos").innerHTML = seleccion.slice(-3).map((n) => { const f = porNumero.get(n); return f ? '<img src="' + esc(rutaMini(f)) + '" alt="" draggable="false">' : ""; }).join("");
   renderCajon();
   actualizarFicha();
 }
 function renderCajon() {
   const fotos = seleccion.map((n) => porNumero.get(n)).filter(Boolean);
   $("#cajon-lista").innerHTML = fotos.map((f) =>
-    '<li><img src="' + rutaMini(f) + '" alt="" draggable="false" style="--mat:' + colorMat(f.paleta) + '">' +
-      '<div><span class="foto-num">N.° ' + f.n + '</span><strong>' + esc(f.titulo) + '</strong><span class="lugar">' + esc(f.lugar) + '</span></div>' +
-      '<button type="button" class="quitar" data-quitar="' + f.n + '" aria-label="Quitar N.° ' + f.n + ' de tu selección"><svg class="ico" aria-hidden="true"><use href="#i-cerrar"/></svg></button>' +
+    '<li><img src="' + esc(rutaMini(f)) + '" alt="" draggable="false" style="--mat:' + colorMat(f.paleta) + '">' +
+      '<div><span class="foto-num">N.° ' + esc(f.n) + '</span><strong>' + esc(f.titulo) + '</strong><span class="lugar">' + esc(f.lugar) + '</span></div>' +
+      '<button type="button" class="quitar" data-quitar="' + esc(f.n) + '" aria-label="Quitar N.° ' + esc(f.n) + ' de tu selección"><svg class="ico" aria-hidden="true"><use href="#i-cerrar"/></svg></button>' +
     '</li>').join("");
   $("#cajon-lista").hidden = !fotos.length;
   $("#cajon-vacio").hidden = fotos.length > 0;
@@ -1276,27 +1714,86 @@ function cerrarCajon() {
 }
 
 /* ---------- WhatsApp ---------- */
-function lineaFoto(f) { return "• N.° " + f.n + " — " + f.titulo + " (" + f.lugar + ")"; }
+function lineaFoto(f) { return "• N.° " + f.n + " — " + f.titulo + (f.lugar ? " (" + f.lugar + ")" : ""); }
+/* Dirección de la página sin el #, para armar enlaces a cada foto */
+function direccionSitio() {
+  const base = CONFIG.sitio || (location.protocol.indexOf("http") === 0 ? location.href.split("#")[0] : "");
+  return base ? base.replace(/[?#].*$/, "").replace(/\/?$/, "/") : "";
+}
+const enlaceFoto = (f) => (direccionSitio() ? direccionSitio() + "#foto-" + f.n : "");
+const limpiar = (m) => m.replace(/\(\)/g, "").replace(/ {2,}/g, " ").replace(/[ \t]+\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim();
 function mensajeSeleccion() {
   const fotos = seleccion.map((n) => porNumero.get(n)).filter(Boolean);
   const nota = $("#cajon-nota").value.trim();
-  let m = "¡Hola " + CONFIG.nombre + "! Vi tus fotos en la web y me interesan " + (fotos.length === 1 ? "esta" : "estas") + " como cuadro:\n\n" + fotos.map(lineaFoto).join("\n");
-  if (nota) m += "\n\nComentario: " + nota;
-  m += "\n\n¿Me pasás tamaños y precios?";
-  return m;
+  const lista = fotos.map(lineaFoto).join("\n") + (nota ? "\n\nComentario: " + nota : "");
+  const plantilla = texto("whatsapp.seleccion", "¡Hola {nombre}! Vi tus fotos en la web y me gustaría pedir como cuadro:\n\n{lista}\n\n¿Me pasás tamaños y precios?");
+  let m = rellenar(plantilla, { nombre: CONFIG.nombre, lista: lista });
+  if (plantilla.indexOf("{lista}") < 0) m += "\n\n" + lista;
+  return limpiar(m);
 }
 function mensajeFoto(f) {
-  let m = "¡Hola " + CONFIG.nombre + "! Vi la foto N.° " + f.n + " — " + f.titulo + " (" + f.lugar + ") y me interesa como cuadro. ¿Me pasás tamaños y precios?";
-  if (CONFIG.sitio) m += "\n" + CONFIG.sitio.replace(/\/$/, "") + "/#foto-" + f.n;
-  return m;
+  const plantilla = texto("whatsapp.foto", "¡Hola {nombre}! Vi la foto N.° {n} — {titulo} ({lugar}) y me interesa como cuadro. ¿Me pasás tamaños y precios?\n{enlace}");
+  return limpiar(rellenar(plantilla, { nombre: CONFIG.nombre, n: f.n, titulo: f.titulo, lugar: f.lugar || "", enlace: enlaceFoto(f) }));
 }
 const MENSAJES = {
-  general: () => "¡Hola " + CONFIG.nombre + "! Vi tus fotos en la web y quería hacerte una consulta.",
-  trabajo: () => "¡Hola " + CONFIG.nombre + "! Vi tu web y quería consultarte por un trabajo de fotos."
+  general: () => limpiar(rellenar(texto("whatsapp.general", "¡Hola {nombre}! Vi tus fotos en la web y quería hacerte una consulta."), { nombre: CONFIG.nombre })),
+  trabajo: () => limpiar(rellenar(texto("whatsapp.trabajo", "¡Hola {nombre}! Vi tu web y quería consultarte por un trabajo de fotos."), { nombre: CONFIG.nombre }))
 };
 function enlaceWhatsApp(texto) {
   const numero = String(CONFIG.whatsapp || "").replace(/\D/g, "");
   return "https://wa.me/" + numero + "?text=" + encodeURIComponent(texto);
+}
+
+/* ---------- Textos editables ---------- */
+/* Un texto vacío en el panel oculta ese elemento; si falta, queda el que viene en el HTML */
+function aplicarTextos() {
+  $$("[data-t]").forEach((el) => {
+    const v = TEXTOS[el.dataset.t];
+    if (typeof v !== "string") return;
+    el.textContent = rellenar(v).trim();
+    el.hidden = !v.trim();
+  });
+  $$("[data-t-parrafos]").forEach((el) => {
+    const v = TEXTOS[el.dataset.tParrafos];
+    if (typeof v !== "string") return;
+    const parrafos = rellenar(v).split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
+    el.replaceChildren.apply(el, parrafos.map((p) => { const e = document.createElement("p"); e.textContent = p; return e; }));
+    el.hidden = !parrafos.length;
+  });
+}
+function usuarioRed(v) { return String(v || "").trim().replace(/^@/, "").replace(/^https?:\/\/(www\.)?(instagram|tiktok)\.com\/@?/i, "").replace(/[/?#].*$/, ""); }
+function aplicarRedes() {
+  const ig = usuarioRed(AJUSTES.instagram);
+  $$("[data-instagram]").forEach((a) => { a.hidden = !ig; if (ig) a.href = "https://www.instagram.com/" + encodeURIComponent(ig) + "/"; });
+  $$("[data-instagram-texto]").forEach((el) => { el.textContent = "@" + ig + " en Instagram"; });
+  const tt = usuarioRed(AJUSTES.tiktok);
+  $$("[data-tiktok]").forEach((a) => { a.hidden = !tt; if (tt) a.href = "https://www.tiktok.com/@" + encodeURIComponent(tt); });
+  $$("[data-tiktok-texto]").forEach((el) => { el.textContent = "@" + tt + " en TikTok"; });
+}
+/* Los capítulos se numeran solos (si una sección queda oculta, no se saltea el número) */
+function numerarCapitulos() {
+  let n = 0;
+  $$("main > .seccion").forEach((sec) => { const c = $(".capitulo-n", sec); if (c && !sec.hidden) c.textContent = "Capítulo " + (++n); });
+}
+
+/* ---------- Compartir y copiar ---------- */
+function copiarTexto(t) {
+  if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(t);
+  return new Promise((ok, mal) => {
+    const a = document.createElement("textarea");
+    a.value = t; a.setAttribute("readonly", ""); a.style.position = "fixed"; a.style.opacity = "0";
+    document.body.append(a); a.select();
+    try { document.execCommand("copy") ? ok() : mal(); } catch (e) { mal(e); }
+    a.remove();
+  });
+}
+function compartirFoto() {
+  const f = fotoActual();
+  if (!f) return;
+  const url = enlaceFoto(f) || location.href;
+  const datos = { title: "N.° " + f.n + " — " + f.titulo, text: f.titulo + (f.title ? " · " + f.title : ""), url: url };
+  if (navigator.share) { navigator.share(datos).catch(() => {}); return; }
+  copiarTexto(url).then(() => avisar("Enlace a la foto copiado. Ya lo podés pegar donde quieras."), () => avisar(url));
 }
 
 /* ---------- Avisos ---------- */
@@ -1329,6 +1826,8 @@ function cerrarMenu() { $("#nav-movil").hidden = true; $("#btn-menu").setAttribu
 /* ---------- Eventos ---------- */
 document.addEventListener("click", (e) => {
   const t = e.target;
+  const copiar = t.closest("[data-copiar]");
+  if (copiar) { const c = copiar.dataset.copiar; copiarTexto(c).then(() => avisar("Color " + c + " copiado."), () => avisar(c)); return; }
   const paleta = t.closest("[data-paleta-sitio]");
   if (paleta) { aplicarPaletaSitio(paleta.dataset.paletaSitio, true); return; }
   const abrir = t.closest("[data-abrir]");
@@ -1366,6 +1865,7 @@ $("#visor-prev").addEventListener("click", () => mover(-1));
 $("#visor-next").addEventListener("click", () => mover(1));
 $("#visor").addEventListener("click", (e) => { if (e.target === $("#visor") || e.target.classList.contains("visor-caja")) cerrarVisor(); });
 $("#ficha-sumar").addEventListener("click", () => alternar(fotoActual().n));
+$("#ficha-compartir").addEventListener("click", compartirFoto);
 $("#cajon-vaciar").addEventListener("click", () => {
   const antes = seleccion.slice();
   seleccion = [];
@@ -1426,6 +1926,8 @@ document.addEventListener("contextmenu", (e) => {
 document.addEventListener("dragstart", (e) => { if (e.target.tagName === "IMG") e.preventDefault(); });
 
 /* ---------- Inicio ---------- */
+aplicarTextos();
+aplicarRedes();
 aplicarPaletaSitio(leerLocal("ojodecristi-paleta", "rayas"), false);
 $$("[data-wa]").forEach((a) => { a.href = enlaceWhatsApp(MENSAJES[a.dataset.wa]()); });
 $("#nota-numero").hidden = !!String(CONFIG.whatsapp || "").replace(/\D/g, "");
@@ -1433,6 +1935,7 @@ $("#dato-fotos").textContent = FOTOS.length === 1 ? "1 fotografía" : FOTOS.leng
 renderChips();
 renderPortada();
 renderSeries();
+numerarCapitulos();
 aplicarFiltro({ tipo: "todo" }, { hash: false });
 refrescarSeleccion();
 window.addEventListener("hashchange", leerHash);

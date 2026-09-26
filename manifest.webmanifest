@@ -1,0 +1,16 @@
+{
+  "name": "ojodecristi · Cristian Torrecillas",
+  "short_name": "ojodecristi",
+  "description": "Fotografía de autor de Cristian Torrecillas en Mar del Plata.",
+  "lang": "es-AR",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#F7D8CB",
+  "theme_color": "#F7D8CB",
+  "icons": [
+    { "src": "icono-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icono-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icono-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

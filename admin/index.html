@@ -1,0 +1,2242 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Panel · ojodecristi</title>
+<link rel="icon" href="../favicon.ico" sizes="32x32">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta name="theme-color" content="#3A2426">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@1,400;1,500&family=Jost:wght@300..700&display=swap">
+<style>
+:root {
+  --fondo: #F7D8CB;
+  --superficie: #FCEBE3;
+  --papel: #FFF9F6;
+  --tinta: #3A2426;
+  --tinta-2: #6A4F50;
+  --linea: rgba(58, 36, 38, .16);
+  --linea-fuerte: rgba(58, 36, 38, .42);
+  --acento: #B8404F;
+  --acento-texto: #FFF6F2;
+  --celeste: #A9CFE2;
+  --amarillo: #F3D98F;
+  --verde: #BCD5B4;
+  --ok: #2F6B45;
+  --ok-fondo: #DCEBDD;
+  --alerta: #7A4B00;
+  --alerta-fondo: #F6E3B8;
+  --error: #9E2438;
+  --error-fondo: #F6D2D6;
+  --titulo: "Jost", "Futura", "Century Gothic", "Avenir Next", system-ui, sans-serif;
+  --serif: "EB Garamond", Garamond, Georgia, serif;
+  color-scheme: light;
+}
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--fondo); color: var(--tinta); font: 400 16px/1.55 var(--titulo); -webkit-font-smoothing: antialiased; }
+html.sin-scroll { overflow: hidden; }
+a { color: inherit; }
+button, input, select, textarea { font: inherit; color: inherit; }
+p { margin: 0; }
+h1, h2, h3 { margin: 0; font-weight: 500; }
+img { max-width: 100%; display: block; }
+:focus-visible { outline: 2px solid var(--tinta); outline-offset: 2px; }
+.envoltorio { width: 100%; max-width: 980px; margin-inline: auto; padding-inline: clamp(14px, 4vw, 32px); }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+.versal { font: 500 11px/1.4 var(--titulo); letter-spacing: .24em; text-transform: uppercase; }
+.suave { color: var(--tinta-2); }
+.chico { font-size: 14px; }
+
+/* Botones */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 46px; padding: 0 20px;
+  border: 1px solid var(--tinta); border-radius: 0; background: transparent; color: var(--tinta); cursor: pointer; text-decoration: none;
+  font: 500 12px/1.2 var(--titulo); letter-spacing: .18em; text-transform: uppercase; text-align: center;
+  transition: background-color .15s, color .15s, border-color .15s, opacity .15s;
+}
+.btn:hover { background: var(--tinta); color: var(--superficie); }
+.btn-lleno { background: var(--acento); border-color: var(--acento); color: var(--acento-texto); }
+.btn-lleno:hover { background: var(--tinta); border-color: var(--tinta); }
+.btn-oscuro { background: var(--tinta); color: var(--superficie); }
+.btn-oscuro:hover { background: var(--acento); border-color: var(--acento); }
+.btn-peligro { color: var(--error); border-color: var(--error); }
+.btn-peligro:hover { background: var(--error); color: #fff; }
+.btn-chico { min-height: 36px; padding: 0 12px; font-size: 11px; letter-spacing: .14em; }
+.btn[disabled], .btn[aria-disabled="true"] { opacity: .45; cursor: not-allowed; pointer-events: none; }
+.btn-texto { background: none; border: 0; padding: 6px 0; cursor: pointer; font: 500 11.5px/1.4 var(--titulo); letter-spacing: .16em; text-transform: uppercase; text-decoration: underline; text-underline-offset: 5px; }
+.btn-icono { width: 38px; height: 38px; display: inline-grid; place-items: center; padding: 0; border: 1px solid var(--linea-fuerte); background: var(--papel); cursor: pointer; border-radius: 0; }
+.btn-icono:hover:not([disabled]) { border-color: var(--tinta); }
+.btn-icono[disabled] { opacity: .3; cursor: default; }
+.ico { width: 17px; height: 17px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+/* Campos */
+.campo { display: grid; gap: 6px; }
+.campo > label, .etiqueta { font: 500 13px/1.35 var(--titulo); letter-spacing: .02em; }
+.campo .ayuda { font-size: 13.5px; line-height: 1.45; color: var(--tinta-2); }
+input[type="text"], input[type="tel"], input[type="url"], input[type="password"], input[type="number"], select, textarea {
+  width: 100%; min-height: 46px; padding: 10px 12px; border-radius: 0; border: 1px solid var(--linea-fuerte); background: var(--papel);
+  font-size: 16px; line-height: 1.45;
+}
+textarea { resize: vertical; min-height: 84px; }
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--tinta); box-shadow: 0 0 0 1px var(--tinta); }
+.campo.cambiado > label::after { content: "· modificado"; margin-left: 8px; color: var(--acento); font-size: 12px; letter-spacing: .04em; }
+.campo.con-error input, .campo.con-error textarea { border-color: var(--error); box-shadow: 0 0 0 1px var(--error); }
+.campo .error { color: var(--error); font-size: 13.5px; }
+.fila-campos { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; }
+.check { display: flex; align-items: flex-start; gap: 10px; cursor: pointer; font-size: 15px; line-height: 1.4; }
+.check input { width: 20px; height: 20px; margin: 1px 0 0; accent-color: var(--acento); flex: none; }
+.restaurar { justify-self: start; background: none; border: 0; padding: 0; cursor: pointer; color: var(--acento); font-size: 13px; text-decoration: underline; text-underline-offset: 3px; }
+
+/* Avisos en línea */
+.nota { padding: 12px 14px; background: var(--superficie); border: 1px solid var(--linea); font-size: 14.5px; line-height: 1.5; }
+.nota.ok { background: var(--ok-fondo); border-color: rgba(47, 107, 69, .35); color: var(--ok); }
+.nota.alerta { background: var(--alerta-fondo); border-color: rgba(122, 75, 0, .3); color: var(--alerta); }
+.nota.error { background: var(--error-fondo); border-color: rgba(158, 36, 56, .35); color: var(--error); }
+.nota strong { font-weight: 600; }
+
+/* ============ Ingreso ============ */
+.ingreso { min-height: 100vh; min-height: 100dvh; display: grid; place-items: center; padding: 32px 16px; }
+.ingreso-caja { width: 100%; max-width: 560px; display: grid; gap: 22px; background: var(--papel); padding: clamp(24px, 5vw, 40px); outline: 1px solid var(--linea-fuerte); outline-offset: -8px; }
+.sello { width: 64px; height: 64px; margin: 0 auto; }
+.ingreso h1 { text-align: center; font: 500 clamp(24px, 5vw, 30px)/1.15 var(--titulo); letter-spacing: .14em; text-transform: uppercase; }
+.ingreso .sub { text-align: center; color: var(--tinta-2); }
+.pasos-token { margin: 0; padding: 0 0 0 20px; display: grid; gap: 8px; font-size: 15px; }
+.pasos-token strong { font-weight: 600; }
+.ingreso details { border: 1px solid var(--linea); background: var(--superficie); padding: 12px 14px; }
+.ingreso summary { cursor: pointer; font-weight: 500; }
+.ingreso details[open] summary { margin-bottom: 12px; }
+.clave-fila { display: flex; gap: 8px; }
+.clave-fila input { flex: 1; min-width: 0; font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 15px; }
+
+/* ============ Cargando ============ */
+.cargando { min-height: 100vh; min-height: 100dvh; display: grid; place-items: center; align-content: center; gap: 16px; text-align: center; padding: 24px; }
+.girando { width: 56px; height: 56px; animation: girar 2.4s linear infinite; }
+@keyframes girar { to { transform: rotate(360deg); } }
+
+/* ============ Panel ============ */
+.barra { position: sticky; top: 0; z-index: 30; background: var(--tinta); color: var(--superficie); }
+.barra .envoltorio { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 56px; }
+.barra-marca { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.barra-marca svg { width: 30px; height: 30px; flex: none; }
+.barra-marca span { font: 500 14px/1.2 var(--titulo); letter-spacing: .26em; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.barra-acciones { display: flex; align-items: center; gap: 14px; }
+@media (max-width: 480px) { .barra-prefijo { display: none; } .barra-acciones { gap: 12px; } }
+.barra a, .barra button { font: 500 11px/1 var(--titulo); letter-spacing: .18em; text-transform: uppercase; color: inherit; text-decoration: none; background: none; border: 0; cursor: pointer; padding: 8px 0; white-space: nowrap; }
+.barra a:hover, .barra button:hover { text-decoration: underline; text-underline-offset: 5px; }
+.pestanas { position: sticky; top: 56px; z-index: 29; background: var(--fondo); border-bottom: 1px solid var(--linea); }
+.pestanas .envoltorio { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+.pestanas .envoltorio::-webkit-scrollbar { display: none; }
+.pestana { flex: none; padding: 16px 12px 13px; background: none; border: 0; border-bottom: 3px solid transparent; cursor: pointer; font: 500 12px/1 var(--titulo); letter-spacing: .18em; text-transform: uppercase; color: var(--tinta-2); }
+.pestana[aria-selected="true"] { color: var(--tinta); border-bottom-color: var(--acento); }
+.pestana .punto { display: inline-block; width: 7px; height: 7px; margin-left: 6px; border-radius: 50%; background: var(--acento); vertical-align: 2px; }
+main.contenido { padding-block: 26px 150px; }
+.cabeza-seccion { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px 20px; margin-bottom: 18px; }
+.cabeza-seccion h2 { font: 500 clamp(22px, 4vw, 28px)/1.1 var(--titulo); letter-spacing: .12em; text-transform: uppercase; }
+.cabeza-seccion p { color: var(--tinta-2); font-size: 15px; max-width: 60ch; margin-top: 6px; }
+.bloque { background: var(--papel); border: 1px solid var(--linea); padding: clamp(16px, 3vw, 24px); display: grid; gap: 16px; }
+.bloque + .bloque { margin-top: 18px; }
+.bloque > h3 { font: 500 14px/1.3 var(--titulo); letter-spacing: .18em; text-transform: uppercase; }
+.bloque > .ayuda-bloque { margin-top: -8px; color: var(--tinta-2); font-size: 14px; }
+
+/* Portada */
+.portada-slots { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.slot { display: grid; gap: 6px; padding: 8px; border: 1px dashed var(--linea-fuerte); background: var(--superficie); cursor: pointer; text-align: center; }
+.slot:hover { border-color: var(--tinta); }
+.slot-img { aspect-ratio: 3 / 2; background: var(--fondo) center / cover no-repeat; display: grid; place-items: center; color: var(--tinta-2); font-size: 13px; }
+.slot.centro .slot-img { outline: 2px solid var(--acento); outline-offset: -2px; }
+.slot .versal { font-size: 10px; letter-spacing: .18em; }
+
+/* Subida */
+.zona-subir { display: grid; justify-items: center; gap: 10px; padding: 22px 16px; text-align: center; border: 1px dashed var(--linea-fuerte); background: var(--superficie); }
+.zona-subir.encima { border-color: var(--acento); background: #fff; }
+.zona-subir p { color: var(--tinta-2); font-size: 14px; max-width: 52ch; }
+.cola { display: grid; gap: 6px; }
+.cola-fila { display: flex; align-items: center; gap: 10px; font-size: 14px; }
+.barra-progreso { height: 6px; background: var(--linea); overflow: hidden; }
+.barra-progreso span { display: block; height: 100%; width: 0; background: var(--acento); transition: width .3s ease; }
+
+/* Lista de fotos */
+.herramientas { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
+.buscar { flex: 1 1 220px; max-width: 360px; }
+.lista-fotos { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.item-foto { display: grid; grid-template-columns: auto 92px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 8px; background: var(--papel); border: 1px solid var(--linea); }
+.item-foto.oculta { opacity: .6; }
+.item-foto .sel { width: 22px; height: 22px; accent-color: var(--acento); }
+.lista-fotos:not(.eligiendo) .sel { display: none; }
+.lista-fotos:not(.eligiendo) .item-foto { grid-template-columns: 92px minmax(0, 1fr) auto; }
+.item-img { width: 92px; aspect-ratio: 3 / 2; object-fit: cover; background: var(--fondo); border: 4px solid var(--superficie); }
+.item-abrir { display: grid; gap: 3px; min-width: 0; padding: 4px 0; background: none; border: 0; text-align: left; cursor: pointer; }
+.item-abrir .n { font: 500 10.5px/1 var(--titulo); letter-spacing: .24em; color: var(--tinta-2); }
+.item-abrir strong { font: 500 14.5px/1.3 var(--titulo); letter-spacing: .08em; text-transform: uppercase; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.item-abrir .det { font-size: 13.5px; color: var(--tinta-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.etiquetas { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 3px; }
+.tag { font: 500 9.5px/1 var(--titulo); letter-spacing: .14em; text-transform: uppercase; padding: 4px 6px; background: var(--superficie); border: 1px solid var(--linea); }
+.tag.nueva { background: var(--ok-fondo); border-color: rgba(47, 107, 69, .3); color: var(--ok); }
+.tag.portada { background: var(--amarillo); border-color: rgba(0, 0, 0, .1); }
+.tag.oculta { background: var(--linea); }
+.tag.falta { background: var(--alerta-fondo); color: var(--alerta); border-color: rgba(122, 75, 0, .25); }
+.item-orden { display: flex; gap: 4px; }
+.puntos { display: inline-flex; gap: 3px; margin-top: 2px; }
+.puntos i { width: 9px; height: 9px; border-radius: 50%; background: var(--c); box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .12); }
+@media (max-width: 560px) {
+  .item-foto, .lista-fotos:not(.eligiendo) .item-foto { grid-template-columns: 72px minmax(0, 1fr) auto; gap: 10px; }
+  .lista-fotos.eligiendo .item-foto { grid-template-columns: auto 64px minmax(0, 1fr); }
+  .lista-fotos.eligiendo .item-orden { display: none; }
+  .item-img { width: 72px; }
+  .lista-fotos.eligiendo .item-img { width: 64px; }
+  .item-orden { flex-direction: column; }
+  .item-orden .btn-icono { width: 34px; height: 30px; }
+}
+
+/* Categorías y series */
+.filas { display: grid; gap: 8px; }
+.fila-cat { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 10px; }
+.fila-cat .cuenta { font-size: 13px; color: var(--tinta-2); white-space: nowrap; }
+.fila-cat .acciones-fila { display: flex; gap: 4px; }
+.tarjeta-serie { display: grid; gap: 12px; padding: 14px; background: var(--superficie); border: 1px solid var(--linea); }
+.tarjeta-serie .cabeza { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+@media (max-width: 560px) {
+  .fila-cat { grid-template-columns: minmax(0, 1fr) auto; }
+  .fila-cat .cuenta { grid-column: 1; grid-row: 2; margin-top: -4px; }
+  .fila-cat .acciones-fila { grid-column: 2; grid-row: 1 / span 2; }
+}
+
+/* Historial */
+.historial { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; }
+.historial li { display: grid; gap: 2px; padding: 10px 0; border-bottom: 1px solid var(--linea); font-size: 14.5px; }
+.historial time { font-size: 12.5px; color: var(--tinta-2); }
+
+/* ============ Barra de publicar ============ */
+.publicar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; background: var(--papel); border-top: 1px solid var(--linea-fuerte); box-shadow: 0 -8px 30px rgba(58, 36, 38, .12); padding-bottom: env(safe-area-inset-bottom, 0px); }
+.publicar .envoltorio { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; padding-block: 12px; }
+.publicar-texto { display: grid; gap: 2px; min-width: 0; flex: 1 1 240px; }
+.publicar-texto strong { font: 500 13px/1.3 var(--titulo); letter-spacing: .12em; text-transform: uppercase; }
+.publicar-texto span { font-size: 13.5px; color: var(--tinta-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.publicar-botones { display: flex; flex-wrap: wrap; gap: 8px; }
+@media (max-width: 560px) {
+  .publicar-botones { width: 100%; display: grid; grid-template-columns: 1fr 1fr 1.3fr; }
+  .publicar-botones .btn { padding: 0 8px; letter-spacing: .1em; }
+}
+.barra-eleccion { position: fixed; left: 0; right: 0; bottom: 0; z-index: 41; background: var(--tinta); color: var(--superficie); padding-bottom: env(safe-area-inset-bottom, 0px); }
+.barra-eleccion .envoltorio { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; padding-block: 12px; }
+.barra-eleccion .btn { border-color: var(--superficie); color: var(--superficie); }
+.barra-eleccion .btn:hover { background: var(--superficie); color: var(--tinta); }
+.barra-eleccion .btn-lleno { background: var(--superficie); color: var(--tinta); }
+
+/* ============ Hojas (editor, varias, portada, publicar) ============ */
+.hoja { position: fixed; inset: 0; z-index: 60; display: grid; }
+.hoja-fondo { position: absolute; inset: 0; background: rgba(58, 36, 38, .5); animation: aparecer .2s ease; }
+.hoja-panel {
+  position: relative; justify-self: end; width: min(620px, 100%); height: 100%; overflow-y: auto; overscroll-behavior: contain;
+  background: var(--papel); display: flex; flex-direction: column; animation: entrar .28s cubic-bezier(.2, .7, .2, 1);
+}
+@keyframes aparecer { from { opacity: 0; } to { opacity: 1; } }
+@keyframes entrar { from { transform: translateX(36px); opacity: 0; } to { transform: none; opacity: 1; } }
+.hoja-cabeza { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 16px; padding-top: calc(env(safe-area-inset-top, 0px) + 12px); background: var(--papel); border-bottom: 1px solid var(--linea); }
+.hoja-cabeza h2 { font: 500 14px/1.3 var(--titulo); letter-spacing: .2em; text-transform: uppercase; }
+.hoja-cuerpo { display: grid; gap: 18px; padding: 18px 16px 28px; }
+.hoja-pie { position: sticky; bottom: 0; display: flex; flex-wrap: wrap; gap: 8px; justify-content: space-between; padding: 12px 16px; padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 12px); background: var(--papel); border-top: 1px solid var(--linea); margin-top: auto; }
+.editor-foto { background: var(--superficie); padding: 14px; display: grid; justify-items: center; gap: 12px; }
+.editor-foto img { max-height: 46vh; width: auto; max-width: 100%; box-shadow: 0 0 0 6px #fff, 0 0 0 7px var(--linea-fuerte); }
+.paleta-edicion { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px; }
+.color { display: grid; justify-items: center; gap: 4px; }
+.color input[type="color"] { width: 44px; height: 44px; padding: 0; border: 1px solid var(--linea-fuerte); border-radius: 50%; background: none; cursor: pointer; overflow: hidden; }
+.color input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+.color input[type="color"]::-webkit-color-swatch { border: 0; border-radius: 50%; }
+.color input[type="color"]::-moz-color-swatch { border: 0; border-radius: 50%; }
+.color code { font-size: 11px; color: var(--tinta-2); text-transform: uppercase; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; min-height: 38px; padding: 0 12px; border: 1px solid var(--linea-fuerte); background: var(--papel); cursor: pointer; font: 500 12px/1 var(--titulo); letter-spacing: .1em; text-transform: uppercase; }
+.chip[aria-pressed="true"] { background: var(--tinta); border-color: var(--tinta); color: var(--superficie); }
+.nav-editor { display: flex; align-items: center; gap: 8px; }
+.nav-editor span { font-size: 13px; color: var(--tinta-2); min-width: 64px; text-align: center; }
+.grilla-eleccion { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; }
+.grilla-eleccion button { display: grid; gap: 6px; padding: 6px; border: 1px solid var(--linea); background: var(--superficie); cursor: pointer; text-align: left; }
+.grilla-eleccion button:hover { border-color: var(--tinta); }
+.grilla-eleccion img { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; }
+.grilla-eleccion span { font-size: 12.5px; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pasos-publicar { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.pasos-publicar li { display: flex; align-items: center; gap: 10px; font-size: 15px; color: var(--tinta-2); }
+.pasos-publicar li::before { content: ""; width: 12px; height: 12px; border-radius: 50%; border: 1px solid var(--linea-fuerte); flex: none; }
+.pasos-publicar li.activo { color: var(--tinta); font-weight: 500; }
+.pasos-publicar li.activo::before { border-color: var(--acento); background: radial-gradient(circle, var(--acento) 45%, transparent 50%); animation: latir 1s ease-in-out infinite; }
+.pasos-publicar li.hecho { color: var(--ok); }
+.pasos-publicar li.hecho::before { background: var(--ok); border-color: var(--ok); }
+@keyframes latir { 50% { opacity: .35; } }
+@media (max-width: 620px) {
+  .hoja-panel { width: 100%; }
+}
+
+/* Vista previa */
+.previa { position: fixed; inset: 0; z-index: 70; display: flex; flex-direction: column; background: #2b1d1f; }
+.previa-barra { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 12px; padding-top: calc(env(safe-area-inset-top, 0px) + 8px); color: var(--superficie); }
+.previa-barra .btn { border-color: rgba(255, 255, 255, .5); color: var(--superficie); min-height: 38px; }
+.previa-barra .btn[aria-pressed="true"] { background: var(--superficie); color: var(--tinta); }
+.previa-marco { flex: 1; display: grid; justify-items: center; overflow: hidden; padding: 0 8px 8px; }
+.previa iframe { width: 100%; height: 100%; border: 0; background: #fff; }
+.previa.celu iframe { width: 390px; max-width: 100%; }
+
+/* Diálogo y aviso */
+.dialogo { position: fixed; inset: 0; z-index: 90; display: grid; place-items: center; padding: 16px; }
+.dialogo-caja { position: relative; width: min(460px, 100%); display: grid; gap: 14px; padding: 24px; background: var(--papel); outline: 1px solid var(--linea-fuerte); outline-offset: -8px; box-shadow: 0 20px 60px rgba(0, 0, 0, .25); animation: aparecer .15s ease; }
+.dialogo-caja h2 { font: 500 16px/1.3 var(--titulo); letter-spacing: .14em; text-transform: uppercase; }
+.dialogo-caja p { white-space: pre-line; }
+.dialogo-botones { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; margin-top: 6px; }
+.aviso {
+  position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 96px); z-index: 95; transform: translateX(-50%);
+  width: max-content; max-width: calc(100% - 32px); padding: 12px 18px; background: var(--tinta); color: var(--superficie);
+  font-size: 14.5px; line-height: 1.45; text-align: center; box-shadow: 0 10px 30px rgba(0, 0, 0, .2); animation: aparecer .2s ease;
+}
+.aviso.error { background: var(--error); }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="sello" viewBox="0 0 200 200">
+    <circle cx="100" cy="100" r="95" fill="none" stroke="currentColor" stroke-width="3"/>
+    <circle cx="100" cy="100" r="86" fill="none" stroke="currentColor" stroke-width="1.2" stroke-dasharray="2 6"/>
+    <circle cx="100" cy="100" r="56" fill="none" stroke="currentColor" stroke-width="1.2"/>
+    <path d="M94.1 86.3A18 18 0 1 0 94.1 113.7M107.6 82H135.6M121.6 82V120" fill="none" stroke="currentColor" stroke-width="5"/>
+  </symbol>
+  <symbol id="i-arriba" viewBox="0 0 24 24"><path d="M6 14l6-6 6 6"/></symbol>
+  <symbol id="i-abajo" viewBox="0 0 24 24"><path d="M6 10l6 6 6-6"/></symbol>
+  <symbol id="i-cerrar" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+  <symbol id="i-izq" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></symbol>
+  <symbol id="i-der" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></symbol>
+  <symbol id="i-subir" viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v4h16v-4"/></symbol>
+  <symbol id="i-basura" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></symbol>
+  <symbol id="i-ojo" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-recalcular" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v5h-5"/></symbol>
+</svg>
+
+<!-- ============ Ingreso ============ -->
+<section class="ingreso" id="ingreso" hidden>
+  <div class="ingreso-caja">
+    <svg class="sello" aria-hidden="true"><use href="#sello"/></svg>
+    <div>
+      <h1>Panel de la página</h1>
+      <p class="sub">Desde acá editás los textos, subís fotos y publicás los cambios en tu página.</p>
+    </div>
+    <div class="nota error" id="ingreso-error" role="alert" hidden></div>
+    <details id="ingreso-ayuda" open>
+      <summary>Primera vez: crear tu llave de GitHub (token)</summary>
+      <ol class="pasos-token">
+        <li>Tocá <strong>Crear el token en GitHub</strong>. Se abre GitHub con casi todo completado.</li>
+        <li>En <strong>Repository access</strong> elegí <strong>Only select repositories</strong> y marcá <strong>pagina-web</strong>.</li>
+        <li>Revisá que en <strong>Permissions → Repository permissions</strong> diga <strong>Contents: Read and write</strong>.</li>
+        <li>Tocá <strong>Generate token</strong>, copiá el código (empieza con <code>github_pat_</code>) y pegalo acá abajo.</li>
+      </ol>
+      <p style="margin-top:14px"><a class="btn btn-oscuro btn-chico" id="enlace-token" href="#" target="_blank" rel="noopener">Crear el token en GitHub</a></p>
+    </details>
+    <form id="form-ingreso" class="campo" autocomplete="off">
+      <label for="token">Token de GitHub</label>
+      <div class="clave-fila">
+        <input type="password" id="token" name="token" placeholder="github_pat_…" spellcheck="false" autocapitalize="off" required>
+        <button type="button" class="btn btn-chico" id="ver-token" aria-pressed="false">Ver</button>
+      </div>
+      <label class="check" style="margin-top:6px"><input type="checkbox" id="recordar" checked> Recordarme en este dispositivo</label>
+      <button type="submit" class="btn btn-lleno" id="btn-entrar" style="margin-top:8px">Entrar</button>
+    </form>
+    <p class="chico suave">El token queda guardado solo en este navegador y sirve únicamente para tu repositorio. No lo compartas: con él se puede cambiar la página. Dura un año; cuando venza, creás otro igual.</p>
+  </div>
+</section>
+
+<!-- ============ Cargando ============ -->
+<section class="cargando" id="cargando">
+  <svg class="girando" aria-hidden="true"><use href="#sello"/></svg>
+  <p class="versal" id="cargando-texto">Abriendo el panel…</p>
+</section>
+
+<!-- ============ Panel ============ -->
+<div id="panel" hidden>
+  <header class="barra">
+    <div class="envoltorio">
+      <div class="barra-marca"><svg aria-hidden="true"><use href="#sello"/></svg><span><span class="barra-prefijo">Panel · </span><span id="marca-panel">ojodecristi</span></span></div>
+      <div class="barra-acciones">
+        <a href="../" target="_blank" rel="noopener">Ver la página ↗</a>
+        <button type="button" id="btn-salir">Salir</button>
+      </div>
+    </div>
+  </header>
+  <nav class="pestanas" aria-label="Secciones del panel">
+    <div class="envoltorio" role="tablist">
+      <button type="button" class="pestana" role="tab" data-pestana="fotos" aria-selected="true">Fotos<span class="punto" hidden></span></button>
+      <button type="button" class="pestana" role="tab" data-pestana="textos" aria-selected="false">Textos<span class="punto" hidden></span></button>
+      <button type="button" class="pestana" role="tab" data-pestana="grupos" aria-selected="false">Categorías y series<span class="punto" hidden></span></button>
+      <button type="button" class="pestana" role="tab" data-pestana="ajustes" aria-selected="false">Ajustes<span class="punto" hidden></span></button>
+    </div>
+  </nav>
+
+  <main class="contenido envoltorio">
+    <div class="nota alerta" id="aviso-borrador" hidden style="margin-bottom:18px"></div>
+
+    <!-- Fotos -->
+    <section id="p-fotos" role="tabpanel">
+      <div class="cabeza-seccion">
+        <div>
+          <h2>Fotos <span class="suave" id="cuenta-fotos"></span></h2>
+          <p>Tocá una foto para editar su título, lugar, categorías y paleta. Las flechas cambian el orden en que aparecen en la página.</p>
+        </div>
+      </div>
+
+      <div class="bloque">
+        <h3>Portada</h3>
+        <p class="ayuda-bloque">Las tres fotos de arriba de todo. La del centro es la grande.</p>
+        <div class="portada-slots" id="portada-slots"></div>
+        <p class="nota alerta" id="portada-aviso" hidden></p>
+      </div>
+
+      <div class="bloque">
+        <h3>Subir fotos</h3>
+        <label class="zona-subir" id="zona-subir">
+          <svg class="ico" style="width:30px;height:30px" aria-hidden="true"><use href="#i-subir"/></svg>
+          <span class="btn btn-lleno" role="presentation">Elegir fotos</span>
+          <p>Podés elegir muchas juntas (JPG o PNG). Se achican solas para la web, se les calcula la paleta y se les saca la ubicación GPS. Quedan como borrador hasta que publiques. Desde el celu conviene subir de a 20 o 30 y publicar.</p>
+          <input type="file" id="archivos" accept="image/jpeg,image/png,image/webp,image/*" multiple class="sr">
+        </label>
+        <div class="cola" id="cola" hidden>
+          <div class="cola-fila"><span id="cola-texto"></span></div>
+          <div class="barra-progreso"><span id="cola-barra"></span></div>
+        </div>
+      </div>
+
+      <div class="bloque">
+        <div class="herramientas">
+          <input type="text" class="buscar" id="buscar" placeholder="Buscar por título, lugar o número" aria-label="Buscar fotos">
+          <button type="button" class="btn btn-chico" id="btn-elegir">Elegir varias</button>
+        </div>
+        <ol class="lista-fotos" id="lista-fotos"></ol>
+        <p class="suave chico" id="lista-vacia" hidden>No hay fotos que coincidan.</p>
+      </div>
+    </section>
+
+    <!-- Textos -->
+    <section id="p-textos" role="tabpanel" hidden>
+      <div class="cabeza-seccion">
+        <div>
+          <h2>Textos</h2>
+          <p>Todo lo que se lee en la página. Si dejás un texto vacío, ese elemento no se muestra (salvo los obligatorios).</p>
+        </div>
+      </div>
+      <div id="form-textos"></div>
+    </section>
+
+    <!-- Categorías y series -->
+    <section id="p-grupos" role="tabpanel" hidden>
+      <div class="cabeza-seccion">
+        <div>
+          <h2>Categorías y series</h2>
+          <p>Las categorías son los botones para filtrar el archivo. Las series agrupan fotos de un mismo tema; se asignan desde cada foto.</p>
+        </div>
+      </div>
+      <div class="bloque">
+        <h3>Categorías</h3>
+        <div class="filas" id="lista-categorias"></div>
+        <form class="clave-fila" id="form-categoria">
+          <input type="text" id="nueva-categoria" placeholder="Nueva categoría (ej.: Autos clásicos)" aria-label="Nombre de la nueva categoría">
+          <button type="submit" class="btn btn-chico">Agregar</button>
+        </form>
+      </div>
+      <div class="bloque">
+        <h3>Series</h3>
+        <p class="ayuda-bloque">Una serie aparece en la página cuando tiene al menos una foto.</p>
+        <div class="filas" id="lista-series"></div>
+        <button type="button" class="btn btn-chico" id="btn-nueva-serie" style="justify-self:start">Agregar serie</button>
+      </div>
+    </section>
+
+    <!-- Ajustes -->
+    <section id="p-ajustes" role="tabpanel" hidden>
+      <div class="cabeza-seccion">
+        <div>
+          <h2>Ajustes</h2>
+          <p>Contacto, redes y la dirección de la página.</p>
+        </div>
+      </div>
+      <div class="bloque" id="form-ajustes"></div>
+      <div class="bloque">
+        <h3>Publicaciones anteriores</h3>
+        <p class="ayuda-bloque">Cada vez que publicás queda guardada una versión. Si algo salió mal, podés deshacer la última.</p>
+        <ol class="historial" id="historial"><li class="suave">Cargando…</li></ol>
+        <div><button type="button" class="btn btn-chico btn-peligro" id="btn-deshacer" hidden>Deshacer la última publicación</button></div>
+      </div>
+      <div class="bloque">
+        <h3>Sesión</h3>
+        <p class="chico" id="sesion-texto"></p>
+        <div><button type="button" class="btn btn-chico" id="btn-salir-2">Salir y olvidar el token en este dispositivo</button></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Barra de publicar -->
+  <div class="publicar" id="barra-publicar" hidden>
+    <div class="envoltorio">
+      <div class="publicar-texto">
+        <strong id="publicar-titulo">Cambios sin publicar</strong>
+        <span id="publicar-resumen"></span>
+      </div>
+      <div class="publicar-botones">
+        <button type="button" class="btn btn-chico" id="btn-descartar">Descartar</button>
+        <button type="button" class="btn btn-chico" id="btn-previa">Vista previa</button>
+        <button type="button" class="btn btn-chico btn-lleno" id="btn-publicar">Publicar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Barra al elegir varias -->
+  <div class="barra-eleccion" id="barra-eleccion" hidden>
+    <div class="envoltorio">
+      <span id="eleccion-texto">0 elegidas</span>
+      <div class="publicar-botones">
+        <button type="button" class="btn btn-chico" id="btn-elegir-todas">Todas</button>
+        <button type="button" class="btn btn-chico" id="btn-cancelar-eleccion">Cancelar</button>
+        <button type="button" class="btn btn-chico btn-lleno" id="btn-editar-varias">Editar juntas</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Editor de una foto -->
+<div class="hoja" id="hoja-editor" role="dialog" aria-modal="true" aria-labelledby="editor-titulo" hidden>
+  <div class="hoja-fondo" data-cerrar-hoja></div>
+  <div class="hoja-panel">
+    <div class="hoja-cabeza">
+      <h2 id="editor-titulo">Foto</h2>
+      <div class="nav-editor">
+        <button type="button" class="btn-icono" id="editor-ant" aria-label="Foto anterior"><svg class="ico"><use href="#i-izq"/></svg></button>
+        <span id="editor-pos"></span>
+        <button type="button" class="btn-icono" id="editor-sig" aria-label="Foto siguiente"><svg class="ico"><use href="#i-der"/></svg></button>
+        <button type="button" class="btn-icono" data-cerrar-hoja aria-label="Cerrar"><svg class="ico"><use href="#i-cerrar"/></svg></button>
+      </div>
+    </div>
+    <div class="hoja-cuerpo" id="editor-cuerpo"></div>
+    <div class="hoja-pie">
+      <button type="button" class="btn btn-chico btn-peligro" id="editor-borrar"><svg class="ico"><use href="#i-basura"/></svg>Borrar foto</button>
+      <button type="button" class="btn btn-chico btn-oscuro" data-cerrar-hoja>Listo</button>
+    </div>
+  </div>
+</div>
+
+<!-- Editar varias -->
+<div class="hoja" id="hoja-varias" role="dialog" aria-modal="true" aria-labelledby="varias-titulo" hidden>
+  <div class="hoja-fondo" data-cerrar-hoja></div>
+  <div class="hoja-panel">
+    <div class="hoja-cabeza">
+      <h2 id="varias-titulo">Editar varias</h2>
+      <button type="button" class="btn-icono" data-cerrar-hoja aria-label="Cerrar"><svg class="ico"><use href="#i-cerrar"/></svg></button>
+    </div>
+    <div class="hoja-cuerpo" id="varias-cuerpo"></div>
+    <div class="hoja-pie">
+      <button type="button" class="btn btn-chico btn-peligro" id="varias-borrar">Borrar las elegidas</button>
+      <button type="button" class="btn btn-chico btn-lleno" id="varias-aplicar">Aplicar cambios</button>
+    </div>
+  </div>
+</div>
+
+<!-- Elegir foto para la portada -->
+<div class="hoja" id="hoja-portada" role="dialog" aria-modal="true" aria-labelledby="portada-titulo" hidden>
+  <div class="hoja-fondo" data-cerrar-hoja></div>
+  <div class="hoja-panel">
+    <div class="hoja-cabeza">
+      <h2 id="portada-titulo">Elegir foto</h2>
+      <button type="button" class="btn-icono" data-cerrar-hoja aria-label="Cerrar"><svg class="ico"><use href="#i-cerrar"/></svg></button>
+    </div>
+    <div class="hoja-cuerpo">
+      <div class="grilla-eleccion" id="grilla-portada"></div>
+    </div>
+    <div class="hoja-pie">
+      <button type="button" class="btn btn-chico" id="portada-quitar">Dejar vacío</button>
+      <button type="button" class="btn btn-chico btn-oscuro" data-cerrar-hoja>Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Publicando -->
+<div class="hoja" id="hoja-publicar" role="dialog" aria-modal="true" aria-labelledby="publicar-h" hidden>
+  <div class="hoja-fondo"></div>
+  <div class="hoja-panel">
+    <div class="hoja-cabeza"><h2 id="publicar-h">Publicando</h2></div>
+    <div class="hoja-cuerpo">
+      <ol class="pasos-publicar" id="pasos-publicar"></ol>
+      <div class="barra-progreso"><span id="publicar-barra"></span></div>
+      <p class="chico suave" id="publicar-detalle"></p>
+      <div class="nota" id="publicar-final" hidden></div>
+    </div>
+    <div class="hoja-pie">
+      <a class="btn btn-chico" id="publicar-ver" href="../" target="_blank" rel="noopener" hidden>Ver la página ↗</a>
+      <button type="button" class="btn btn-chico btn-oscuro" id="publicar-cerrar" hidden>Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Vista previa -->
+<div class="previa" id="previa" hidden>
+  <div class="previa-barra">
+    <span class="versal">Vista previa · todavía no está publicada</span>
+    <div class="publicar-botones">
+      <button type="button" class="btn btn-chico" data-ancho="celu" aria-pressed="false">Celular</button>
+      <button type="button" class="btn btn-chico" data-ancho="compu" aria-pressed="true">Compu</button>
+      <button type="button" class="btn btn-chico" id="previa-cerrar">Cerrar</button>
+    </div>
+  </div>
+  <div class="previa-marco"><iframe id="previa-marco" title="Vista previa de la página"></iframe></div>
+</div>
+
+<!-- Diálogo -->
+<div class="dialogo" id="dialogo" role="alertdialog" aria-modal="true" aria-labelledby="dialogo-titulo" hidden>
+  <div class="hoja-fondo"></div>
+  <div class="dialogo-caja">
+    <h2 id="dialogo-titulo"></h2>
+    <p id="dialogo-texto"></p>
+    <div class="dialogo-botones" id="dialogo-botones"></div>
+  </div>
+</div>
+<div class="aviso" id="aviso" role="status" aria-live="polite" hidden></div>
+
+<script>
+(() => {
+"use strict";
+
+/* ==============================================================
+   Repositorio donde vive la página
+   ============================================================== */
+const REPO = { dueno: "CristianTorrecillas", nombre: "pagina-web", rama: "main" };
+const API = "https://api.github.com";
+const RAW = "https://raw.githubusercontent.com";
+const TAM_WEB = 1600, TAM_MINI = 800, CALIDAD_WEB = 0.86, CALIDAD_MINI = 0.82;
+const PREFIJO_COMMIT = "Panel: ";
+
+/* ---------- Utilidades ---------- */
+const $ = (s, el = document) => el.querySelector(s);
+const $$ = (s, el = document) => Array.from(el.querySelectorAll(s));
+const esc = (t) => String(t == null ? "" : t).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const clonar = (o) => JSON.parse(JSON.stringify(o));
+const igual = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+const dormir = (ms) => new Promise((ok) => setTimeout(ok, ms));
+const n3 = (n) => String(n).padStart(3, "0");
+const plural = (k, uno, varios) => k + " " + (k === 1 ? uno : varios);
+const slug = (t) => String(t || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 48) || "grupo";
+const HEX = /^#[0-9a-f]{6}$/i;
+function el(etiqueta, atributos, hijos) {
+  const e = document.createElement(etiqueta);
+  Object.entries(atributos || {}).forEach(([k, v]) => {
+    if (v == null || v === false) return;
+    if (k === "texto") e.textContent = v;
+    else if (k === "html") e.innerHTML = v;
+    else if (k.indexOf("on") === 0) e.addEventListener(k.slice(2), v);
+    else e.setAttribute(k, v === true ? "" : v);
+  });
+  (hijos || []).forEach((h) => h != null && e.append(h));
+  return e;
+}
+const usuarioRed = (v) => String(v || "").trim().replace(/^@/, "").replace(/^https?:\/\/(www\.)?(instagram|tiktok)\.com\/@?/i, "").replace(/[/?#].*$/, "");
+function normalizarSitio(v) {
+  v = String(v || "").trim();
+  if (!v) return "";
+  if (!/^https?:\/\//i.test(v)) v = "https://" + v;
+  try { const u = new URL(v); return u.origin + u.pathname.replace(/\/?$/, "/"); } catch (_) { return ""; }
+}
+
+/* ---------- Guardado en este dispositivo ---------- */
+const CLAVE_TOKEN = "panel-ojodecristi-token";
+const CLAVE_BORRADOR = "panel-ojodecristi-borrador";
+const local = {
+  leer(k, almacen) { try { const v = (almacen || localStorage).getItem(k); return v == null ? null : JSON.parse(v); } catch (_) { return null; } },
+  poner(k, v, almacen) { try { (almacen || localStorage).setItem(k, JSON.stringify(v)); return true; } catch (_) { return false; } },
+  sacar(k, almacen) { try { (almacen || localStorage).removeItem(k); } catch (_) {} }
+};
+/* Las fotos nuevas (todavía sin publicar) se guardan en IndexedDB para no perderlas si se recarga */
+const BD = (() => {
+  let base = null, falla = false;
+  function abrir() {
+    if (falla) return Promise.reject(new Error("sin IndexedDB"));
+    if (base) return Promise.resolve(base);
+    return new Promise((ok, mal) => {
+      let r;
+      try { r = indexedDB.open("panel-ojodecristi", 1); } catch (e) { falla = true; mal(e); return; }
+      r.onupgradeneeded = () => r.result.createObjectStore("fotos");
+      r.onsuccess = () => { base = r.result; ok(base); };
+      r.onerror = () => { falla = true; mal(r.error); };
+    });
+  }
+  function op(modo, fn) {
+    return abrir().then((d) => new Promise((ok, mal) => {
+      const tx = d.transaction("fotos", modo);
+      const pedido = fn(tx.objectStore("fotos"));
+      tx.oncomplete = () => ok(pedido ? pedido.result : undefined);
+      tx.onerror = () => mal(tx.error);
+      tx.onabort = () => mal(tx.error);
+    }));
+  }
+  return {
+    poner: (k, v) => op("readwrite", (s) => s.put(v, k)).then(() => true, () => false),
+    leer: (k) => op("readonly", (s) => s.get(k)).catch(() => undefined),
+    borrar: (k) => op("readwrite", (s) => s.delete(k)).catch(() => {}),
+    claves: () => op("readonly", (s) => s.getAllKeys()).catch(() => []),
+    vaciar: () => op("readwrite", (s) => s.clear()).catch(() => {})
+  };
+})();
+
+/* ---------- Estado ---------- */
+let token = null;
+let usuario = null;
+let base = null;          // lo publicado: { commit, arbol, archivos:Set, html, contenido, texto }
+let doc = null;           // el borrador que se está editando
+const nuevas = new Map(); // n -> { web: Blob, mini: Blob, urlWeb, urlMini, blobWeb, blobMini }
+let pestana = "fotos";
+let publicando = false;
+let procesando = false;       // hay fotos preparándose
+const colaArchivos = [];
+let avisoAlmacen = false;
+
+/* ==============================================================
+   GitHub
+   ============================================================== */
+const rutaRepo = (r) => "/repos/" + REPO.dueno + "/" + REPO.nombre + r;
+async function gh(ruta, opciones) {
+  opciones = opciones || {};
+  let r;
+  try {
+    r = await fetch(API + ruta, {
+      method: opciones.method || "GET",
+      headers: Object.assign({ Authorization: "Bearer " + token, Accept: "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28" },
+        opciones.body ? { "Content-Type": "application/json" } : {}),
+      body: opciones.body ? JSON.stringify(opciones.body) : undefined,
+      cache: "no-store"
+    });
+  } catch (e) {
+    const err = new Error("No hay conexión con GitHub. Revisá internet y probá de nuevo.");
+    err.status = 0; err.red = true; throw err;
+  }
+  if (r.status === 204) return null;
+  const datos = await r.json().catch(() => ({}));
+  if (!r.ok) {
+    const err = new Error(datos.message || "Error " + r.status);
+    err.status = r.status; err.datos = datos; err.reintentar = r.headers.get("retry-after");
+    err.limite = (r.status === 403 || r.status === 429) && (/rate limit|abuse|secondary/i.test(err.message) || r.headers.get("x-ratelimit-remaining") === "0");
+    throw err;
+  }
+  return datos;
+}
+/* Las escrituras van de a una y espaciadas: GitHub limita cuántas se pueden hacer por minuto */
+let ultimaEscritura = 0;
+async function ghEscribir(ruta, opciones, alEsperar) {
+  for (let intento = 0; ; intento++) {
+    const falta = 800 - (Date.now() - ultimaEscritura);
+    if (falta > 0) await dormir(falta);
+    ultimaEscritura = Date.now();
+    try { return await gh(ruta, opciones); }
+    catch (e) {
+      if (intento >= 5 || !(e.limite || e.red || e.status >= 500)) throw e;
+      const segundos = e.limite ? Math.max(20, parseInt(e.reintentar, 10) || 60) : 4 * (intento + 1);
+      if (alEsperar) alEsperar(segundos, e);
+      await dormir(segundos * 1000);
+    }
+  }
+}
+function mensajeError(e) {
+  if (!e) return "Algo salió mal.";
+  if (e.conflicto) return e.message;
+  if (e.status === 401) return "GitHub no aceptó el token: puede que esté mal copiado o que se haya vencido. Creá uno nuevo.";
+  if (e.status === 403 && !e.limite) return "El token no tiene permiso para guardar cambios. Revisá que tenga «Contents: Read and write» para pagina-web.";
+  if (e.status === 404) return "El token no tiene acceso al repositorio pagina-web. Al crearlo, elegí «Only select repositories» y marcá pagina-web.";
+  if (e.limite) return "GitHub pidió una pausa por muchas operaciones seguidas. Esperá un minuto y probá de nuevo.";
+  return e.message || "Algo salió mal.";
+}
+function b64aTexto(b64) {
+  const bin = atob(String(b64).replace(/\s/g, ""));
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return new TextDecoder("utf-8").decode(bytes);
+}
+const blobABase64 = (blob) => new Promise((ok, mal) => {
+  const r = new FileReader();
+  r.onload = () => ok(String(r.result).split(",")[1] || "");
+  r.onerror = () => mal(r.error);
+  r.readAsDataURL(blob);
+});
+async function leerRepo() {
+  const ref = await gh(rutaRepo("/git/ref/heads/" + REPO.rama));
+  const commit = await gh(rutaRepo("/git/commits/" + ref.object.sha));
+  const arbol = await gh(rutaRepo("/git/trees/" + commit.tree.sha + "?recursive=1"));
+  const entrada = (arbol.tree || []).find((e) => e.path === "index.html");
+  if (!entrada) throw new Error("No encontré index.html en el repositorio.");
+  const blob = await gh(rutaRepo("/git/blobs/" + entrada.sha));
+  const html = b64aTexto(blob.content);
+  const contenido = extraerContenido(html);
+  return {
+    commit: ref.object.sha, arbol: commit.tree.sha, mensaje: commit.message,
+    archivos: new Map((arbol.tree || []).filter((e) => e.type === "blob").map((e) => [e.path, e.sha])),
+    html: html, contenido: contenido, texto: JSON.stringify(contenido)
+  };
+}
+
+/* ==============================================================
+   El contenido vive dentro de index.html
+   ============================================================== */
+const RE_CONTENIDO = /(<script type="application\/json" id="contenido">)([\s\S]*?)(<\/script>)/g;
+const RE_SEO = /<!-- seo:inicio[^>]*-->[\s\S]*?<!-- seo:fin -->/;
+function extraerContenido(html) {
+  const m = Array.from(html.matchAll(RE_CONTENIDO));
+  if (m.length !== 1) throw new Error("No encontré el bloque de contenido en index.html.");
+  const c = JSON.parse(m[0][2]);
+  c.ajustes = c.ajustes || {}; c.textos = c.textos || {};
+  c.categorias = Array.isArray(c.categorias) ? c.categorias : [];
+  c.series = Array.isArray(c.series) ? c.series : [];
+  c.fotos = Array.isArray(c.fotos) ? c.fotos : [];
+  return c;
+}
+const serializar = (c) => JSON.stringify(c, null, 2).replace(/</g, "\\u003c");
+/* Limpia lo que es solo del panel (vistas previas) */
+function paraGuardar(c) {
+  const copia = clonar(c);
+  copia.fotos = copia.fotos.map((f) => { const g = {}; Object.keys(f).forEach((k) => { if (k[0] !== "_") g[k] = f[k]; }); return g; });
+  return copia;
+}
+const attr = (t) => esc(String(t || "").replace(/\s+/g, " ").trim());
+function bloqueSeo(c) {
+  const t = c.textos || {}, a = c.ajustes || {};
+  const sitio = normalizarSitio(a.sitio);
+  const marca = t["marca.nombre"] || "ojodecristi";
+  const titulo = t["seo.titulo"] || marca;
+  const desc = t["seo.descripcion"] || "";
+  const ig = usuarioRed(a.instagram), tt = usuarioRed(a.tiktok);
+  const persona = { "@type": "Person", name: a.nombreCompleto || a.nombre || marca, jobTitle: "Fotógrafo" };
+  if (sitio) persona.url = sitio;
+  if (t["marca.lugar"]) persona.address = { "@type": "PostalAddress", addressLocality: t["marca.lugar"], addressCountry: "AR" };
+  persona.sameAs = [ig && "https://www.instagram.com/" + ig + "/", tt && "https://www.tiktok.com/@" + tt].filter(Boolean);
+  const web = { "@type": "WebSite", name: marca };
+  if (sitio) web.url = sitio;
+  web.inLanguage = "es-AR";
+  const ld = { "@context": "https://schema.org", "@graph": [web, persona] };
+  return [
+    "<!-- seo:inicio · este bloque lo reescribe el panel (admin/) al publicar -->",
+    "<title>" + esc(titulo) + "</title>",
+    '<meta name="description" content="' + attr(desc) + '">',
+    sitio && '<link rel="canonical" href="' + attr(sitio) + '">',
+    '<meta property="og:type" content="website">',
+    '<meta property="og:site_name" content="' + attr(marca) + '">',
+    '<meta property="og:locale" content="es_AR">',
+    '<meta property="og:title" content="' + attr(titulo) + '">',
+    '<meta property="og:description" content="' + attr(desc) + '">',
+    sitio && '<meta property="og:url" content="' + attr(sitio) + '">',
+    sitio && '<meta property="og:image" content="' + attr(sitio + "compartir.jpg") + '">',
+    '<meta property="og:image:width" content="1200">',
+    '<meta property="og:image:height" content="630">',
+    '<meta property="og:image:alt" content="' + attr(t["portada.creditos"] || titulo) + '">',
+    '<meta name="twitter:card" content="summary_large_image">',
+    '<script type="application/ld+json">' + JSON.stringify(ld).replace(/</g, "\\u003c") + "</" + "script>",
+    "<!-- seo:fin -->"
+  ].filter(Boolean).join("\n");
+}
+function armarHtml(html, c, previa) {
+  let veces = 0;
+  let nuevo = html.replace(RE_CONTENIDO, (m, a, b, z) => { veces++; return a + "\n" + serializar(c) + "\n" + z; });
+  if (veces !== 1) throw new Error("No encontré el bloque de contenido en index.html.");
+  if (RE_SEO.test(nuevo)) nuevo = nuevo.replace(RE_SEO, () => bloqueSeo(c));
+  if (!previa) {
+    extraerContenido(nuevo); // se vuelve a leer para confirmar que quedó bien
+    if (!/<\/html>\s*$/i.test(nuevo)) throw new Error("La página quedó incompleta; no se publicó nada.");
+  }
+  return nuevo;
+}
+function robotsTxt(sitio) { return "User-agent: *\nAllow: /\n" + (sitio ? "Sitemap: " + sitio + "sitemap.xml\n" : ""); }
+function sitemapXml(sitio) {
+  return '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url><loc>' + esc(sitio) + "</loc><lastmod>" + new Date().toISOString().slice(0, 10) + "</lastmod></url>\n</urlset>\n";
+}
+
+/* ==============================================================
+   Fotos: lectura, achicado, paleta y datos de cámara
+   ============================================================== */
+function leerExif(buffer) {
+  const v = new DataView(buffer);
+  if (v.byteLength < 4 || v.getUint16(0) !== 0xFFD8) return null;
+  let o = 2;
+  while (o + 4 <= v.byteLength) {
+    if (v.getUint8(o) !== 0xFF) return null;
+    const marca = v.getUint8(o + 1);
+    if (marca === 0xDA || marca === 0xD9) return null;
+    const largo = v.getUint16(o + 2);
+    if (marca === 0xE1 && o + 10 <= v.byteLength && v.getUint32(o + 4) === 0x45786966 && v.getUint16(o + 8) === 0) {
+      try { return leerTiff(v, o + 10, Math.min(v.byteLength, o + 2 + largo)); } catch (_) { return null; }
+    }
+    o += 2 + largo;
+  }
+  return null;
+}
+function leerTiff(v, t, fin) {
+  const le = v.getUint16(t) === 0x4949;
+  const u16 = (p) => v.getUint16(p, le), u32 = (p) => v.getUint32(p, le);
+  if (u16(t + 2) !== 42) return null;
+  const datos = {};
+  const TAM = { 1: 1, 2: 1, 3: 2, 4: 4, 5: 8, 7: 1, 9: 4, 10: 8 };
+  function ifd(off, tags) {
+    const p = t + off;
+    if (p + 2 > fin) return;
+    const n = u16(p);
+    for (let i = 0; i < n; i++) {
+      const e = p + 2 + i * 12;
+      if (e + 12 > fin) break;
+      const nombre = tags[u16(e)];
+      if (!nombre) continue;
+      const tipo = u16(e + 2), cuenta = u32(e + 4), tam = (TAM[tipo] || 1) * cuenta;
+      const pos = tam > 4 ? t + u32(e + 8) : e + 8;
+      if (pos + Math.min(tam, 8) > fin) continue;
+      let val;
+      if (tipo === 2) { let s = ""; for (let k = 0; k < cuenta && pos + k < fin; k++) { const c = v.getUint8(pos + k); if (!c) break; s += String.fromCharCode(c); } val = s.trim(); }
+      else if (tipo === 3) val = u16(pos);
+      else if (tipo === 4) val = u32(pos);
+      else if (tipo === 5) { const a = u32(pos), b = u32(pos + 4); val = b ? a / b : 0; }
+      else if (tipo === 10) { const a = v.getInt32(pos, le), b = v.getInt32(pos + 4, le); val = b ? a / b : 0; }
+      else continue;
+      datos[nombre] = val;
+    }
+  }
+  ifd(u32(t + 4), { 0x010F: "marca", 0x0110: "modelo", 0x0132: "fechaArchivo", 0x8769: "exif" });
+  if (datos.exif) ifd(datos.exif, { 0x829A: "exposicion", 0x829D: "diafragma", 0x8827: "iso", 0x9003: "fecha", 0x920A: "focal", 0xA434: "lente" });
+  return datos;
+}
+function textoCamara(x) {
+  if (!x) return "";
+  let marca = String(x.marca || "").replace(/\b(corporation|corp\.?|co\.,?\s*ltd\.?|imaging|optical|company|electric)\b/gi, "").replace(/[\s,]+$/g, "").replace(/\s+/g, " ").trim();
+  if (marca === marca.toUpperCase() && marca.length > 3) marca = marca.charAt(0) + marca.slice(1).toLowerCase();
+  marca = marca.charAt(0).toUpperCase() + marca.slice(1);
+  const modelo = String(x.modelo || "").trim();
+  let cam = modelo && marca && modelo.toLowerCase().indexOf(marca.toLowerCase()) === 0 ? modelo : [marca, modelo].filter(Boolean).join(" ");
+  if (/^apple$/i.test(marca) && modelo) cam = modelo;
+  const lente = String(x.lente || "").trim();
+  return [cam, lente && lente.toLowerCase().indexOf(modelo.toLowerCase() || "\u0000") < 0 ? lente : ""].filter(Boolean).join(" · ");
+}
+function textoTecnica(x) {
+  if (!x) return "";
+  const p = [];
+  if (x.focal) p.push(Math.round(x.focal) + " mm");
+  if (x.diafragma) p.push("f/" + (Math.round(x.diafragma * 10) / 10));
+  if (x.exposicion) p.push(x.exposicion >= 1 ? Math.round(x.exposicion * 10) / 10 + " s" : "1/" + Math.round(1 / x.exposicion) + " s");
+  if (x.iso) p.push("ISO " + x.iso);
+  return p.join(" · ");
+}
+async function decodificar(archivo) {
+  if (window.createImageBitmap) {
+    try { return await createImageBitmap(archivo, { imageOrientation: "from-image" }); } catch (_) {}
+  }
+  const url = URL.createObjectURL(archivo);
+  try {
+    const img = new Image();
+    img.decoding = "async";
+    img.src = url;
+    await img.decode();
+    return img;
+  } finally { setTimeout(() => URL.revokeObjectURL(url), 2000); }
+}
+const anchoDe = (f) => f.naturalWidth || f.width;
+const altoDe = (f) => f.naturalHeight || f.height;
+/* Achica por mitades para que quede nítida, y al final al tamaño justo */
+const TOPE_LIENZO = 16000000; // píxeles
+function lienzoA(fuente, ancho, alto) {
+  let src = fuente, sw = anchoDe(fuente), sh = altoDe(fuente);
+  while (sw >= ancho * 2 && sh >= alto * 2) {
+    const c = document.createElement("canvas");
+    let f = 0.5;
+    if (sw * sh * f * f > TOPE_LIENZO) f = Math.sqrt(TOPE_LIENZO / (sw * sh));
+    c.width = Math.max(ancho, Math.round(sw * f)); c.height = Math.max(alto, Math.round(sh * f));
+    const x = c.getContext("2d");
+    x.imageSmoothingEnabled = true; x.imageSmoothingQuality = "high";
+    x.drawImage(src, 0, 0, c.width, c.height);
+    if (src !== fuente) { src.width = 0; src.height = 0; }
+    src = c; sw = c.width; sh = c.height;
+  }
+  const c = document.createElement("canvas");
+  c.width = ancho; c.height = alto;
+  const x = c.getContext("2d");
+  x.fillStyle = "#fff"; x.fillRect(0, 0, ancho, alto);
+  x.imageSmoothingEnabled = true; x.imageSmoothingQuality = "high";
+  x.drawImage(src, 0, 0, ancho, alto);
+  if (src !== fuente) { src.width = 0; src.height = 0; }
+  return c;
+}
+const lienzoABlob = (c, calidad) => new Promise((ok, mal) => c.toBlob((b) => (b ? ok(b) : mal(new Error("No se pudo comprimir la imagen."))), "image/jpeg", calidad));
+function medidasPara(w, h, lado) {
+  const escala = Math.min(1, lado / Math.max(w, h));
+  return [Math.max(1, Math.round(w * escala)), Math.max(1, Math.round(h * escala))];
+}
+/* Paleta: el mismo cálculo que usa la página (k-medias sobre una versión de 64 px) */
+function extraerPaleta(img, k) {
+  k = k || 5;
+  const W = anchoDe(img), H = altoDe(img);
+  const w = 64, h = Math.max(1, Math.round(64 * H / W));
+  const lienzo = document.createElement("canvas");
+  lienzo.width = w; lienzo.height = h;
+  const ctx = lienzo.getContext("2d", { willReadFrequently: true });
+  ctx.drawImage(img, 0, 0, w, h);
+  const d = ctx.getImageData(0, 0, w, h).data;
+  const px = [];
+  for (let i = 0; i < d.length; i += 4) px.push([d[i], d[i + 1], d[i + 2]]);
+  const dist = (a, b) => (a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2 + (a[2] - b[2]) ** 2;
+  let cent = [px.reduce((a, p) => [a[0] + p[0] / px.length, a[1] + p[1] / px.length, a[2] + p[2] / px.length], [0, 0, 0])];
+  while (cent.length < 9) {
+    let mejor = px[0], md = -1;
+    for (const p of px) { let m = Infinity; for (const c of cent) m = Math.min(m, dist(p, c)); if (m > md) { md = m; mejor = p; } }
+    cent.push(mejor.slice());
+  }
+  const asig = new Array(px.length).fill(0);
+  for (let it = 0; it < 12; it++) {
+    const suma = cent.map(() => [0, 0, 0, 0]);
+    px.forEach((p, i) => {
+      let b = 0, bd = Infinity;
+      cent.forEach((c, j) => { const dd = dist(p, c); if (dd < bd) { bd = dd; b = j; } });
+      asig[i] = b; const s = suma[b]; s[0] += p[0]; s[1] += p[1]; s[2] += p[2]; s[3]++;
+    });
+    cent = suma.map((s, j) => (s[3] ? [s[0] / s[3], s[1] / s[3], s[2] / s[3]] : cent[j]));
+  }
+  const cuenta = cent.map(() => 0);
+  asig.forEach((a) => cuenta[a]++);
+  const sat = (c) => { const mx = Math.max(c[0], c[1], c[2]), mn = Math.min(c[0], c[1], c[2]); return mx ? (mx - mn) / mx : 0; };
+  const grupos = cent.map((c, j) => ({ c: c, n: cuenta[j], puntaje: Math.sqrt(cuenta[j] / px.length) * (1 + 1.6 * sat(c)) }))
+    .filter((g) => g.n > px.length * 0.01)
+    .sort((a, b) => b.puntaje - a.puntaje);
+  const elegidos = [];
+  for (const g of grupos) { if (elegidos.length === k) break; if (elegidos.every((e) => dist(e.c, g.c) > 900)) elegidos.push(g); }
+  for (const g of grupos) { if (elegidos.length === k) break; if (elegidos.indexOf(g) < 0) elegidos.push(g); }
+  const hex = (x) => Math.round(x).toString(16).padStart(2, "0");
+  return elegidos.sort((a, b) => b.n - a.n).map((g) => "#" + hex(g.c[0]) + hex(g.c[1]) + hex(g.c[2]));
+}
+async function procesarArchivo(archivo) {
+  let exif = null;
+  try { exif = leerExif(await archivo.slice(0, 256 * 1024).arrayBuffer()); } catch (_) {}
+  let fuente;
+  try { fuente = await decodificar(archivo); }
+  catch (_) { throw new Error("«" + archivo.name + "» no se pudo abrir. Si es HEIC (iPhone), exportala como JPG."); }
+  try {
+    const W = anchoDe(fuente), H = altoDe(fuente);
+    if (!W || !H) throw new Error("«" + archivo.name + "» no tiene medidas válidas.");
+    const [aw, ah] = medidasPara(W, H, TAM_WEB);
+    const lienzoWeb = lienzoA(fuente, aw, ah);
+    const [mw, mh] = medidasPara(aw, ah, TAM_MINI);
+    const lienzoMini = lienzoA(lienzoWeb, mw, mh);
+    const web = await lienzoABlob(lienzoWeb, CALIDAD_WEB);
+    const mini = await lienzoABlob(lienzoMini, CALIDAD_MINI);
+    const paleta = extraerPaleta(lienzoMini);
+    lienzoWeb.width = lienzoWeb.height = 0; lienzoMini.width = lienzoMini.height = 0;
+    const fecha = exif && (exif.fecha || exif.fechaArchivo);
+    return {
+      web: web, mini: mini, ancho: aw, alto: ah, paleta: paleta,
+      anio: fecha && /^\d{4}/.test(fecha) ? fecha.slice(0, 4) : "",
+      camara: textoCamara(exif), tecnica: textoTecnica(exif)
+    };
+  } finally { if (fuente && fuente.close) fuente.close(); }
+}
+
+/* ==============================================================
+   Borrador
+   ============================================================== */
+let temporizadorBorrador = null;
+function hayCambios() { return !!(doc && base) && JSON.stringify(paraGuardar(doc)) !== base.texto; }
+function guardarBorrador(inmediato) {
+  clearTimeout(temporizadorBorrador);
+  const guardar = () => {
+    if (!doc || !base) return;
+    if (hayCambios()) local.poner(CLAVE_BORRADOR, { baseCommit: base.commit, baseTexto: base.texto, doc: paraGuardar(doc), fecha: Date.now() });
+    else local.sacar(CLAVE_BORRADOR);
+  };
+  if (inmediato) guardar(); else temporizadorBorrador = setTimeout(guardar, 250);
+}
+function cambio(opciones) {
+  opciones = opciones || {};
+  guardarBorrador();
+  actualizarBarra();
+  if (opciones.lista) renderFotos();
+  if (opciones.portada) renderPortada();
+}
+async function limpiarBorrador() {
+  local.sacar(CLAVE_BORRADOR);
+  nuevas.forEach((v) => { if (v.urlWeb) URL.revokeObjectURL(v.urlWeb); if (v.urlMini) URL.revokeObjectURL(v.urlMini); });
+  nuevas.clear();
+  await BD.vaciar();
+}
+async function recuperarNuevas() {
+  const claves = await BD.claves();
+  for (const k of claves) {
+    const v = await BD.leer(k);
+    if (v && v.web && v.mini) nuevas.set(k, { web: v.web, mini: v.mini, blobWeb: v.blobWeb || null, blobMini: v.blobMini || null });
+  }
+}
+function registrarNueva(n, datos) {
+  const previa = nuevas.get(n) || {};
+  const v = Object.assign(previa, datos);
+  nuevas.set(n, v);
+  BD.poner(n, { web: v.web, mini: v.mini, blobWeb: v.blobWeb || null, blobMini: v.blobMini || null }).then((ok) => {
+    if (!ok && !avisoAlmacen) {
+      avisoAlmacen = true;
+      dialogo("Publicá antes de cerrar", "Este navegador no deja guardar las fotos nuevas en el dispositivo (puede pasar en modo privado). Van a estar acá mientras no cierres ni recargues la pestaña: publicalas antes de salir.", [{ texto: "Entendido", principal: true }]);
+    }
+  });
+}
+function urlNueva(n, cual) {
+  const v = nuevas.get(n);
+  if (!v) return "";
+  const k = cual === "web" ? "urlWeb" : "urlMini";
+  if (!v[k]) v[k] = URL.createObjectURL(v[cual]);
+  return v[k];
+}
+const publicada = (n) => !!base && base.contenido.fotos.some((f) => f.n === n) && base.archivos.has("fotos/mini/" + n + ".jpg");
+function urlMini(f) {
+  if (nuevas.has(f.n)) return urlNueva(f.n, "mini");
+  return RAW + "/" + REPO.dueno + "/" + REPO.nombre + "/" + base.commit + "/fotos/mini/" + f.n + ".jpg";
+}
+function urlWeb(f) {
+  if (nuevas.has(f.n)) return urlNueva(f.n, "web");
+  return RAW + "/" + REPO.dueno + "/" + REPO.nombre + "/" + base.commit + "/fotos/web/" + f.n + ".jpg";
+}
+
+function resolverChoques() {
+  const enBase = new Set(base.contenido.fotos.map((f) => f.n));
+  doc.fotos.forEach((f) => {
+    if (!nuevas.has(f.n) || !enBase.has(f.n)) return;
+    const viejo = f.n, datos = nuevas.get(viejo);
+    if (datos.blobWeb && base.archivos.get("fotos/web/" + viejo + ".jpg") === datos.blobWeb) {
+      // es la misma foto: ya se había publicado (por ejemplo, si se cerró la pestaña justo al final)
+      nuevas.delete(viejo); BD.borrar(viejo);
+      return;
+    }
+    const numero = siguienteNumero();
+    const n = n3(numero);
+    nuevas.delete(viejo); BD.borrar(viejo);
+    registrarNueva(n, { web: datos.web, mini: datos.mini, blobWeb: datos.blobWeb || null, blobMini: datos.blobMini || null });
+    doc.ajustes.portada = (doc.ajustes.portada || []).map((x) => (x === viejo ? n : x));
+    doc.ajustes.ultimoNumero = numero;
+    f.n = n;
+  });
+}
+
+/* ==============================================================
+   Resumen de cambios
+   ============================================================== */
+function resumen() {
+  if (!doc || !base) return [];
+  const a = base.contenido, b = paraGuardar(doc);
+  const pa = new Map(a.fotos.map((f) => [f.n, f])), pb = new Map(b.fotos.map((f) => [f.n, f]));
+  const partes = [];
+  const altas = b.fotos.filter((f) => !pa.has(f.n)).length;
+  const bajas = a.fotos.filter((f) => !pb.has(f.n)).length;
+  const editadas = b.fotos.filter((f) => pa.has(f.n) && !igual(f, pa.get(f.n))).length;
+  const orden = !igual(a.fotos.map((f) => f.n).filter((n) => pb.has(n)), b.fotos.map((f) => f.n).filter((n) => pa.has(n)));
+  if (altas) partes.push(plural(altas, "foto nueva", "fotos nuevas"));
+  if (bajas) partes.push(plural(bajas, "foto borrada", "fotos borradas"));
+  if (editadas) partes.push(plural(editadas, "foto editada", "fotos editadas"));
+  if (orden) partes.push("orden de las fotos");
+  const claves = new Set(Object.keys(a.textos).concat(Object.keys(b.textos)));
+  const textos = Array.from(claves).filter((k) => (a.textos[k] || "") !== (b.textos[k] || "")).length;
+  if (textos) partes.push(plural(textos, "texto", "textos"));
+  if (!igual(a.categorias, b.categorias)) partes.push("categorías");
+  if (!igual(a.series, b.series)) partes.push("series");
+  if (!igual(a.ajustes.portada, b.ajustes.portada)) partes.push("portada");
+  const sinPortada = (x) => { const c = Object.assign({}, x); delete c.portada; delete c.ultimoNumero; return c; };
+  if (!igual(sinPortada(a.ajustes), sinPortada(b.ajustes))) partes.push("ajustes");
+  return partes;
+}
+function actualizarBarra() {
+  const partes = resumen();
+  const hay = hayCambios();
+  $("#barra-publicar").hidden = !hay || !$("#barra-eleccion").hidden;
+  $("#publicar-resumen").textContent = procesando ? "Preparando fotos… esperá a que terminen para publicar." : partes.join(" · ") || "Cambios menores";
+  ["#btn-publicar", "#btn-descartar", "#btn-previa"].forEach((b) => { $(b).disabled = procesando; });
+  $("#publicar-titulo").textContent = hay ? "Cambios sin publicar" : "Todo publicado";
+  const marcas = { fotos: false, textos: false, grupos: false, ajustes: false };
+  if (hay) {
+    const a = base.contenido, b = paraGuardar(doc);
+    marcas.fotos = !igual(a.fotos, b.fotos) || !igual(a.ajustes.portada, b.ajustes.portada);
+    marcas.textos = !igual(a.textos, b.textos);
+    marcas.grupos = !igual(a.categorias, b.categorias) || !igual(a.series, b.series);
+    const sinP = (x) => { const c = Object.assign({}, x); delete c.portada; delete c.ultimoNumero; return c; };
+    marcas.ajustes = !igual(sinP(a.ajustes), sinP(b.ajustes));
+  }
+  $$(".pestana").forEach((p) => { $(".punto", p).hidden = !marcas[p.dataset.pestana]; });
+}
+
+/* ==============================================================
+   Pestañas
+   ============================================================== */
+function irA(nombre) {
+  pestana = nombre;
+  $$(".pestana").forEach((p) => p.setAttribute("aria-selected", String(p.dataset.pestana === nombre)));
+  ["fotos", "textos", "grupos", "ajustes"].forEach((k) => { $("#p-" + k).hidden = k !== nombre; });
+  if (nombre === "textos") renderTextos();
+  if (nombre === "grupos") renderGrupos();
+  if (nombre === "ajustes") renderAjustes();
+  if (nombre === "fotos") { renderPortada(); renderFotos(); }
+  window.scrollTo({ top: 0 });
+}
+
+/* ==============================================================
+   Fotos
+   ============================================================== */
+const sinTitulo = (f) => !String(f.titulo || "").trim() || f.titulo === "Sin título";
+function puntos(paleta) {
+  const s = el("span", { class: "puntos", "aria-hidden": "true" });
+  (paleta || []).forEach((c) => { const i = document.createElement("i"); i.style.setProperty("--c", c); s.append(i); });
+  return s;
+}
+function renderPortada() {
+  const cont = $("#portada-slots");
+  cont.replaceChildren();
+  const nombres = ["Izquierda", "Centro · grande", "Derecha"];
+  const p = doc.ajustes.portada || [];
+  nombres.forEach((nombre, i) => {
+    const f = doc.fotos.find((x) => x.n === p[i]);
+    const img = el("span", { class: "slot-img" });
+    if (f) img.style.backgroundImage = "url(\"" + urlMini(f) + "\")"; else img.textContent = "Vacío";
+    cont.append(el("button", { type: "button", class: "slot" + (i === 1 ? " centro" : ""), onclick: () => abrirEleccionPortada(i), "aria-label": "Cambiar la foto de la portada: " + nombre }, [
+      img, el("span", { class: "versal", texto: nombre }), el("span", { class: "chico suave", texto: f ? "N.° " + f.n + " · " + (f.titulo || "") : "Tocá para elegir" })
+    ]));
+  });
+  const ocultas = p.filter((n) => { const f = doc.fotos.find((x) => x.n === n); return f && f.oculta; });
+  const llenos = p.slice(0, 3).filter((n) => doc.fotos.some((x) => x.n === n && !x.oculta)).length;
+  const aviso = $("#portada-aviso");
+  aviso.hidden = !(ocultas.length || (llenos > 0 && llenos < 3));
+  aviso.textContent = ocultas.length ? "En la portada hay una foto oculta: no se va a ver. Elegí otra o mostrala."
+    : "Con menos de tres fotos, la portada muestra una sola (la de la izquierda o la primera que haya).";
+}
+let slotPortada = 0;
+function abrirEleccionPortada(i) {
+  slotPortada = i;
+  const g = $("#grilla-portada");
+  g.replaceChildren();
+  doc.fotos.filter((f) => !f.oculta).forEach((f) => {
+    g.append(el("button", { type: "button", onclick: () => elegirPortada(f.n) }, [
+      el("img", { src: urlMini(f), alt: "", loading: "lazy" }),
+      el("span", { texto: "N.° " + f.n + " · " + (f.titulo || "") })
+    ]));
+  });
+  $("#portada-titulo").textContent = "Portada · " + ["izquierda", "centro", "derecha"][i];
+  abrirHoja("#hoja-portada");
+}
+function elegirPortada(n) {
+  const p = (doc.ajustes.portada || []).slice(0, 3);
+  while (p.length < 3) p.push("");
+  const antes = p.indexOf(n);
+  if (antes >= 0 && antes !== slotPortada) p[antes] = p[slotPortada]; // si ya estaba en otro lugar, se intercambian
+  p[slotPortada] = n || "";
+  doc.ajustes.portada = p;
+  cerrarHojas();
+  renderPortada();
+  cambio({ lista: true });
+}
+
+function fotosFiltradas() {
+  const q = $("#buscar").value.trim().toLowerCase();
+  return doc.fotos.filter((f) => !q || [f.n, f.titulo, f.title, f.lugar, f.anio].join(" ").toLowerCase().indexOf(q) >= 0);
+}
+let eligiendo = false;
+const elegidas = new Set();
+function renderFotos() {
+  const lista = $("#lista-fotos");
+  const q = $("#buscar").value.trim().toLowerCase();
+  const portada = doc.ajustes.portada || [];
+  lista.classList.toggle("eligiendo", eligiendo);
+  lista.replaceChildren();
+  const visibles = fotosFiltradas();
+  visibles.forEach((f) => {
+    const i = doc.fotos.indexOf(f);
+    const tags = el("span", { class: "etiquetas" });
+    if (nuevas.has(f.n) && !publicada(f.n)) tags.append(el("span", { class: "tag nueva", texto: "Nueva" }));
+    const pos = portada.indexOf(f.n);
+    if (pos >= 0) tags.append(el("span", { class: "tag portada", texto: "Portada" }));
+    if (f.oculta) tags.append(el("span", { class: "tag oculta", texto: "Oculta" }));
+    if (sinTitulo(f)) tags.append(el("span", { class: "tag falta", texto: "Sin título" }));
+    if (!(f.categorias || []).length) tags.append(el("span", { class: "tag falta", texto: "Sin categoría" }));
+    const check = el("input", { type: "checkbox", class: "sel", "aria-label": "Elegir N.° " + f.n });
+    check.checked = elegidas.has(f.n);
+    check.addEventListener("change", () => { if (check.checked) elegidas.add(f.n); else elegidas.delete(f.n); actualizarEleccion(); });
+    lista.append(el("li", { class: "item-foto" + (f.oculta ? " oculta" : ""), "data-n": f.n }, [
+      check,
+      el("img", { class: "item-img", src: urlMini(f), alt: "", loading: "lazy", width: "92", height: "61" }),
+      el("button", { type: "button", class: "item-abrir", onclick: () => (eligiendo ? (check.checked = !check.checked, check.dispatchEvent(new Event("change"))) : abrirEditor(f.n)) }, [
+        el("span", { class: "n", texto: "N.° " + f.n }),
+        el("strong", { texto: f.titulo || "Sin título" }),
+        el("span", { class: "det", texto: [f.lugar, f.anio].filter(Boolean).join(" · ") || "Sin lugar" }),
+        puntos(f.paleta),
+        tags
+      ]),
+      el("span", { class: "item-orden" }, [
+        el("button", { type: "button", class: "btn-icono", "aria-label": "Subir N.° " + f.n, disabled: i === 0 || !!q, onclick: () => mover(f.n, -1) }, [iconoSvg("i-arriba")]),
+        el("button", { type: "button", class: "btn-icono", "aria-label": "Bajar N.° " + f.n, disabled: i === doc.fotos.length - 1 || !!q, onclick: () => mover(f.n, 1) }, [iconoSvg("i-abajo")])
+      ])
+    ]));
+  });
+  $("#lista-vacia").hidden = visibles.length > 0;
+  $("#cuenta-fotos").textContent = "(" + doc.fotos.length + ")";
+}
+function iconoSvg(id) {
+  const s = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  s.setAttribute("class", "ico"); s.setAttribute("aria-hidden", "true");
+  const u = document.createElementNS("http://www.w3.org/2000/svg", "use");
+  u.setAttribute("href", "#" + id); s.append(u);
+  return s;
+}
+function mover(n, paso) {
+  const i = doc.fotos.findIndex((f) => f.n === n), j = i + paso;
+  if (i < 0 || j < 0 || j >= doc.fotos.length) return;
+  const [f] = doc.fotos.splice(i, 1);
+  doc.fotos.splice(j, 0, f);
+  cambio({ lista: true });
+  const boton = $('.item-foto[data-n="' + n + '"] .item-orden .btn-icono:' + (paso < 0 ? "first-child" : "last-child"));
+  if (boton && !boton.disabled) boton.focus(); else { const b = $('.item-foto[data-n="' + n + '"] .item-abrir'); if (b) b.focus(); }
+}
+function siguienteNumero() {
+  const usados = doc.fotos.concat(base.contenido.fotos).map((f) => parseInt(f.n, 10) || 0);
+  return Math.max(parseInt(doc.ajustes.ultimoNumero, 10) || 0, parseInt(base.contenido.ajustes.ultimoNumero, 10) || 0, 0, ...usados) + 1;
+}
+async function subirArchivos(archivos) {
+  archivos = Array.from(archivos || []).filter((a) => /^image\//.test(a.type) || /\.(jpe?g|png|webp|heic|heif)$/i.test(a.name));
+  if (!archivos.length) return;
+  colaArchivos.push.apply(colaArchivos, archivos);
+  if (procesando) return; // ya hay una tanda en marcha: estas se suman al final
+  procesando = true;
+  actualizarBarra();
+  if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
+  const cola = $("#cola");
+  cola.hidden = false;
+  let hechas = 0;
+  const errores = [];
+  const lugarPrevio = (doc.fotos[0] && doc.fotos[0].lugar) || "";
+  const soportePrevio = (doc.fotos[0] && doc.fotos[0].soporte) || "";
+  while (colaArchivos.length) {
+    const archivo = colaArchivos.shift();
+    const total = hechas + colaArchivos.length + 1;
+    $("#cola-texto").textContent = "Preparando " + (hechas + 1) + " de " + total + ": " + archivo.name;
+    $("#cola-barra").style.width = Math.round((hechas / total) * 100) + "%";
+    try {
+      const r = await procesarArchivo(archivo);
+      const numero = siguienteNumero();
+      const n = n3(numero);
+      registrarNueva(n, { web: r.web, mini: r.mini, blobWeb: null, blobMini: null });
+      doc.ajustes.ultimoNumero = numero;
+      doc.fotos.unshift({
+        n: n, titulo: "Sin título", title: "Untitled", lugar: lugarPrevio, anio: r.anio || String(new Date().getFullYear()),
+        soporte: r.camara ? "Digital" : soportePrevio, camara: r.camara, tecnica: r.tecnica,
+        categorias: [], serie: null, alt: "", paleta: r.paleta, ancho: r.ancho, alto: r.alto, oculta: false
+      });
+      cambio({ lista: true });
+      guardarBorrador(true);
+    } catch (e) {
+      errores.push(e.message || String(e));
+    }
+    hechas++;
+  }
+  procesando = false;
+  actualizarBarra();
+  $("#cola-barra").style.width = "100%";
+  const ok = hechas - errores.length;
+  $("#cola-texto").textContent = ok ? plural(ok, "foto lista", "fotos listas") + " como borrador. Completá los datos y publicá." : "No se pudo preparar ninguna foto.";
+  if (errores.length) dialogo("Algunas fotos no se pudieron preparar", errores.join("\n"), [{ texto: "Entendido", principal: true }]);
+  setTimeout(() => { if (!procesando) cola.hidden = true; }, 6000);
+  renderPortada();
+}
+
+/* ---------- Editor de una foto ---------- */
+let editando = null;
+const SOPORTES = ["Película 35 mm", "Película 120 mm", "Digital", "Celular"];
+function campoTexto(etiqueta, valor, alCambiar, opciones) {
+  opciones = opciones || {};
+  const id = "c" + Math.random().toString(36).slice(2, 9);
+  const entrada = opciones.multilinea ? el("textarea", { id: id, rows: opciones.filas || 3 }) : el("input", { id: id, type: opciones.tipo || "text", inputmode: opciones.inputmode, placeholder: opciones.placeholder || null, list: opciones.lista || null, autocomplete: "off" });
+  entrada.value = valor == null ? "" : valor;
+  entrada.addEventListener("input", () => alCambiar(entrada.value, entrada));
+  return el("div", { class: "campo" }, [
+    el("label", { for: id, texto: etiqueta }),
+    entrada,
+    opciones.ayuda ? el("p", { class: "ayuda", texto: opciones.ayuda }) : null
+  ]);
+}
+function abrirEditor(n) {
+  editando = n;
+  renderEditor();
+  abrirHoja("#hoja-editor");
+}
+function renderEditor() {
+  const f = doc.fotos.find((x) => x.n === editando);
+  if (!f) { cerrarHojas(); return; }
+  const i = doc.fotos.indexOf(f);
+  $("#editor-titulo").textContent = "N.° " + f.n;
+  $("#editor-pos").textContent = (i + 1) + " de " + doc.fotos.length;
+  $("#editor-ant").disabled = i === 0;
+  $("#editor-sig").disabled = i === doc.fotos.length - 1;
+  const cuerpo = $("#editor-cuerpo");
+  cuerpo.replaceChildren();
+  const set = (k) => (v) => { f[k] = v; cambio(); renderFilaLista(f); };
+
+  // Foto y paleta
+  const img = el("img", { src: urlWeb(f), alt: f.alt || "", crossorigin: nuevas.has(f.n) ? null : "anonymous" });
+  const paleta = el("div", { class: "paleta-edicion" });
+  const pintarPaleta = () => {
+    paleta.replaceChildren();
+    (f.paleta || []).forEach((c, k) => {
+      const entrada = el("input", { type: "color", "aria-label": "Color " + (k + 1) + " de la paleta" });
+      entrada.value = HEX.test(c) ? c : "#cccccc";
+      const codigo = el("code", { texto: entrada.value });
+      entrada.addEventListener("input", () => { f.paleta[k] = entrada.value.toLowerCase(); codigo.textContent = entrada.value; cambio(); renderFilaLista(f); });
+      paleta.append(el("span", { class: "color" }, [entrada, codigo]));
+    });
+    paleta.append(el("button", { type: "button", class: "btn btn-chico", onclick: recalcular }, [iconoSvg("i-recalcular"), document.createTextNode("Recalcular")]));
+  };
+  const recalcular = async () => {
+    try {
+      const fuente = nuevas.has(f.n) ? await decodificar(nuevas.get(f.n).mini) : await cargarImagen(urlMini(f));
+      f.paleta = extraerPaleta(fuente);
+      if (fuente.close) fuente.close();
+      pintarPaleta(); cambio(); renderFilaLista(f);
+      avisar("Paleta recalculada.");
+    } catch (_) { avisar("No se pudo leer la imagen para calcular la paleta.", true); }
+  };
+  pintarPaleta();
+  cuerpo.append(el("div", { class: "editor-foto" }, [img, paleta]));
+
+  // Datos
+  cuerpo.append(campoTexto("Título", f.titulo, set("titulo"), { ayuda: "En castellano. Aparece en mayúsculas debajo de la foto." }));
+  cuerpo.append(campoTexto("Título en inglés", f.title, set("title"), { placeholder: "Opcional" }));
+  cuerpo.append(el("div", { class: "fila-campos" }, [
+    campoTexto("Lugar", f.lugar, set("lugar"), { placeholder: "Ej.: Playa Grande, Mar del Plata" }),
+    campoTexto("Año", f.anio, set("anio"), { inputmode: "numeric", placeholder: "2026" })
+  ]));
+  const lista = el("datalist", { id: "soportes" }, SOPORTES.map((s) => el("option", { value: s })));
+  cuerpo.append(lista);
+  cuerpo.append(el("div", { class: "fila-campos" }, [
+    campoTexto("Soporte", f.soporte, set("soporte"), { lista: "soportes", placeholder: "Película 35 mm, Digital…" }),
+    campoTexto("Cámara", f.camara, set("camara"), { placeholder: "Opcional" })
+  ]));
+  cuerpo.append(campoTexto("Técnica", f.tecnica, set("tecnica"), { placeholder: "Ej.: 23 mm · f/2 · 1/500 s · ISO 160", ayuda: "Se completa sola con los datos de la cámara cuando la foto los trae." }));
+
+  // Categorías
+  const chips = el("div", { class: "chips", role: "group", "aria-label": "Categorías" });
+  doc.categorias.forEach((c) => {
+    const activa = (f.categorias || []).indexOf(c.id) >= 0;
+    chips.append(el("button", { type: "button", class: "chip", "aria-pressed": String(activa), texto: c.nombre, onclick: (e) => {
+      const b = e.currentTarget, on = b.getAttribute("aria-pressed") !== "true";
+      b.setAttribute("aria-pressed", String(on));
+      const set2 = new Set(f.categorias || []);
+      if (on) set2.add(c.id); else set2.delete(c.id);
+      f.categorias = doc.categorias.map((x) => x.id).filter((id) => set2.has(id));
+      cambio(); renderFilaLista(f);
+    } }));
+  });
+  cuerpo.append(el("div", { class: "campo" }, [el("span", { class: "etiqueta", texto: "Categorías" }), chips,
+    doc.categorias.length ? null : el("p", { class: "ayuda", texto: "Todavía no hay categorías. Creá alguna en «Categorías y series»." })]));
+
+  // Serie
+  const sel = el("select", { id: "editor-serie" }, [el("option", { value: "", texto: "Ninguna" })].concat(doc.series.map((s) => el("option", { value: s.id, texto: s.titulo }))));
+  sel.value = f.serie || "";
+  sel.addEventListener("change", () => { f.serie = sel.value || null; cambio(); renderFilaLista(f); });
+  cuerpo.append(el("div", { class: "campo" }, [el("label", { for: "editor-serie", texto: "Serie" }), sel]));
+
+  cuerpo.append(campoTexto("Descripción de la foto", f.alt, set("alt"), { multilinea: true, filas: 2, ayuda: "Una frase que cuente qué se ve. La usan Google y los lectores de pantalla (no aparece escrita en la página)." }));
+
+  const oculta = el("input", { type: "checkbox" });
+  oculta.checked = !!f.oculta;
+  oculta.addEventListener("change", () => { f.oculta = oculta.checked; cambio({ lista: true, portada: true }); });
+  cuerpo.append(el("label", { class: "check" }, [oculta, document.createTextNode("Ocultar de la página (queda guardada acá y la podés volver a mostrar)")]));
+}
+function renderFilaLista(f) {
+  const fila = $('.item-foto[data-n="' + f.n + '"]');
+  if (!fila) return;
+  $(".item-abrir strong", fila).textContent = f.titulo || "Sin título";
+  $(".item-abrir .det", fila).textContent = [f.lugar, f.anio].filter(Boolean).join(" · ") || "Sin lugar";
+  $(".puntos", fila).replaceWith(puntos(f.paleta));
+  const tags = $(".etiquetas", fila);
+  $$(".tag.falta", tags).forEach((t) => t.remove());
+  if (sinTitulo(f)) tags.append(el("span", { class: "tag falta", texto: "Sin título" }));
+  if (!(f.categorias || []).length) tags.append(el("span", { class: "tag falta", texto: "Sin categoría" }));
+}
+function cargarImagen(url) {
+  return new Promise((ok, mal) => {
+    const i = new Image();
+    i.crossOrigin = "anonymous";
+    i.onload = () => ok(i);
+    i.onerror = () => mal(new Error("imagen"));
+    i.src = url + (url.indexOf("?") < 0 ? "?" : "&") + "c=" + Date.now();
+  });
+}
+function borrarFotos(ns, alTerminar) {
+  const k = ns.length;
+  const publicadas = ns.filter(publicada).length;
+  dialogo(k === 1 ? "¿Borrar la foto N.° " + ns[0] + "?" : "¿Borrar " + k + " fotos?",
+    (publicadas ? "Se van a sacar de la página cuando publiques. " : "") + "Si solo querés que no se vean, mejor usá «Ocultar».",
+    [{ texto: "Cancelar" }, { texto: "Borrar", peligro: true, fn: () => {
+      const set = new Set(ns);
+      doc.fotos = doc.fotos.filter((f) => !set.has(f.n));
+      doc.ajustes.portada = (doc.ajustes.portada || []).map((n) => (set.has(n) ? "" : n));
+      ns.forEach((n) => {
+        if (!publicada(n)) {
+          const v = nuevas.get(n);
+          if (v) { if (v.urlWeb) URL.revokeObjectURL(v.urlWeb); if (v.urlMini) URL.revokeObjectURL(v.urlMini); }
+          nuevas.delete(n); BD.borrar(n);
+        }
+      });
+      cambio({ lista: true, portada: true });
+      if (alTerminar) alTerminar();
+    } }]);
+}
+
+/* ---------- Elegir varias ---------- */
+function actualizarEleccion() {
+  $("#eleccion-texto").textContent = plural(elegidas.size, "elegida", "elegidas");
+  $("#btn-editar-varias").disabled = !elegidas.size;
+}
+function modoEleccion(on) {
+  eligiendo = on;
+  elegidas.clear();
+  $("#barra-eleccion").hidden = !on;
+  $("#btn-elegir").textContent = on ? "Dejar de elegir" : "Elegir varias";
+  actualizarEleccion();
+  actualizarBarra();
+  renderFotos();
+}
+function abrirVarias() {
+  if (!elegidas.size) return;
+  const cuerpo = $("#varias-cuerpo");
+  cuerpo.replaceChildren();
+  $("#varias-titulo").textContent = "Editar " + plural(elegidas.size, "foto", "fotos");
+  cuerpo.append(el("p", { class: "nota", texto: "Solo se cambia lo que completes. Lo que dejes vacío queda como está en cada foto." }));
+  const datos = { lugar: "", anio: "", soporte: "", camara: "", sumar: new Set(), quitar: new Set(), serie: "__igual", oculta: "__igual" };
+  cuerpo.append(el("div", { class: "fila-campos" }, [
+    campoTexto("Lugar", "", (v) => { datos.lugar = v; }),
+    campoTexto("Año", "", (v) => { datos.anio = v; }, { inputmode: "numeric" })
+  ]));
+  cuerpo.append(el("datalist", { id: "soportes-v" }, SOPORTES.map((s) => el("option", { value: s }))));
+  cuerpo.append(el("div", { class: "fila-campos" }, [
+    campoTexto("Soporte", "", (v) => { datos.soporte = v; }, { lista: "soportes-v" }),
+    campoTexto("Cámara", "", (v) => { datos.camara = v; })
+  ]));
+  const chipsDe = (conjunto, otro, etiqueta, grupo) => {
+    const c = el("div", { class: "chips" });
+    doc.categorias.forEach((cat) => c.append(el("button", { type: "button", class: "chip", "aria-pressed": "false", "data-grupo": grupo, "data-cat": cat.id, texto: cat.nombre, onclick: (e) => {
+      const b = e.currentTarget, on = b.getAttribute("aria-pressed") !== "true";
+      b.setAttribute("aria-pressed", String(on));
+      if (on) {
+        conjunto.add(cat.id); otro.delete(cat.id);
+        $$('.chip[data-cat="' + cat.id + '"]', cuerpo).forEach((x) => { if (x !== b) x.setAttribute("aria-pressed", "false"); });
+      } else conjunto.delete(cat.id);
+    } })));
+    return el("div", { class: "campo" }, [el("span", { class: "etiqueta", texto: etiqueta }), c]);
+  };
+  if (doc.categorias.length) {
+    cuerpo.append(chipsDe(datos.sumar, datos.quitar, "Sumar a estas categorías", "sumar"));
+    cuerpo.append(chipsDe(datos.quitar, datos.sumar, "Sacar de estas categorías", "quitar"));
+  }
+  const sel = el("select", { id: "varias-serie" }, [el("option", { value: "__igual", texto: "(no cambiar)" }), el("option", { value: "", texto: "Ninguna" })].concat(doc.series.map((s) => el("option", { value: s.id, texto: s.titulo }))));
+  sel.addEventListener("change", () => { datos.serie = sel.value; });
+  cuerpo.append(el("div", { class: "campo" }, [el("label", { for: "varias-serie", texto: "Serie" }), sel]));
+  const vis = el("select", { id: "varias-oculta" }, [el("option", { value: "__igual", texto: "(no cambiar)" }), el("option", { value: "mostrar", texto: "Mostrar en la página" }), el("option", { value: "ocultar", texto: "Ocultar de la página" })]);
+  vis.addEventListener("change", () => { datos.oculta = vis.value; });
+  cuerpo.append(el("div", { class: "campo" }, [el("label", { for: "varias-oculta", texto: "Visibilidad" }), vis]));
+  $("#varias-aplicar").onclick = () => {
+    const orden = doc.categorias.map((c) => c.id);
+    doc.fotos.forEach((f) => {
+      if (!elegidas.has(f.n)) return;
+      ["lugar", "anio", "soporte", "camara"].forEach((k) => { if (datos[k].trim()) f[k] = datos[k].trim(); });
+      if (datos.sumar.size || datos.quitar.size) {
+        const s = new Set(f.categorias || []);
+        datos.sumar.forEach((id) => s.add(id)); datos.quitar.forEach((id) => s.delete(id));
+        f.categorias = orden.filter((id) => s.has(id));
+      }
+      if (datos.serie !== "__igual") f.serie = datos.serie || null;
+      if (datos.oculta !== "__igual") f.oculta = datos.oculta === "ocultar";
+    });
+    const k = elegidas.size;
+    cerrarHojas();
+    modoEleccion(false);
+    cambio({ lista: true, portada: true });
+    avisar("Listo: se editaron " + plural(k, "foto", "fotos") + ".");
+  };
+  $("#varias-borrar").onclick = () => borrarFotos(Array.from(elegidas), () => { cerrarHojas(); modoEleccion(false); });
+  abrirHoja("#hoja-varias");
+}
+
+/* ==============================================================
+   Textos
+   ============================================================== */
+const ESQUEMA = [
+  { grupo: "Portada", ayuda: "Lo primero que se ve al entrar.", campos: [
+    ["portada.creditos", "Línea de arriba (nombre y profesión)", "linea", true],
+    ["portada.titulo", "Título grande", "linea", true],
+    ["portada.traduccion", "Traducción del título (en cursiva)", "linea"],
+    ["portada.intro", "Presentación", "texto"],
+    ["portada.boton-archivo", "Botón 1", "linea", true],
+    ["portada.boton-cuadros", "Botón 2", "linea", true],
+    ["portada.dato", "Dato del final (al lado de la cantidad de fotos)", "linea"]
+  ] },
+  { grupo: "Marca y menú", ayuda: "El nombre de arriba de todo (también va en el pie) y los links del menú.", campos: [
+    ["marca.nombre", "Nombre de la marca", "linea", true],
+    ["marca.lugar", "Lugar (debajo del nombre)", "linea"],
+    ["menu.archivo", "Menú · Archivo", "linea", true],
+    ["menu.series", "Menú · Series", "linea", true],
+    ["menu.cuadros", "Menú · Cuadros", "linea", true],
+    ["menu.sobre", "Menú · Sobre mí", "linea", true]
+  ] },
+  { grupo: "Capítulo · El archivo", campos: [
+    ["archivo.titulo", "Título", "linea", true],
+    ["archivo.ingles", "Título en inglés", "linea"],
+    ["archivo.nota", "Texto de ayuda", "texto"],
+    ["archivo.todo", "Botón para ver todas las fotos", "linea", true],
+    ["archivo.vacio-titulo", "Categoría sin fotos · título", "linea"],
+    ["archivo.vacio-texto", "Categoría sin fotos · texto", "texto"]
+  ] },
+  { grupo: "Capítulo · Las series", campos: [
+    ["series.titulo", "Título", "linea", true],
+    ["series.ingles", "Título en inglés", "linea"],
+    ["series.nota", "Texto", "texto"]
+  ] },
+  { grupo: "Capítulo · Cómo pedir un cuadro", campos: [
+    ["cuadros.titulo", "Título", "linea", true],
+    ["cuadros.ingles", "Título en inglés", "linea"],
+    ["cuadros.nota", "Texto", "texto"],
+    ["cuadros.paso1-titulo", "Paso 1 · título", "linea", true],
+    ["cuadros.paso1-texto", "Paso 1 · texto", "texto"],
+    ["cuadros.paso2-titulo", "Paso 2 · título", "linea", true],
+    ["cuadros.paso2-texto", "Paso 2 · texto", "texto"],
+    ["cuadros.paso3-titulo", "Paso 3 · título", "linea", true],
+    ["cuadros.paso3-texto", "Paso 3 · texto", "texto"],
+    ["cuadros.boton", "Botón de WhatsApp", "linea", true]
+  ] },
+  { grupo: "Capítulo · Sobre mí", campos: [
+    ["sobre.titulo", "Título", "linea", true],
+    ["sobre.ingles", "Título en inglés", "linea"],
+    ["sobre.texto", "Texto", "parrafos", false, "Dejá una línea en blanco entre párrafos."]
+  ] },
+  { grupo: "Recuadro de trabajos", ayuda: "El recuadro amarillo debajo de «Sobre mí».", campos: [
+    ["trabajos.etiqueta", "Etiqueta chica", "linea"],
+    ["trabajos.titulo", "Título", "linea"],
+    ["trabajos.texto", "Texto", "texto"],
+    ["trabajos.boton", "Botón", "linea", true]
+  ] },
+  { grupo: "Pie de página y visor", campos: [
+    ["pie.texto", "Texto del pie", "texto"],
+    ["pie.legal", "Aviso legal", "texto", false, "Escribí {año} y se completa solo con el año actual."],
+    ["visor.nota", "Nota al ver una foto en grande", "texto"]
+  ] },
+  { grupo: "Mensajes de WhatsApp", ayuda: "Lo que le queda escrito a quien te contacta. {nombre} es tu nombre (de Ajustes).", campos: [
+    ["whatsapp.general", "Consulta general", "texto", true],
+    ["whatsapp.trabajo", "Consulta por un trabajo", "texto", true],
+    ["whatsapp.foto", "Consulta por una foto", "texto", true, "Podés usar {n} (número), {titulo}, {lugar} y {enlace} (link directo a la foto)."],
+    ["whatsapp.seleccion", "Consulta por una selección", "texto", true, "{lista} es la lista de fotos elegidas (con el comentario, si dejan uno)."]
+  ] },
+  { grupo: "Google y links compartidos", ayuda: "Cómo aparece la página en Google y en la vista previa cuando mandás el link por WhatsApp o Instagram.", campos: [
+    ["seo.titulo", "Título", "linea", true, "Ideal: menos de 60 letras."],
+    ["seo.descripcion", "Descripción", "texto", true, "Ideal: una o dos oraciones, menos de 160 letras."]
+  ] }
+];
+const OBLIGATORIOS = new Set();
+ESQUEMA.forEach((g) => g.campos.forEach((c) => { if (c[3]) OBLIGATORIOS.add(c[0]); }));
+function renderTextos() {
+  const cont = $("#form-textos");
+  cont.replaceChildren();
+  ESQUEMA.forEach((g) => {
+    const bloque = el("div", { class: "bloque" }, [el("h3", { texto: g.grupo }), g.ayuda ? el("p", { class: "ayuda-bloque", texto: g.ayuda }) : null]);
+    g.campos.forEach(([clave, etiqueta, tipo, requerido, ayuda]) => {
+      const id = "t-" + clave.replace(/[^a-z0-9]/gi, "-");
+      const valor = doc.textos[clave] == null ? "" : doc.textos[clave];
+      const entrada = tipo === "linea" ? el("input", { type: "text", id: id, autocomplete: "off" }) : el("textarea", { id: id, rows: tipo === "parrafos" ? 7 : 3 });
+      entrada.value = valor;
+      const campo = el("div", { class: "campo", "data-clave": clave }, [
+        el("label", { for: id, texto: etiqueta + (requerido ? " *" : "") }),
+        entrada,
+        ayuda ? el("p", { class: "ayuda", texto: ayuda }) : null,
+        el("p", { class: "error", texto: "Este texto no puede quedar vacío.", hidden: true }),
+        el("button", { type: "button", class: "restaurar", texto: "Volver al texto publicado", hidden: true })
+      ]);
+      const publicado = base.contenido.textos[clave] == null ? "" : base.contenido.textos[clave];
+      const marcar = () => {
+        const cambiado = (doc.textos[clave] || "") !== (publicado || "");
+        campo.classList.toggle("cambiado", cambiado);
+        $(".restaurar", campo).hidden = !cambiado;
+        const vacio = !!requerido && !String(doc.textos[clave] || "").trim();
+        campo.classList.toggle("con-error", vacio);
+        $(".error", campo).hidden = !vacio;
+      };
+      entrada.addEventListener("input", () => { doc.textos[clave] = entrada.value; marcar(); cambio(); });
+      $(".restaurar", campo).addEventListener("click", () => { entrada.value = publicado; doc.textos[clave] = publicado; marcar(); cambio(); });
+      marcar();
+      bloque.append(campo);
+    });
+    cont.append(bloque);
+  });
+}
+
+/* ==============================================================
+   Categorías y series
+   ============================================================== */
+function cuantasCon(tipo, id) { return doc.fotos.filter((f) => (tipo === "cat" ? (f.categorias || []).indexOf(id) >= 0 : f.serie === id)).length; }
+function moverEn(lista, i, paso) { const j = i + paso; if (j < 0 || j >= lista.length) return false; const [x] = lista.splice(i, 1); lista.splice(j, 0, x); return true; }
+function renderGrupos() {
+  const lc = $("#lista-categorias");
+  lc.replaceChildren();
+  doc.categorias.forEach((c, i) => {
+    const entrada = el("input", { type: "text", "aria-label": "Nombre de la categoría", value: c.nombre });
+    entrada.value = c.nombre;
+    entrada.addEventListener("input", () => { c.nombre = entrada.value; cambio(); });
+    entrada.addEventListener("blur", () => { if (!entrada.value.trim()) { entrada.value = c.nombre = "Sin nombre"; cambio(); } });
+    const k = cuantasCon("cat", c.id);
+    lc.append(el("div", { class: "fila-cat" }, [
+      entrada,
+      el("span", { class: "cuenta", texto: plural(k, "foto", "fotos") }),
+      el("span", { class: "acciones-fila" }, [
+        el("button", { type: "button", class: "btn-icono", "aria-label": "Subir", disabled: i === 0, onclick: () => { moverEn(doc.categorias, i, -1); cambio(); renderGrupos(); } }, [iconoSvg("i-arriba")]),
+        el("button", { type: "button", class: "btn-icono", "aria-label": "Bajar", disabled: i === doc.categorias.length - 1, onclick: () => { moverEn(doc.categorias, i, 1); cambio(); renderGrupos(); } }, [iconoSvg("i-abajo")]),
+        el("button", { type: "button", class: "btn-icono", "aria-label": "Borrar la categoría " + c.nombre, onclick: () => {
+          dialogo("¿Borrar la categoría «" + c.nombre + "»?", k ? "Las " + plural(k, "foto", "fotos") + " que la tienen no se borran: solo dejan de estar en esa categoría." : "No tiene fotos.", [
+            { texto: "Cancelar" }, { texto: "Borrar", peligro: true, fn: () => {
+              doc.categorias = doc.categorias.filter((x) => x !== c);
+              doc.fotos.forEach((f) => { f.categorias = (f.categorias || []).filter((id) => id !== c.id); });
+              cambio({ lista: true }); renderGrupos();
+            } }]);
+        } }, [iconoSvg("i-basura")])
+      ])
+    ]));
+  });
+  if (!doc.categorias.length) lc.append(el("p", { class: "suave chico", texto: "No hay categorías." }));
+
+  const ls = $("#lista-series");
+  ls.replaceChildren();
+  doc.series.forEach((s, i) => {
+    const k = cuantasCon("serie", s.id);
+    const t = el("div", { class: "tarjeta-serie" }, [
+      el("div", { class: "cabeza" }, [
+        el("span", { class: "versal suave", texto: "Serie · " + plural(k, "foto", "fotos") }),
+        el("span", { class: "acciones-fila", style: "display:flex;gap:4px" }, [
+          el("button", { type: "button", class: "btn-icono", "aria-label": "Subir", disabled: i === 0, onclick: () => { moverEn(doc.series, i, -1); cambio(); renderGrupos(); } }, [iconoSvg("i-arriba")]),
+          el("button", { type: "button", class: "btn-icono", "aria-label": "Bajar", disabled: i === doc.series.length - 1, onclick: () => { moverEn(doc.series, i, 1); cambio(); renderGrupos(); } }, [iconoSvg("i-abajo")]),
+          el("button", { type: "button", class: "btn-icono", "aria-label": "Borrar la serie " + s.titulo, onclick: () => {
+            dialogo("¿Borrar la serie «" + s.titulo + "»?", k ? "Las fotos no se borran: solo dejan de estar en esta serie." : "No tiene fotos.", [
+              { texto: "Cancelar" }, { texto: "Borrar", peligro: true, fn: () => {
+                doc.series = doc.series.filter((x) => x !== s);
+                doc.fotos.forEach((f) => { if (f.serie === s.id) f.serie = null; });
+                cambio({ lista: true }); renderGrupos();
+              } }]);
+          } }, [iconoSvg("i-basura")])
+        ])
+      ]),
+      campoTexto("Título", s.titulo, (v) => {
+        s.titulo = v;
+        if (v.trim() && !base.contenido.series.some((x) => x.id === s.id)) {
+          const nuevoId = idUnico(v, doc.series.filter((x) => x !== s).concat(doc.categorias));
+          doc.fotos.forEach((f) => { if (f.serie === s.id) f.serie = nuevoId; });
+          s.id = nuevoId;
+        }
+        cambio();
+      }),
+      campoTexto("Título en inglés", s.title, (v) => { s.title = v; cambio(); }),
+      campoTexto("Texto", s.texto, (v) => { s.texto = v; cambio(); }, { multilinea: true, filas: 2 })
+    ]);
+    ls.append(t);
+  });
+  if (!doc.series.length) ls.append(el("p", { class: "suave chico", texto: "No hay series." }));
+}
+function idUnico(nombre, lista) {
+  const baseId = slug(nombre).replace(/^foto-/, "fotos-");
+  let id = baseId, k = 2;
+  const usados = new Set(lista.map((x) => x.id).concat(["todo", "inicio", "archivo", "series", "cuadros", "sobre-mi"]));
+  while (usados.has(id) || /^foto-/.test(id)) id = baseId + "-" + k++;
+  return id;
+}
+
+/* ==============================================================
+   Ajustes
+   ============================================================== */
+function renderAjustes() {
+  const a = doc.ajustes;
+  const cont = $("#form-ajustes");
+  cont.replaceChildren(el("h3", { texto: "Contacto y redes" }));
+  const wa = campoTexto("Tu número de WhatsApp", a.whatsapp, (v, entrada) => {
+    a.whatsapp = v.replace(/\D/g, "");
+    validarWa(); cambio();
+  }, { tipo: "tel", inputmode: "numeric", placeholder: "5492231234567", ayuda: "Con código de país y sin el 15: 54 9 + característica + número, todo junto. Ej.: 5492231234567." });
+  const errorWa = el("p", { class: "error", hidden: true });
+  const probar = el("a", { class: "btn-texto", target: "_blank", rel: "noopener", texto: "Probar el link de WhatsApp" });
+  wa.append(errorWa, probar);
+  function validarWa() {
+    const d = String(a.whatsapp || "");
+    const ok = !d || (d.length >= 10 && d.length <= 15);
+    errorWa.hidden = ok;
+    errorWa.textContent = "El número parece incompleto: tiene " + d.length + " dígitos.";
+    wa.classList.toggle("con-error", !ok);
+    probar.hidden = !d || !ok;
+    probar.href = "https://wa.me/" + d;
+  }
+  validarWa();
+  cont.append(wa);
+  if (!a.whatsapp) cont.append(el("p", { class: "nota alerta", texto: "Todavía no cargaste tu número: sin él, los botones de WhatsApp de la página no te llegan a vos." }));
+  cont.append(el("div", { class: "fila-campos" }, [
+    campoTexto("Tu nombre (para los mensajes)", a.nombre, (v) => { a.nombre = v; cambio(); }, { ayuda: "Se usa en «¡Hola Cristian!»." }),
+    campoTexto("Nombre completo", a.nombreCompleto, (v) => { a.nombreCompleto = v; cambio(); }, { ayuda: "Para Google." })
+  ]));
+  cont.append(el("div", { class: "fila-campos" }, [
+    campoTexto("Usuario de Instagram", a.instagram, (v) => { a.instagram = usuarioRed(v); cambio(); }, { placeholder: "ojodecristi", ayuda: "Sin @. Vacío = no se muestra." }),
+    campoTexto("Usuario de TikTok", a.tiktok, (v) => { a.tiktok = usuarioRed(v); cambio(); }, { placeholder: "Opcional", ayuda: "Sin @. Vacío = no se muestra." })
+  ]));
+  const sitio = campoTexto("Dirección de la página", a.sitio, (v) => { a.sitio = v.trim(); cambio(); }, { tipo: "url", placeholder: "https://…", ayuda: "Se usa en los links que se comparten. Si algún día comprás un dominio (ej.: ojodecristi.com.ar), cambialo acá." });
+  sitio.querySelector("input").addEventListener("blur", (e) => { const n = normalizarSitio(e.target.value); if (n && n !== a.sitio) { a.sitio = n; e.target.value = n; cambio(); } });
+  cont.append(sitio);
+  $("#sesion-texto").textContent = usuario ? "Entraste como @" + usuario + ". El token está guardado en este dispositivo." : "";
+  cargarHistorial();
+}
+async function cargarHistorial() {
+  const ol = $("#historial");
+  try {
+    const lista = await gh(rutaRepo("/commits?sha=" + REPO.rama + "&per_page=8"));
+    ol.replaceChildren();
+    lista.forEach((c, i) => {
+      const fecha = new Date(c.commit.author.date);
+      ol.append(el("li", {}, [
+        el("span", { texto: c.commit.message.split("\n")[0] + (i === 0 ? " (actual)" : "") }),
+        el("time", { datetime: c.commit.author.date, texto: fecha.toLocaleString("es-AR", { dateStyle: "medium", timeStyle: "short" }) })
+      ]));
+    });
+    const primero = lista[0];
+    $("#btn-deshacer").hidden = !(primero && primero.commit.message.indexOf(PREFIJO_COMMIT) === 0 && primero.parents && primero.parents.length === 1);
+  } catch (e) {
+    ol.replaceChildren(el("li", { class: "suave", texto: "No se pudo cargar el historial." }));
+  }
+}
+async function deshacerUltima() {
+  if (hayCambios()) { dialogo("Primero publicá o descartá", "Tenés cambios sin publicar. Publicalos o descartalos antes de deshacer.", [{ texto: "Entendido", principal: true }]); return; }
+  try {
+    const ref = await gh(rutaRepo("/git/ref/heads/" + REPO.rama));
+    const ultimo = await gh(rutaRepo("/git/commits/" + ref.object.sha));
+    if (ultimo.message.indexOf(PREFIJO_COMMIT) !== 0 || ultimo.parents.length !== 1) { avisar("La última versión no la hizo el panel; no se puede deshacer desde acá.", true); return; }
+    const titulo = ultimo.message.split("\n")[0];
+    dialogo("¿Deshacer «" + titulo.replace(PREFIJO_COMMIT, "") + "»?", "La página vuelve a como estaba antes de esa publicación (textos y fotos).", [
+      { texto: "Cancelar" }, { texto: "Deshacer", peligro: true, fn: async () => {
+        try {
+          cargando("Deshaciendo…");
+          const anterior = await gh(rutaRepo("/git/commits/" + ultimo.parents[0].sha));
+          const nuevo = await ghEscribir(rutaRepo("/git/commits"), { method: "POST", body: { message: PREFIJO_COMMIT + "deshace «" + titulo.replace(PREFIJO_COMMIT, "") + "»", tree: anterior.tree.sha, parents: [ultimo.sha] } });
+          await ghEscribir(rutaRepo("/git/refs/heads/" + REPO.rama), { method: "PATCH", body: { sha: nuevo.sha, force: false } });
+          await limpiarBorrador();
+          await cargarTodo();
+          irA("ajustes");
+          avisar("Listo: se deshizo la última publicación. La página se actualiza en 1 o 2 minutos.");
+        } catch (e) { mostrarPanel(); avisar(mensajeError(e), true); }
+      } }]);
+  } catch (e) { avisar(mensajeError(e), true); }
+}
+
+/* ==============================================================
+   Validar y publicar
+   ============================================================== */
+function problemas() {
+  const lista = [];
+  OBLIGATORIOS.forEach((k) => { if (!String(doc.textos[k] || "").trim()) lista.push("Falta el texto «" + etiquetaDe(k) + "» (pestaña Textos)."); });
+  const d = String(doc.ajustes.whatsapp || "");
+  if (d && (d.length < 10 || d.length > 15)) lista.push("El número de WhatsApp parece incompleto (pestaña Ajustes).");
+  doc.fotos.forEach((f) => {
+    if (!String(f.titulo || "").trim()) lista.push("La foto N.° " + f.n + " no tiene título.");
+    if (f.paleta && f.paleta.some((c) => !HEX.test(c))) lista.push("La paleta de la foto N.° " + f.n + " tiene un color inválido.");
+    if (!publicada(f.n) && !nuevas.has(f.n)) lista.push("La foto N.° " + f.n + " perdió su imagen (volvé a subirla).");
+  });
+  return lista;
+}
+function etiquetaDe(clave) {
+  for (const g of ESQUEMA) for (const c of g.campos) if (c[0] === clave) return g.grupo + " · " + c[1];
+  return clave;
+}
+function pasosPublicar(lista, activo) {
+  const ol = $("#pasos-publicar");
+  ol.replaceChildren();
+  lista.forEach((t, i) => ol.append(el("li", { class: i < activo ? "hecho" : i === activo ? "activo" : "", texto: t })));
+}
+/* Arma la lista de cambios de archivos para el commit, sobre la versión publicada «actual» */
+function armarArbol(actual, final, altas) {
+  const html = armarHtml(actual.html, final);
+  const arbol = [{ path: "index.html", mode: "100644", type: "blob", content: html }];
+  altas.forEach((f) => {
+    const v = nuevas.get(f.n);
+    arbol.push({ path: "fotos/web/" + f.n + ".jpg", mode: "100644", type: "blob", sha: v.blobWeb });
+    arbol.push({ path: "fotos/mini/" + f.n + ".jpg", mode: "100644", type: "blob", sha: v.blobMini });
+  });
+  const quedan = new Set(final.fotos.map((f) => f.n));
+  actual.contenido.fotos.forEach((f) => {
+    if (quedan.has(f.n)) return;
+    ["web", "mini"].forEach((t) => { const ruta = "fotos/" + t + "/" + f.n + ".jpg"; if (actual.archivos.has(ruta)) arbol.push({ path: ruta, mode: "100644", type: "blob", sha: null }); });
+  });
+  const sitio = normalizarSitio(final.ajustes.sitio);
+  if (sitio && (sitio !== normalizarSitio(actual.contenido.ajustes.sitio) || !actual.archivos.has("sitemap.xml"))) {
+    arbol.push({ path: "robots.txt", mode: "100644", type: "blob", content: robotsTxt(sitio) });
+    arbol.push({ path: "sitemap.xml", mode: "100644", type: "blob", content: sitemapXml(sitio) });
+  }
+  return { arbol: arbol, html: html };
+}
+async function publicar() {
+  if (publicando || !hayCambios()) return;
+  if (procesando) { avisar("Esperá a que terminen de prepararse las fotos y después publicá."); return; }
+  const p = problemas();
+  if (p.length) { dialogo("Antes de publicar", p.slice(0, 8).join("\n") + (p.length > 8 ? "\n…y " + (p.length - 8) + " más." : ""), [{ texto: "Entendido", principal: true }]); return; }
+  publicando = true;
+  const nombresPasos = ["Revisando la versión publicada", "Subiendo fotos", "Guardando la página", "Listo"];
+  pasosPublicar(nombresPasos, 0);
+  $("#publicar-barra").style.width = "4%";
+  $("#publicar-detalle").textContent = "No cierres esta pestaña hasta que termine.";
+  $("#publicar-final").hidden = true; $("#publicar-ver").hidden = true; $("#publicar-cerrar").hidden = true;
+  $("#publicar-h").textContent = "Publicando";
+  abrirHoja("#hoja-publicar", true);
+  const final = paraGuardar(doc);
+  final.publicado = new Date().toISOString();
+  const partes = resumen();
+  let hecho = null, arbolFinal = null, htmlFinal = null, actual = null, altas = [];
+  try {
+    // 1. ¿Cambió algo en GitHub desde que abrí el panel?
+    actual = await leerRepo();
+    if (actual.commit !== base.commit && actual.texto !== base.texto) {
+      publicando = false;
+      cerrarHojas();
+      dialogo("Hay una versión más nueva", "Mientras editabas se publicaron otros cambios (desde otro dispositivo). Si publicás igual, tus cambios reemplazan esos.", [
+        { texto: "Cancelar" },
+        { texto: "Publicar igual", peligro: true, fn: () => { base = actual; resolverChoques(); guardarBorrador(true); renderTodo(); publicar(); } }
+      ]);
+      return;
+    }
+    // 2. Subir las fotos nuevas (si una ya se había subido en un intento anterior, no se repite)
+    pasosPublicar(nombresPasos, 1);
+    altas = final.fotos.filter((f) => !publicada(f.n));
+    let k = 0;
+    for (const f of altas) {
+      const v = nuevas.get(f.n);
+      if (!v) throw new Error("Falta la imagen de la foto N.° " + f.n + ".");
+      $("#publicar-detalle").textContent = "Foto " + (k + 1) + " de " + altas.length + " (N.° " + f.n + ")";
+      const alEsperar = (s) => { $("#publicar-detalle").textContent = "GitHub pidió una pausa: sigo en " + s + " segundos…"; };
+      if (!v.blobWeb) { const r = await ghEscribir(rutaRepo("/git/blobs"), { method: "POST", body: { content: await blobABase64(v.web), encoding: "base64" } }, alEsperar); registrarNueva(f.n, { blobWeb: r.sha }); }
+      if (!v.blobMini) { const r = await ghEscribir(rutaRepo("/git/blobs"), { method: "POST", body: { content: await blobABase64(v.mini), encoding: "base64" } }, alEsperar); registrarNueva(f.n, { blobMini: r.sha }); }
+      k++;
+      $("#publicar-barra").style.width = Math.round(5 + (k / Math.max(1, altas.length)) * 75) + "%";
+    }
+    // 3. Armar la nueva versión y publicarla en un solo paso
+    pasosPublicar(nombresPasos, 2);
+    $("#publicar-detalle").textContent = "Guardando textos y datos…";
+    const mensaje = PREFIJO_COMMIT + (partes.join(", ") || "cambios");
+    for (let intento = 0; intento < 3 && !hecho; intento++) {
+      const armado = armarArbol(actual, final, altas);
+      const t = await ghEscribir(rutaRepo("/git/trees"), { method: "POST", body: { base_tree: actual.arbol, tree: armado.arbol } });
+      const c = await ghEscribir(rutaRepo("/git/commits"), { method: "POST", body: { message: mensaje, tree: t.sha, parents: [actual.commit] } });
+      try {
+        await ghEscribir(rutaRepo("/git/refs/heads/" + REPO.rama), { method: "PATCH", body: { sha: c.sha, force: false } });
+        hecho = c.sha; arbolFinal = t.sha; htmlFinal = armado.html;
+      } catch (e) {
+        if (e.status !== 422 || intento === 2) throw e;
+        // Alguien publicó justo en el medio. Si fue solo un arreglo del sitio, se rearma encima;
+        // si cambiaron textos o fotos, se frena para no pisarlos sin avisar.
+        const otra = await leerRepo();
+        if (otra.texto !== actual.texto) {
+          const err = new Error("Justo se publicó otra versión desde otro lado. Cerrá, revisá y volvé a publicar.");
+          err.conflicto = true;
+          throw err;
+        }
+        actual = otra;
+      }
+    }
+  } catch (e) {
+    publicando = false;
+    $("#publicar-h").textContent = "No se pudo publicar";
+    const fin = $("#publicar-final");
+    fin.hidden = false; fin.className = "nota error";
+    fin.textContent = mensajeError(e) + " Tus cambios siguen guardados como borrador: podés volver a intentar.";
+    $("#publicar-cerrar").hidden = false;
+    $("#publicar-detalle").textContent = "";
+    if (e.status === 401) { setTimeout(() => salir("GitHub no aceptó el token. Creá uno nuevo y volvé a entrar."), 2500); }
+    return;
+  }
+  // 4. Ya está publicado: desde acá nada puede mostrar un error de publicación
+  publicando = false;
+  $("#publicar-barra").style.width = "100%";
+  pasosPublicar(nombresPasos, 3);
+  $("#publicar-h").textContent = "Publicado";
+  $("#publicar-detalle").textContent = "";
+  const fin = $("#publicar-final");
+  fin.hidden = false; fin.className = "nota ok";
+  fin.textContent = "¡Listo! Los cambios ya están guardados. La página se actualiza sola en 1 o 2 minutos.";
+  $("#publicar-ver").hidden = false; $("#publicar-cerrar").hidden = false;
+  try {
+    // La nueva base se arma con lo que ya sabemos (sin volver a pedirle nada a GitHub)
+    const archivos = new Map(actual.archivos);
+    altas.forEach((f) => { const v = nuevas.get(f.n); archivos.set("fotos/web/" + f.n + ".jpg", v.blobWeb); archivos.set("fotos/mini/" + f.n + ".jpg", v.blobMini); });
+    const quedan = new Set(final.fotos.map((f) => f.n));
+    actual.contenido.fotos.forEach((f) => { if (!quedan.has(f.n)) { archivos.delete("fotos/web/" + f.n + ".jpg"); archivos.delete("fotos/mini/" + f.n + ".jpg"); } });
+    const contenido = extraerContenido(htmlFinal);
+    base = { commit: hecho, arbol: arbolFinal, mensaje: "", archivos: archivos, html: htmlFinal, contenido: contenido, texto: JSON.stringify(contenido) };
+    doc = clonar(base.contenido);
+    await limpiarBorrador();
+    renderTodo();
+  } catch (e) {
+    // Lo publicado quedó bien; si algo de acá falla, alcanza con recargar el panel
+    console.error(e);
+    local.sacar(CLAVE_BORRADOR);
+  }
+  esperarEnLaWeb(final.publicado);
+}
+/* Mira la página publicada hasta que aparezca la versión nueva */
+async function esperarEnLaWeb(marca) {
+  const fin = $("#publicar-final");
+  for (let i = 0; i < 36; i++) {
+    await dormir(i === 0 ? 20000 : 10000);
+    try {
+      const r = await fetch("../index.html?v=" + Date.now(), { cache: "no-store" });
+      const t = await r.text();
+      if (t.indexOf(marca) >= 0) {
+        if (!$("#hoja-publicar").hidden) fin.textContent = "¡Listo! Ya se ve en la página.";
+        else avisar("Tus cambios ya se ven en la página.");
+        return;
+      }
+    } catch (_) { return; }
+  }
+}
+
+/* ==============================================================
+   Vista previa
+   ============================================================== */
+function abrirPrevia() {
+  try {
+    const c = clonar(doc);
+    c.fotos.forEach((f) => { if (nuevas.has(f.n)) { f._mini = urlNueva(f.n, "mini"); f._web = urlNueva(f.n, "web"); } });
+    let html = armarHtml(base.html, c, true);
+    html = html.replace(/<head>/i, () => '<head><base href="' + new URL("../", location.href).href + '">');
+    $("#previa-marco").srcdoc = html;
+    $("#previa").hidden = false;
+    document.documentElement.classList.add("sin-scroll");
+  } catch (e) { avisar("No se pudo armar la vista previa: " + e.message, true); }
+}
+function cerrarPrevia() {
+  $("#previa").hidden = true;
+  $("#previa-marco").srcdoc = "";
+  document.documentElement.classList.remove("sin-scroll");
+}
+
+/* ==============================================================
+   Hojas, diálogos y avisos
+   ============================================================== */
+let focoAntes = null;
+function abrirHoja(sel, fija) {
+  focoAntes = document.activeElement;
+  const h = $(sel);
+  h.hidden = false;
+  h.dataset.fija = fija ? "1" : "";
+  document.documentElement.classList.add("sin-scroll");
+  const panel = $(".hoja-panel", h);
+  if (panel) panel.scrollTop = 0;
+  setTimeout(() => { const b = $("[data-cerrar-hoja].btn-icono, .btn-icono, button", h); if (b && !fija) b.focus({ preventScroll: true }); }, 30);
+}
+function cerrarHojas() {
+  $$(".hoja").forEach((h) => { if (!(h.id === "hoja-publicar" && publicando)) h.hidden = true; });
+  if ($$(".hoja").every((h) => h.hidden) && $("#previa").hidden) document.documentElement.classList.remove("sin-scroll");
+  if (focoAntes && document.contains(focoAntes)) focoAntes.focus({ preventScroll: true });
+}
+function dialogo(titulo, texto, botones) {
+  $("#dialogo-titulo").textContent = titulo;
+  $("#dialogo-texto").textContent = texto || "";
+  const cont = $("#dialogo-botones");
+  cont.replaceChildren();
+  (botones || [{ texto: "Entendido", principal: true }]).forEach((b) => {
+    cont.append(el("button", { type: "button", class: "btn btn-chico" + (b.principal ? " btn-oscuro" : "") + (b.peligro ? " btn-peligro" : ""), texto: b.texto, onclick: () => { $("#dialogo").hidden = true; if (b.fn) b.fn(); } }));
+  });
+  $("#dialogo").hidden = false;
+  const ultimo = cont.lastElementChild;
+  if (ultimo) ultimo.focus();
+}
+let temporizadorAviso = null;
+function avisar(texto, error) {
+  const a = $("#aviso");
+  a.textContent = texto;
+  a.classList.toggle("error", !!error);
+  a.hidden = false;
+  clearTimeout(temporizadorAviso);
+  temporizadorAviso = setTimeout(() => { a.hidden = true; }, error ? 6000 : 3200);
+}
+function cargando(texto) {
+  $("#cargando-texto").textContent = texto || "Abriendo el panel…";
+  $("#cargando").hidden = false;
+  $("#panel").hidden = true;
+  $("#ingreso").hidden = true;
+}
+function mostrarPanel() {
+  $("#cargando").hidden = true;
+  $("#ingreso").hidden = true;
+  $("#panel").hidden = false;
+}
+
+/* ==============================================================
+   Ingreso y carga
+   ============================================================== */
+function mostrarIngreso(error) {
+  $("#cargando").hidden = true;
+  $("#panel").hidden = true;
+  $("#ingreso").hidden = false;
+  const e = $("#ingreso-error");
+  e.hidden = !error;
+  e.textContent = error || "";
+  const url = "https://github.com/settings/personal-access-tokens/new?" + new URLSearchParams({
+    name: "Panel ojodecristi",
+    description: "Permite que el panel de la página guarde cambios en pagina-web.",
+    target_name: REPO.dueno,
+    expires_in: "366",
+    contents: "write"
+  }).toString();
+  $("#enlace-token").href = url;
+  setTimeout(() => $("#token").focus(), 50);
+}
+function salir(mensaje) {
+  if ((publicando || procesando) && !mensaje) { avisar("Esperá a que termine lo que está en marcha."); return; }
+  local.sacar(CLAVE_TOKEN); local.sacar(CLAVE_TOKEN, sessionStorage);
+  token = null; usuario = null;
+  mostrarIngreso(mensaje || "");
+}
+async function cargarTodo() {
+  cargando("Leyendo tu página…");
+  base = await leerRepo();
+  await recuperarNuevas();
+  const guardado = local.leer(CLAVE_BORRADOR);
+  doc = clonar(base.contenido);
+  $("#aviso-borrador").hidden = true;
+  const sinMarca = (c) => { const x = clonar(c || {}); delete x.publicado; return JSON.stringify(x); };
+  if (guardado && guardado.doc && sinMarca(guardado.doc) === sinMarca(base.contenido)) {
+    await limpiarBorrador(); // ese borrador ya está publicado
+  } else if (guardado && guardado.doc) {
+    if (guardado.baseTexto === base.texto) {
+      doc = guardado.doc;
+      if (JSON.stringify(doc) !== base.texto) { $("#aviso-borrador").hidden = false; $("#aviso-borrador").textContent = "Recuperé los cambios que habías dejado sin publicar."; }
+    } else {
+      mostrarPanel();
+      renderTodo();
+      dialogo("Tenés un borrador viejo", "Dejaste cambios sin publicar, pero después se publicó otra versión (por ejemplo, desde otro dispositivo). Si seguís con tu borrador y lo publicás, reemplaza esa versión.", [
+        { texto: "Descartarlo", fn: async () => { await limpiarBorrador(); doc = clonar(base.contenido); renderTodo(); } },
+        { texto: "Seguir con el borrador", principal: true, fn: () => { doc = guardado.doc; resolverChoques(); renderTodo(); guardarBorrador(true); } }
+      ]);
+      return;
+    }
+  }
+  // Fotos nuevas sin datos (por ejemplo, si se borró el borrador): se descartan
+  Array.from(nuevas.keys()).forEach((n) => { if (!doc.fotos.some((f) => f.n === n)) { nuevas.delete(n); BD.borrar(n); } });
+  mostrarPanel();
+  renderTodo();
+}
+function renderTodo() {
+  $("#marca-panel").textContent = (doc.textos && doc.textos["marca.nombre"]) || "ojodecristi";
+  renderPortada();
+  renderFotos();
+  if (pestana === "textos") renderTextos();
+  if (pestana === "grupos") renderGrupos();
+  if (pestana === "ajustes") renderAjustes();
+  actualizarBarra();
+}
+async function entrar(t, recordar) {
+  token = t;
+  cargando("Conectando con GitHub…");
+  try {
+    const u = await gh("/user");
+    usuario = u.login;
+    await gh(rutaRepo(""));
+    if (recordar) local.poner(CLAVE_TOKEN, t); else local.poner(CLAVE_TOKEN, t, sessionStorage);
+    await cargarTodo();
+  } catch (e) {
+    token = null;
+    if (e.status === 401 || e.status === 404 || (e.status === 403 && !e.limite)) { local.sacar(CLAVE_TOKEN); local.sacar(CLAVE_TOKEN, sessionStorage); }
+    mostrarIngreso(mensajeError(e));
+  }
+}
+
+/* ==============================================================
+   Eventos
+   ============================================================== */
+$("#form-ingreso").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const t = $("#token").value.trim();
+  if (!t) return;
+  entrar(t, $("#recordar").checked);
+});
+$("#ver-token").addEventListener("click", (e) => {
+  const on = $("#token").type === "password";
+  $("#token").type = on ? "text" : "password";
+  e.currentTarget.textContent = on ? "Ocultar" : "Ver";
+  e.currentTarget.setAttribute("aria-pressed", String(on));
+});
+$("#btn-salir").addEventListener("click", () => salir());
+$("#btn-salir-2").addEventListener("click", () => salir());
+window.addEventListener("pagehide", () => guardarBorrador(true));
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") guardarBorrador(true); });
+$$(".pestana").forEach((p) => p.addEventListener("click", () => irA(p.dataset.pestana)));
+$("#archivos").addEventListener("change", (e) => { const a = Array.from(e.target.files || []); e.target.value = ""; subirArchivos(a); });
+const zona = $("#zona-subir");
+["dragenter", "dragover"].forEach((t) => zona.addEventListener(t, (e) => { e.preventDefault(); zona.classList.add("encima"); }));
+["dragleave", "drop"].forEach((t) => zona.addEventListener(t, (e) => { e.preventDefault(); zona.classList.remove("encima"); }));
+zona.addEventListener("drop", (e) => subirArchivos(e.dataTransfer && e.dataTransfer.files));
+$("#buscar").addEventListener("input", renderFotos);
+$("#btn-elegir").addEventListener("click", () => modoEleccion(!eligiendo));
+$("#btn-cancelar-eleccion").addEventListener("click", () => modoEleccion(false));
+$("#btn-elegir-todas").addEventListener("click", () => { fotosFiltradas().forEach((f) => elegidas.add(f.n)); actualizarEleccion(); renderFotos(); });
+$("#btn-editar-varias").addEventListener("click", abrirVarias);
+$("#editor-ant").addEventListener("click", () => { const i = doc.fotos.findIndex((f) => f.n === editando); if (i > 0) { editando = doc.fotos[i - 1].n; renderEditor(); $("#hoja-editor .hoja-panel").scrollTop = 0; } });
+$("#editor-sig").addEventListener("click", () => { const i = doc.fotos.findIndex((f) => f.n === editando); if (i < doc.fotos.length - 1) { editando = doc.fotos[i + 1].n; renderEditor(); $("#hoja-editor .hoja-panel").scrollTop = 0; } });
+$("#editor-borrar").addEventListener("click", () => borrarFotos([editando], () => cerrarHojas()));
+$("#portada-quitar").addEventListener("click", () => elegirPortada(""));
+$("#form-categoria").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const nombre = $("#nueva-categoria").value.trim();
+  if (!nombre) return;
+  doc.categorias.push({ id: idUnico(nombre, doc.categorias.concat(doc.series)), nombre: nombre });
+  $("#nueva-categoria").value = "";
+  cambio(); renderGrupos();
+  avisar("Categoría «" + nombre + "» agregada. Asignala desde cada foto.");
+});
+$("#btn-nueva-serie").addEventListener("click", () => {
+  const titulo = "Serie nueva";
+  doc.series.push({ id: idUnico("serie " + (doc.series.length + 1), doc.series.concat(doc.categorias)), titulo: titulo, title: "", texto: "" });
+  cambio(); renderGrupos();
+  const t = $$(".tarjeta-serie").pop();
+  if (t) { const i = $("input", t); i.focus(); i.select(); }
+});
+$("#btn-deshacer").addEventListener("click", deshacerUltima);
+$("#btn-publicar").addEventListener("click", publicar);
+$("#btn-previa").addEventListener("click", abrirPrevia);
+$("#previa-cerrar").addEventListener("click", cerrarPrevia);
+$$("[data-ancho]").forEach((b) => b.addEventListener("click", () => {
+  $("#previa").classList.toggle("celu", b.dataset.ancho === "celu");
+  $$("[data-ancho]").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+}));
+$("#btn-descartar").addEventListener("click", () => {
+  dialogo("¿Descartar los cambios?", "Se pierden todos los cambios sin publicar" + (Array.from(nuevas.keys()).some((n) => !publicada(n)) ? ", incluidas las fotos nuevas." : "."), [
+    { texto: "Cancelar" }, { texto: "Descartar", peligro: true, fn: async () => {
+      await limpiarBorrador();
+      doc = clonar(base.contenido);
+      $("#aviso-borrador").hidden = true;
+      renderTodo();
+      avisar("Cambios descartados.");
+    } }]);
+});
+$("#publicar-cerrar").addEventListener("click", () => { $("#hoja-publicar").hidden = true; cerrarHojas(); });
+document.addEventListener("click", (e) => {
+  if (e.target.closest("[data-cerrar-hoja]")) {
+    const h = e.target.closest(".hoja");
+    if (h && h.id === "hoja-editor") renderFotos();
+    cerrarHojas();
+  }
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key !== "Escape") return;
+  if (!$("#dialogo").hidden) { $("#dialogo").hidden = true; return; }
+  if (!$("#previa").hidden) { cerrarPrevia(); return; }
+  if ($$(".hoja").some((h) => !h.hidden)) { if (!$("#hoja-editor").hidden) renderFotos(); cerrarHojas(); }
+});
+window.addEventListener("beforeunload", (e) => { if (publicando) { e.preventDefault(); e.returnValue = ""; } });
+
+/* ---------- Arranque ---------- */
+const guardado = local.leer(CLAVE_TOKEN) || local.leer(CLAVE_TOKEN, sessionStorage);
+if (guardado) entrar(guardado, !!local.leer(CLAVE_TOKEN));
+else mostrarIngreso();
+})();
+</script>
+</body>
+</html>
