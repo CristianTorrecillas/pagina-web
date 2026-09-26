@@ -132,22 +132,28 @@ section[id] { scroll-margin-top: 84px; }
 
 @keyframes aparecer { from { opacity: 0; } to { opacity: 1; } }
 
-/* ============ Aviso de maqueta con selector de paleta ============ */
-.aviso-maqueta { background: var(--tinta); color: var(--superficie); font: 500 10.5px/1.4 var(--titulo); letter-spacing: .18em; text-transform: uppercase; }
-.aviso-maqueta .envoltorio { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 24px; padding-block: 8px; text-align: center; }
-.paletas { display: inline-flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px; }
-.paleta-btn {
-  display: inline-flex; align-items: center; gap: 8px; min-height: 30px; padding: 0 10px; cursor: pointer;
-  background: transparent; color: inherit; border: 1px solid rgba(255, 255, 255, .35); font: inherit; letter-spacing: .14em; text-transform: uppercase;
+/* ============ Selector de paleta de colores ============ */
+.paleta-fija {
+  position: fixed; bottom: 24px; right: 24px; z-index: 50;
+  background: var(--superficie); border: 1px solid var(--linea); border-radius: 12px;
+  padding: 12px; box-shadow: 0 4px 24px rgba(0, 0, 0, .12);
 }
-.paleta-btn > span:first-child { display: inline-flex; }
-.paleta-btn i { width: 10px; height: 10px; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 1px rgba(0, 0, 0, .2); }
-.paleta-btn i + i { margin-left: -3px; }
-.paleta-btn[aria-pressed="true"] { background: var(--superficie); color: var(--tinta); border-color: var(--superficie); }
-@media (max-width: 600px) {
-  .aviso-maqueta .resto { display: none; }
-  .aviso-maqueta .envoltorio { gap: 6px 12px; }
-  .paleta-btn { padding: 0 8px; gap: 6px; }
+.paletas-selector { display: flex; gap: 8px; }
+.paleta-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0;
+  width: 40px; height: 40px; padding: 0; cursor: pointer;
+  background: transparent; color: inherit; border: 1px solid var(--linea); border-radius: 50%;
+  font: inherit; transition: all .2s ease;
+}
+.paleta-btn:hover { border-color: var(--tinta); transform: scale(1.08); }
+.paleta-btn i { width: 8px; height: 8px; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 0.5px rgba(0, 0, 0, .15); }
+.paleta-btn i + i { margin-left: -2px; }
+.paleta-btn[aria-pressed="true"] { background: var(--acento); border-color: var(--acento); box-shadow: 0 0 0 2px var(--fondo), 0 4px 12px rgba(0, 0, 0, .15); }
+@media (max-width: 640px) {
+  .paleta-fija {
+    position: static; margin-top: 24px; margin-bottom: 24px;
+    display: flex; justify-content: center;
+  }
 }
 
 /* ============ Cabecera simétrica ============ */
@@ -548,15 +554,11 @@ section[id] { scroll-margin-top: 84px; }
   <symbol id="i-copias" viewBox="0 0 24 24"><rect x="3" y="8" width="13" height="10"/><path d="M7.5 5H21v10"/></symbol>
 </svg>
 
-<div class="aviso-maqueta cambia">
-  <div class="envoltorio">
-    <p>Maqueta<span class="resto"> · Títulos, lugares y fechas de ejemplo</span></p>
-    <div class="paletas" role="group" aria-label="Probar otra paleta">
-      <span>Paleta:</span>
-      <button type="button" class="paleta-btn" data-paleta-sitio="rayas" aria-pressed="true"><span aria-hidden="true"><i style="--c:#F7D8CB"></i><i style="--c:#A9CFE2"></i><i style="--c:#B8404F"></i></span><span>Rayas<span class="resto"> de domingo</span></span></button>
-      <button type="button" class="paleta-btn" data-paleta-sitio="mar" aria-pressed="false"><span aria-hidden="true"><i style="--c:#F5E2A5"></i><i style="--c:#AED6C8"></i><i style="--c:#2E6F77"></i></span><span><span class="resto">El </span>Mar<span class="resto"> todo lo cura</span></span></button>
-      <button type="button" class="paleta-btn" data-paleta-sitio="estrellas" aria-pressed="false"><span aria-hidden="true"><i style="--c:#CFE3EC"></i><i style="--c:#F4D98A"></i><i style="--c:#C4452F"></i></span><span>Estrellas<span class="resto"> de viento</span></span></button>
-    </div>
+<div class="paleta-fija">
+  <div class="paletas-selector" role="group" aria-label="Cambiar paleta de colores">
+    <button type="button" class="paleta-btn" data-paleta-sitio="rayas" aria-pressed="true" title="Rayas de domingo"><i style="--c:#F7D8CB"></i><i style="--c:#A9CFE2"></i><i style="--c:#B8404F"></i></button>
+    <button type="button" class="paleta-btn" data-paleta-sitio="mar" aria-pressed="false" title="El Mar todo lo cura"><i style="--c:#F5E2A5"></i><i style="--c:#AED6C8"></i><i style="--c:#2E6F77"></i></button>
+    <button type="button" class="paleta-btn" data-paleta-sitio="estrellas" aria-pressed="false" title="Estrellas de viento"><i style="--c:#CFE3EC"></i><i style="--c:#F4D98A"></i><i style="--c:#C4452F"></i></button>
   </div>
 </div>
 
