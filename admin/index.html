@@ -469,7 +469,10 @@ main.contenido { padding-block: 26px 150px; }
       <div class="bloque" id="bloque-numeracion">
         <h3>Numeración de las fotos</h3>
         <p class="ayuda-bloque" id="numeracion-texto"></p>
-        <div><button type="button" class="btn btn-chico" id="btn-renumerar" hidden>Numerar las fotos nuevas desde el N.° 001</button></div>
+        <div class="acciones-titulo">
+          <button type="button" class="btn btn-chico" id="btn-renumerar" hidden>Numerar las fotos nuevas desde el N.° 001</button>
+          <button type="button" class="btn btn-chico" id="btn-renumerar-pub" hidden>Cerrar los huecos de la numeración</button>
+        </div>
       </div>
       <div class="bloque">
         <h3>Publicaciones anteriores</h3>
@@ -1329,6 +1332,54 @@ function siguienteNumero() {
 /* Si todavía no hay nada publicado, las fotos nuevas se pueden volver a numerar desde el 1 */
 const puedeRenumerar = () => !base.contenido.fotos.length && doc.fotos.length > 0 &&
   doc.fotos.some((f) => (parseInt(f.n, 10) || 0) > doc.fotos.length);
+/* Fotos ya publicadas con huecos en la numeración (por ejemplo, después de borrar algunas) */
+function huecosPublicadas() {
+  const ns = base.contenido.fotos.map((f) => parseInt(f.n, 10) || 0).sort((a, b) => a - b);
+  return ns.length > 0 && ns.some((n, i) => n !== i + 1);
+}
+function renumerarPublicadas() {
+  if (hayCambios() || procesando || publicando) { dialogo("Primero publicá o descartá", "Tenés cambios sin publicar. Publicalos o descartalos antes de renumerar.", [{ texto: "Entendido", principal: true }]); return; }
+  const k = base.contenido.fotos.length;
+  dialogo("¿Renumerar las " + k + " fotos publicadas?", "Van a quedar del N.° 001 al N.° " + n3(k) + ", sin huecos, en el mismo orden. Los links que ya hayas mandado a una foto con un número que cambia dejan de apuntar a esa foto. Se puede deshacer desde Ajustes, con «Deshacer la última publicación».", [
+    { texto: "Cancelar" }, { texto: "Renumerar", principal: true, fn: hacerRenumerarPublicadas }]);
+}
+async function hacerRenumerarPublicadas() {
+  publicando = true;
+  cargando("Renumerando las fotos…");
+  try {
+    let actual = await leerRepo();
+    if (actual.commit !== base.commit && actual.texto !== base.texto) throw Object.assign(new Error("Mientras tanto se publicó otra versión (desde otro dispositivo). Recargá el panel y volvé a intentar."), { conflicto: true });
+    const orden = actual.contenido.fotos.map((f) => f.n).sort((a, b) => (parseInt(a, 10) || 0) - (parseInt(b, 10) || 0));
+    const mapa = new Map(orden.map((n, i) => [n, n3(i + 1)]));
+    const final = clonar(actual.contenido);
+    final.fotos.forEach((f) => { f.n = mapa.get(f.n); });
+    final.ajustes.portada = (final.ajustes.portada || []).map((x) => mapa.get(x) || "");
+    final.ajustes.ultimoNumero = orden.length;
+    final.publicado = new Date().toISOString();
+    const html = armarHtml(actual.html, final);
+    const arbol = [{ path: "index.html", mode: "100644", type: "blob", content: html }];
+    const nuevos = new Map();
+    orden.forEach((viejo) => ["web", "mini"].forEach((t) => {
+      const sha = actual.archivos.get("fotos/" + t + "/" + viejo + ".jpg");
+      if (!sha) throw new Error("Falta el archivo de la foto N.° " + viejo + " en la página; no se renumeró nada.");
+      nuevos.set("fotos/" + t + "/" + mapa.get(viejo) + ".jpg", sha);
+    }));
+    nuevos.forEach((sha, ruta) => { if (actual.archivos.get(ruta) !== sha) arbol.push({ path: ruta, mode: "100644", type: "blob", sha: sha }); });
+    orden.forEach((viejo) => ["web", "mini"].forEach((t) => { const ruta = "fotos/" + t + "/" + viejo + ".jpg"; if (!nuevos.has(ruta)) arbol.push({ path: ruta, mode: "100644", type: "blob", sha: null }); }));
+    const t = await ghEscribir(rutaRepo("/git/trees"), { method: "POST", body: { base_tree: actual.arbol, tree: arbol } });
+    const c = await ghEscribir(rutaRepo("/git/commits"), { method: "POST", body: { message: PREFIJO_COMMIT + "fotos renumeradas (001 a " + n3(orden.length) + ")", tree: t.sha, parents: [actual.commit] } });
+    await ghEscribir(rutaRepo("/git/refs/heads/" + REPO.rama), { method: "PATCH", body: { sha: c.sha, force: false } });
+    publicando = false;
+    await limpiarBorrador();
+    await cargarTodo();
+    irA("ajustes");
+    avisar("Listo: las fotos quedaron numeradas del N.° 001 al N.° " + n3(orden.length) + ". La página se actualiza en 1 o 2 minutos.");
+  } catch (e) {
+    publicando = false;
+    mostrarPanel();
+    avisar(mensajeError(e), true);
+  }
+}
 async function renumerarDesdeUno() {
   if (procesando || publicando) { avisar("Esperá a que terminen las fotos que se están preparando.", true); return; }
   const orden = doc.fotos.slice().sort((a, b) => (parseInt(a.n, 10) || 0) - (parseInt(b.n, 10) || 0));
@@ -2015,6 +2066,11 @@ function renderAjustes() {
     : "No hay ninguna foto: la próxima que subas va a ser la N.° 001.")
     + (puedeRenumerar() ? " Como todavía no publicaste ninguna, podés volver a numerar las nuevas desde el 1 (en el orden en que las subiste)." : "");
   $("#btn-renumerar").hidden = !puedeRenumerar();
+  const huecos = huecosPublicadas();
+  $("#btn-renumerar-pub").hidden = !huecos || hayCambios();
+  if (huecos) $("#numeracion-texto").textContent += hayCambios()
+    ? " Hay huecos en la numeración de las fotos publicadas; para cerrarlos, primero publicá o descartá tus cambios."
+    : " Hay huecos en la numeración de las fotos publicadas (por ejemplo, de fotos borradas): podés cerrarlos y que queden del 001 al " + n3(base.contenido.fotos.length) + ".";
   $("#sesion-texto").textContent = usuario ?"Entraste como @" + usuario + ". El token está guardado en este dispositivo." : "";
   cargarHistorial();
 }
@@ -2431,6 +2487,7 @@ $("#btn-nueva-serie").addEventListener("click", () => {
 });
 $("#btn-deshacer").addEventListener("click", deshacerUltima);
 $("#btn-renumerar").addEventListener("click", renumerarDesdeUno);
+$("#btn-renumerar-pub").addEventListener("click", renumerarPublicadas);
 $("#btn-publicar").addEventListener("click", publicar);
 $("#btn-previa").addEventListener("click", abrirPrevia);
 $("#previa-cerrar").addEventListener("click", cerrarPrevia);
