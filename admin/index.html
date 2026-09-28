@@ -178,6 +178,7 @@ main.contenido { padding-block: 26px 150px; }
 .etiquetas { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 3px; }
 .tag { font: 500 9.5px/1 var(--titulo); letter-spacing: .14em; text-transform: uppercase; padding: 4px 6px; background: var(--superficie); border: 1px solid var(--linea); }
 .tag.falta.ok { color: var(--tinta-2); border-color: var(--linea); background: var(--superficie); }
+.eligiendo .item-foto { -webkit-user-select: none; user-select: none; }
 .acciones-titulo { display: flex; flex-wrap: wrap; gap: 8px; margin: -6px 0 4px; }
 .nota-titulo { margin: 0 0 6px; font-size: 13.5px; line-height: 1.45; color: var(--tinta-2); }
 .tag.nueva { background: var(--ok-fondo); border-color: rgba(47, 107, 69, .3); color: var(--ok); }
@@ -386,7 +387,7 @@ main.contenido { padding-block: 26px 150px; }
       <div class="cabeza-seccion">
         <div>
           <h2>Fotos <span class="suave" id="cuenta-fotos"></span></h2>
-          <p>Tocá una foto para editar su título, lugar, categorías y paleta. Las flechas cambian el orden en que aparecen en la página.</p>
+          <p>Tocá una foto para editar su título, lugar, categorías y paleta. Las flechas cambian el orden en que aparecen en la página. En la compu, con <b>Shift + clic</b> elegís todas las fotos que hay entre dos.</p>
         </div>
       </div>
 
@@ -1247,6 +1248,17 @@ function fotosFiltradas() {
   return doc.fotos.filter((f) => !q || [f.n, f.titulo, f.title, f.lugar, f.anio].join(" ").toLowerCase().indexOf(q) >= 0);
 }
 let eligiendo = false;
+let ancla = null; // la última foto que se tocó al elegir (para elegir un tramo con Shift)
+/* Con Shift + clic se eligen (o se sacan) todas las fotos entre la última tocada y esta */
+function elegirConClick(n, marcar, conShift) {
+  const vis = fotosFiltradas().map((x) => x.n);
+  const i = conShift && ancla ? vis.indexOf(ancla) : -1, j = vis.indexOf(n);
+  const tramo = i >= 0 && j >= 0 ? vis.slice(Math.min(i, j), Math.max(i, j) + 1) : [n];
+  tramo.forEach((k) => { if (marcar) elegidas.add(k); else elegidas.delete(k); });
+  ancla = n;
+  $$(".item-foto").forEach((li) => { const c = $(".sel", li); if (c) c.checked = elegidas.has(li.dataset.n); });
+  actualizarEleccion();
+}
 const elegidas = new Set();
 function renderFotos() {
   const lista = $("#lista-fotos");
@@ -1266,11 +1278,15 @@ function renderFotos() {
     if (!(f.categorias || []).length) tags.append(el("span", { class: "tag falta", texto: "Sin categoría" }));
     const check = el("input", { type: "checkbox", class: "sel", "aria-label": "Elegir N.° " + f.n });
     check.checked = elegidas.has(f.n);
-    check.addEventListener("change", () => { if (check.checked) elegidas.add(f.n); else elegidas.delete(f.n); actualizarEleccion(); });
+    check.addEventListener("click", (e) => elegirConClick(f.n, check.checked, e.shiftKey));
     lista.append(el("li", { class: "item-foto" + (f.oculta ? " oculta" : ""), "data-n": f.n }, [
       check,
       el("img", { class: "item-img", src: urlMini(f), alt: "", loading: "lazy", width: "92", height: "61" }),
-      el("button", { type: "button", class: "item-abrir", onclick: () => (eligiendo ? (check.checked = !check.checked, check.dispatchEvent(new Event("change"))) : abrirEditor(f.n)) }, [
+      el("button", { type: "button", class: "item-abrir", onclick: (e) => {
+        if (eligiendo) elegirConClick(f.n, !elegidas.has(f.n), e.shiftKey);
+        else if (e.shiftKey) { modoEleccion(true); elegirConClick(f.n, true, false); }
+        else abrirEditor(f.n);
+      } }, [
         el("span", { class: "n", texto: "N.° " + f.n }),
         el("strong", { texto: f.titulo || "Sin título" }),
         el("span", { class: "det", texto: [f.lugar, f.anio].filter(Boolean).join(" · ") || "Sin lugar" }),
@@ -1677,6 +1693,7 @@ function actualizarEleccion() {
 }
 function modoEleccion(on) {
   eligiendo = on;
+  ancla = null;
   elegidas.clear();
   $("#barra-eleccion").hidden = !on;
   $("#btn-elegir").textContent = on ? "Dejar de elegir" : "Elegir varias";
@@ -1690,7 +1707,11 @@ function abrirVarias() {
   cuerpo.replaceChildren();
   $("#varias-titulo").textContent = "Editar " + plural(elegidas.size, "foto", "fotos");
   cuerpo.append(el("p", { class: "nota", texto: "Solo se cambia lo que completes. Lo que dejes vacío queda como está en cada foto." }));
-  const datos = { lugar: "", anio: "", soporte: "", camara: "", sumar: new Set(), quitar: new Set(), serie: "__igual", oculta: "__igual", titulos: "__igual" };
+  const datos = { titulo: "", title: "", lugar: "", anio: "", soporte: "", camara: "", sumar: new Set(), quitar: new Set(), serie: "__igual", oculta: "__igual", titulos: "__igual" };
+  cuerpo.append(el("div", { class: "fila-campos" }, [
+    campoTexto("Título", "", (v) => { datos.titulo = v; }, { ayuda: "El mismo para todas las elegidas." }),
+    campoTexto("Título en inglés", "", (v) => { datos.title = v; }, { placeholder: "Opcional" })
+  ]));
   const selTit = el("select", { id: "varias-titulos" }, [
     el("option", { value: "__igual", texto: "(no cambiar)" }),
     el("option", { value: "vacias", texto: "Generar uno para las que no tienen título" }),
@@ -1698,8 +1719,8 @@ function abrirVarias() {
     el("option", { value: "sin", texto: "Dejarlas «Sin título» (usan el de su serie)" })
   ]);
   selTit.addEventListener("change", () => { datos.titulos = selTit.value; });
-  cuerpo.append(el("div", { class: "campo" }, [el("label", { for: "varias-titulos", texto: "Títulos" }), selTit,
-    el("p", { class: "ayuda", texto: "Los generados no se repiten entre fotos. Después podés cambiar cualquiera desde la foto." })]));
+  cuerpo.append(el("div", { class: "campo" }, [el("label", { for: "varias-titulos", texto: "O que se generen solos" }), selTit,
+    el("p", { class: "ayuda", texto: "Si escribiste un título arriba, se usa ese y esto no se aplica. Cada foto se puede cambiar después desde la foto." })]));
   cuerpo.append(el("div", { class: "fila-campos" }, [
     campoTexto("Lugar", "", (v) => { datos.lugar = v; }),
     campoTexto("Año", "", (v) => { datos.anio = v; }, { inputmode: "numeric" })
@@ -1746,7 +1767,8 @@ function abrirVarias() {
       if (datos.serie !== "__igual") f.serie = datos.serie || null;
       if (datos.oculta !== "__igual") f.oculta = datos.oculta === "ocultar";
       // va después de la serie, así el generador usa la serie nueva
-      if (datos.titulos === "sin") { f.titulo = "Sin título"; f.title = "Untitled"; }
+      if (datos.titulo.trim()) { f.titulo = datos.titulo.trim(); f.title = datos.title.trim(); }
+      else if (datos.titulos === "sin") { f.titulo = "Sin título"; f.title = "Untitled"; }
       else if (datos.titulos === "todas" || (datos.titulos === "vacias" && sinTitulo(f))) {
         const t = generarTitulo(f, usados);
         f.titulo = t[0]; f.title = t[1];
