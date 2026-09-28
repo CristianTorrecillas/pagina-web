@@ -177,6 +177,9 @@ main.contenido { padding-block: 26px 150px; }
 .item-abrir .det { font-size: 13.5px; color: var(--tinta-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .etiquetas { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 3px; }
 .tag { font: 500 9.5px/1 var(--titulo); letter-spacing: .14em; text-transform: uppercase; padding: 4px 6px; background: var(--superficie); border: 1px solid var(--linea); }
+.tag.falta.ok { color: var(--tinta-2); border-color: var(--linea); background: var(--superficie); }
+.acciones-titulo { display: flex; flex-wrap: wrap; gap: 8px; margin: -6px 0 4px; }
+.nota-titulo { margin: 0 0 6px; font-size: 13.5px; line-height: 1.45; color: var(--tinta-2); }
 .tag.nueva { background: var(--ok-fondo); border-color: rgba(47, 107, 69, .3); color: var(--ok); }
 .tag.portada { background: var(--amarillo); border-color: rgba(0, 0, 0, .1); }
 .tag.oculta { background: var(--linea); }
@@ -462,6 +465,11 @@ main.contenido { padding-block: 26px 150px; }
         </div>
       </div>
       <div class="bloque" id="form-ajustes"></div>
+      <div class="bloque" id="bloque-numeracion">
+        <h3>Numeración de las fotos</h3>
+        <p class="ayuda-bloque" id="numeracion-texto"></p>
+        <div><button type="button" class="btn btn-chico" id="btn-renumerar" hidden>Numerar las fotos nuevas desde el N.° 001</button></div>
+      </div>
       <div class="bloque">
         <h3>Publicaciones anteriores</h3>
         <p class="ayuda-bloque">Cada vez que publicás queda guardada una versión. Si algo salió mal, podés deshacer la última.</p>
@@ -1180,6 +1188,9 @@ function irA(nombre) {
    Fotos
    ============================================================== */
 const sinTitulo = (f) => !String(f.titulo || "").trim() || f.titulo === "Sin título";
+const etiquetaSinTitulo = (f) => tituloSerie(f)
+  ? el("span", { class: "tag falta ok", texto: "Título de la serie" })
+  : el("span", { class: "tag falta", texto: "Sin título" });
 function puntos(paleta) {
   const s = el("span", { class: "puntos", "aria-hidden": "true" });
   (paleta || []).forEach((c) => { const i = document.createElement("i"); i.style.setProperty("--c", c); s.append(i); });
@@ -1251,7 +1262,7 @@ function renderFotos() {
     const pos = portada.indexOf(f.n);
     if (pos >= 0) tags.append(el("span", { class: "tag portada", texto: "Portada" }));
     if (f.oculta) tags.append(el("span", { class: "tag oculta", texto: "Oculta" }));
-    if (sinTitulo(f)) tags.append(el("span", { class: "tag falta", texto: "Sin título" }));
+    if (sinTitulo(f)) tags.append(etiquetaSinTitulo(f));
     if (!(f.categorias || []).length) tags.append(el("span", { class: "tag falta", texto: "Sin categoría" }));
     const check = el("input", { type: "checkbox", class: "sel", "aria-label": "Elegir N.° " + f.n });
     check.checked = elegidas.has(f.n);
@@ -1291,9 +1302,33 @@ function mover(n, paso) {
   const boton = $('.item-foto[data-n="' + n + '"] .item-orden .btn-icono:' + (paso < 0 ? "first-child" : "last-child"));
   if (boton && !boton.disabled) boton.focus(); else { const b = $('.item-foto[data-n="' + n + '"] .item-abrir'); if (b) b.focus(); }
 }
+/* Los números no se reutilizan mientras haya fotos en la página. Si no queda ninguna
+   (ni publicada ni en el borrador), la numeración vuelve a empezar desde el 1. */
 function siguienteNumero() {
   const usados = doc.fotos.concat(base.contenido.fotos).map((f) => parseInt(f.n, 10) || 0);
-  return Math.max(parseInt(doc.ajustes.ultimoNumero, 10) || 0, parseInt(base.contenido.ajustes.ultimoNumero, 10) || 0, 0, ...usados) + 1;
+  if (!usados.length) return 1;
+  const topeBase = base.contenido.fotos.length ? parseInt(base.contenido.ajustes.ultimoNumero, 10) || 0 : 0;
+  return Math.max(parseInt(doc.ajustes.ultimoNumero, 10) || 0, topeBase, 0, ...usados) + 1;
+}
+/* Si todavía no hay nada publicado, las fotos nuevas se pueden volver a numerar desde el 1 */
+const puedeRenumerar = () => !base.contenido.fotos.length && doc.fotos.length > 0 &&
+  doc.fotos.some((f) => (parseInt(f.n, 10) || 0) > doc.fotos.length);
+async function renumerarDesdeUno() {
+  if (procesando || publicando) { avisar("Esperá a que terminen las fotos que se están preparando.", true); return; }
+  const orden = doc.fotos.slice().sort((a, b) => (parseInt(a.n, 10) || 0) - (parseInt(b.n, 10) || 0));
+  if (orden.some((f) => !nuevas.has(f.n))) { avisar("Hay fotos sin su imagen; no se pudo renumerar.", true); return; }
+  const mapa = new Map(orden.map((f, i) => [f.n, n3(i + 1)]));
+  const datos = new Map(orden.map((f) => [f.n, nuevas.get(f.n)]));
+  for (const viejo of datos.keys()) { nuevas.delete(viejo); await BD.borrar(viejo); }
+  datos.forEach((v, viejo) => registrarNueva(mapa.get(viejo), v));
+  doc.fotos.forEach((f) => { f.n = mapa.get(f.n); });
+  doc.ajustes.portada = (doc.ajustes.portada || []).map((x) => mapa.get(x) || (x && !mapa.has(x) ? x : ""));
+  doc.ajustes.ultimoNumero = orden.length;
+  elegidas.clear();
+  guardarBorrador(true);
+  renderTodo();
+  renderAjustes();
+  avisar("Listo: las fotos quedaron numeradas del N.° 001 al N.° " + n3(orden.length) + ".");
 }
 async function subirArchivos(archivos) {
   archivos = Array.from(archivos || []).filter((a) => /^image\//.test(a.type) || /\.(jpe?g|png|webp|heic|heif)$/i.test(a.name));
@@ -1341,6 +1376,139 @@ async function subirArchivos(archivos) {
   setTimeout(() => { if (!procesando) cola.hidden = true; }, 6000);
   renderPortada();
 }
+
+/* ---------- Generador de títulos ----------
+   Arma títulos cortos en castellano (con su versión en inglés) a partir de un banco de palabras.
+   Tiene en cuenta las categorías, la serie y el lugar de la foto (mar, cielo, flores, ciudad…),
+   y si la paleta es gris usa también palabras de blanco y negro. No repite títulos ya usados. */
+const BANCO_TITULOS = {
+  general: {
+    frases: [
+      ["Después de la lluvia", "After the rain"], ["Lo que queda", "What remains"], ["Mientras tanto", "Meanwhile"],
+      ["Casi de noche", "Almost night"], ["Hora dorada", "Golden hour"], ["Hora azul", "Blue hour"],
+      ["Sin apuro", "Unhurried"], ["De paso", "Passing through"], ["Por un momento", "For a moment"],
+      ["Aquí y ahora", "Here and now"], ["Primera luz", "First light"], ["Última luz", "Last light"],
+      ["Tiempo quieto", "Still time"], ["Lo de siempre", "The usual"], ["Un rato más", "A little longer"],
+      ["Nadie mira", "No one is looking"], ["Otra vez", "Once again"], ["Sin nombre", "Nameless"],
+      ["Lo simple", "Simple things"], ["Todavía", "Still"], ["A la vuelta", "Around the corner"],
+      ["Día de semana", "Weekday"], ["Domingo largo", "Long Sunday"], ["Mediodía", "Midday"]
+    ],
+    cosas: [
+      ["Luz", "Light"], ["Silencio", "Silence"], ["Calma", "Calm"], ["Sombra", "Shadow"], ["Reflejo", "Reflection"],
+      ["Espera", "Waiting"], ["Pausa", "Pause"], ["Rastro", "Trace"], ["Eco", "Echo"], ["Memoria", "Memory"],
+      ["Distancia", "Distance"], ["Horizonte", "Horizon"], ["Quietud", "Stillness"], ["Refugio", "Shelter"],
+      ["Contraluz", "Backlight"], ["Tibieza", "Warmth"], ["Instante", "Instant"], ["Postal", "Postcard"]
+    ],
+    cuando: [
+      ["al atardecer", "at dusk"], ["al amanecer", "at dawn"], ["de la tarde", "in the afternoon"],
+      ["de la mañana", "in the morning"], ["después de la lluvia", "after the rain"], ["de domingo", "on a Sunday"],
+      ["de invierno", "in winter"], ["de verano", "in summer"], ["en el camino", "on the road"],
+      ["a lo lejos", "in the distance"], ["al mediodía", "at noon"]
+    ]
+  },
+  mar: {
+    claves: ["mar", "playa", "costa", "costanera", "puerto", "muelle", "ola", "orilla", "faro", "escollera", "balneario"],
+    frases: [["Mar adentro", "Out to sea"], ["Viento sur", "South wind"], ["Marea baja", "Low tide"], ["Agua salada", "Salt water"], ["Temporada baja", "Off season"], ["Fuera de temporada", "Out of season"]],
+    cosas: [["Orilla", "Shore"], ["Marea", "Tide"], ["Rompiente", "Breakers"], ["Espuma", "Sea foam"], ["Muelle", "Pier"], ["Arena", "Sand"], ["Brisa", "Sea breeze"], ["Escollera", "Breakwater"], ["Faro", "Lighthouse"], ["Oleaje", "Swell"]],
+    cuando: [["frente al mar", "by the sea"], ["en la costa", "on the coast"], ["de marea baja", "at low tide"], ["de temporada baja", "in the off season"]]
+  },
+  cielo: {
+    claves: ["nube", "cielo", "tormenta", "atardecer", "amanecer", "sol", "luna"],
+    frases: [["Cielo abierto", "Open sky"], ["Antes de la tormenta", "Before the storm"], ["Mirar hacia arriba", "Looking up"], ["Cielo de verano", "Summer sky"]],
+    cosas: [["Nubes", "Clouds"], ["Cielo", "Sky"], ["Tormenta", "Storm"], ["Celeste", "Pale blue"], ["Claro", "Clearing"]],
+    cuando: [["en lo alto", "up above"], ["antes de la tormenta", "before the storm"], ["sobre la ciudad", "over the city"]]
+  },
+  flores: {
+    claves: ["flor", "jardin", "planta", "hoja", "primavera", "arbol", "verde"],
+    frases: [["Primavera", "Spring"], ["Jardín de invierno", "Winter garden"], ["En flor", "In bloom"]],
+    cosas: [["Pétalos", "Petals"], ["Jardín", "Garden"], ["Brote", "Bud"], ["Floración", "Bloom"], ["Tallo", "Stem"], ["Hojas", "Leaves"]],
+    cuando: [["de primavera", "in spring"], ["en el jardín", "in the garden"], ["al sol", "in the sun"]]
+  },
+  ciudad: {
+    claves: ["ciudad", "calle", "urbano", "barrio", "centro", "edificio", "estacion", "tren", "auto", "cartel"],
+    frases: [["Hora pico", "Rush hour"], ["Calle vacía", "Empty street"], ["Luces de la ciudad", "City lights"], ["Ida y vuelta", "Round trip"]],
+    cosas: [["Esquina", "Corner"], ["Vereda", "Sidewalk"], ["Vidriera", "Shop window"], ["Fachada", "Façade"], ["Ventana", "Window"], ["Cartel", "Sign"], ["Balcón", "Balcony"], ["Andén", "Platform"], ["Semáforo", "Traffic light"]],
+    cuando: [["del centro", "downtown"], ["de barrio", "in the neighborhood"], ["en la ciudad", "in the city"]]
+  },
+  animales: {
+    claves: ["animal", "perro", "gato", "ave", "pajaro", "gaviota", "caballo", "lobo marino", "fauna"],
+    frases: [["Siesta al sol", "Nap in the sun"], ["Buena compañía", "Good company"], ["Visita inesperada", "Unexpected visitor"]],
+    cosas: [["Guardián", "Guardian"], ["Siesta", "Nap"], ["Mirada", "Gaze"], ["Compañía", "Company"], ["Vuelo", "Flight"], ["Visita", "Visitor"]],
+    cuando: [["al sol", "in the sun"], ["de la siesta", "at nap time"]]
+  },
+  paisaje: {
+    claves: ["paisaje", "naturaleza", "campo", "sierra", "montana", "ruta", "laguna", "bosque", "rio", "lago", "valle", "argentina"],
+    frases: [["Tierra adentro", "Inland"], ["Ruta abierta", "Open road"], ["Campo abierto", "Open field"], ["Lejos de todo", "Far from everything"]],
+    cosas: [["Llanura", "Plains"], ["Camino", "Road"], ["Monte", "Woods"], ["Sierra", "Hills"], ["Campo", "Field"], ["Laguna", "Lagoon"], ["Ruta", "Highway"]],
+    cuando: [["en el campo", "in the countryside"], ["a lo lejos", "in the distance"], ["de ruta", "on the road"]]
+  },
+  otono: {
+    claves: ["otono", "hojas secas"],
+    frases: [["Hojas secas", "Dry leaves"], ["Tarde de otoño", "Autumn afternoon"], ["Ocre", "Ochre"]],
+    cosas: [["Hojas", "Leaves"], ["Ocre", "Ochre"], ["Otoño", "Autumn"]],
+    cuando: [["de otoño", "in autumn"]]
+  },
+  byn: {
+    claves: ["blanco y negro", "byn", "b&n", "monocromo"],
+    frases: [["Blanco y negro", "Black and white"], ["Escala de grises", "Grayscale"], ["Grano fino", "Fine grain"]],
+    cosas: [["Contraste", "Contrast"], ["Grises", "Grays"], ["Grano", "Grain"], ["Claroscuro", "Chiaroscuro"]],
+    cuando: [["en blanco y negro", "in black and white"]]
+  }
+};
+const normal = (t) => String(t || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+function paletaGris(paleta) {
+  const cs = (paleta || []).filter((c) => HEX.test(c));
+  if (!cs.length) return false;
+  return cs.every((c) => {
+    const r = parseInt(c.slice(1, 3), 16), g = parseInt(c.slice(3, 5), 16), b = parseInt(c.slice(5, 7), 16);
+    return Math.max(r, g, b) - Math.min(r, g, b) < 24;
+  });
+}
+function temasDe(f) {
+  const serie = doc.series.find((s) => s.id === f.serie);
+  const texto = " " + normal([f.lugar, serie && serie.titulo].concat((f.categorias || []).map((id) => (doc.categorias.find((c) => c.id === id) || {}).nombre)).join(" ")) + " ";
+  // palabra entera, con plural opcional: «flor» encuentra «flores», pero «ave» no encuentra «avenida»
+  const esta = (c) => new RegExp("[^a-z]" + c.replace(/[.*+?^${}()|[\]\\&]/g, "\\$&") + "(s|es)?[^a-z]").test(texto);
+  const temas = Object.keys(BANCO_TITULOS).filter((k) => k !== "general" && BANCO_TITULOS[k].claves.some(esta));
+  if (paletaGris(f.paleta) && temas.indexOf("byn") < 0) temas.push("byn");
+  return temas;
+}
+function candidatosTitulo(f) {
+  const temas = temasDe(f);
+  const lista = [];
+  const sumar = (par, peso) => { for (let i = 0; i < peso; i++) lista.push(par); };
+  const g = BANCO_TITULOS.general;
+  // de lo temático sale la mayoría; lo general agrega variedad
+  const pesoTema = temas.length ? 3 : 0;
+  g.frases.forEach((p) => sumar(p, 1));
+  temas.forEach((t) => BANCO_TITULOS[t].frases.forEach((p) => sumar(p, pesoTema)));
+  const cosas = g.cosas.map((c) => [c, 1]).concat(...temas.map((t) => BANCO_TITULOS[t].cosas.map((c) => [c, pesoTema])));
+  const cuandos = g.cuando.map((c) => [c, 1]).concat(...temas.map((t) => BANCO_TITULOS[t].cuando.map((c) => [c, pesoTema])));
+  cosas.forEach(([c, pc]) => cuandos.forEach(([w, pw]) => {
+    if (normal(w[0]).indexOf(normal(c[0])) >= 0) return; // evita «Otoño de otoño»
+    if (Math.random() < 0.35) sumar([c[0] + " " + w[0], c[1] + " " + w[1]], Math.max(pc, pw) > 1 ? 2 : 1);
+  }));
+  return lista;
+}
+/* Devuelve [castellano, inglés]. «evitar» son títulos (en minúscula) que no se quieren repetir. */
+function generarTitulo(f, evitar) {
+  if (!evitar) evitar = new Set(doc.fotos.filter((x) => x !== f).map((x) => normal(x.titulo)));
+  const actual = normal(f.titulo);
+  const lista = candidatosTitulo(f);
+  for (let i = 0; i < 80; i++) {
+    const p = lista[Math.floor(Math.random() * lista.length)];
+    const k = normal(p[0]);
+    if (k !== actual && !evitar.has(k)) return p;
+  }
+  // ya se usaron casi todos: se agrega un número romano para que no se repita
+  const p = lista[Math.floor(Math.random() * lista.length)];
+  for (const r of ["II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"]) {
+    const k = normal(p[0] + " " + r);
+    if (!evitar.has(k) && k !== actual) return [p[0] + " " + r, p[1] + " " + r];
+  }
+  return [p[0], p[1]];
+}
+const tituloSerie = (f) => { const s = doc.series.find((x) => x.id === f.serie); return s && String(s.titulo || "").trim() ? s : null; };
 
 /* ---------- Editor de una foto ---------- */
 let editando = null;
@@ -1401,8 +1569,25 @@ function renderEditor() {
   cuerpo.append(el("div", { class: "editor-foto" }, [img, paleta]));
 
   // Datos
-  cuerpo.append(campoTexto("Título", f.titulo, set("titulo"), { ayuda: "En castellano. Aparece en mayúsculas debajo de la foto." }));
-  cuerpo.append(campoTexto("Título en inglés", f.title, set("title"), { placeholder: "Opcional" }));
+  const campoEs = campoTexto("Título", f.titulo, (v) => { f.titulo = v; cambio(); renderFilaLista(f); pintarNotaTitulo(); }, { ayuda: "En castellano. Aparece en mayúsculas debajo de la foto." });
+  const campoEn = campoTexto("Título en inglés", f.title, set("title"), { placeholder: "Opcional" });
+  const notaTitulo = el("p", { class: "ayuda nota-titulo" });
+  const pintarNotaTitulo = () => {
+    const s = tituloSerie(f);
+    notaTitulo.textContent = !sinTitulo(f) ? "Tocá «Generar título» para que te proponga uno; si no te gusta, tocalo de nuevo."
+      : s ? "Sin título propio: en la página se muestra el de su serie, «" + s.titulo + "»."
+      : "Sin título: en la página se muestra «Sin título». Si la sumás a una serie, toma el título de la serie.";
+  };
+  const ponerTitulo = (es, en) => {
+    f.titulo = es; f.title = en;
+    $("input", campoEs).value = es; $("input", campoEn).value = en;
+    cambio(); renderFilaLista(f); pintarNotaTitulo();
+  };
+  pintarNotaTitulo();
+  cuerpo.append(campoEs, campoEn, el("div", { class: "acciones-titulo" }, [
+    el("button", { type: "button", class: "btn btn-chico", onclick: () => { const t = generarTitulo(f); ponerTitulo(t[0], t[1]); } }, [iconoSvg("i-recalcular"), document.createTextNode("Generar título")]),
+    el("button", { type: "button", class: "btn btn-chico", onclick: () => ponerTitulo("Sin título", "Untitled") }, [document.createTextNode("Dejar sin título")])
+  ]), notaTitulo);
   cuerpo.append(el("div", { class: "fila-campos" }, [
     campoTexto("Lugar", f.lugar, set("lugar"), { placeholder: "Ej.: Playa Grande, Mar del Plata" }),
     campoTexto("Año", f.anio, set("anio"), { inputmode: "numeric", placeholder: "2026" })
@@ -1434,7 +1619,7 @@ function renderEditor() {
   // Serie
   const sel = el("select", { id: "editor-serie" }, [el("option", { value: "", texto: "Ninguna" })].concat(doc.series.map((s) => el("option", { value: s.id, texto: s.titulo }))));
   sel.value = f.serie || "";
-  sel.addEventListener("change", () => { f.serie = sel.value || null; cambio(); renderFilaLista(f); });
+  sel.addEventListener("change", () => { f.serie = sel.value || null; cambio(); renderFilaLista(f); pintarNotaTitulo(); });
   cuerpo.append(el("div", { class: "campo" }, [el("label", { for: "editor-serie", texto: "Serie" }), sel]));
 
   cuerpo.append(campoTexto("Descripción de la foto", f.alt, set("alt"), { multilinea: true, filas: 2, ayuda: "Una frase que cuente qué se ve. La usan Google y los lectores de pantalla (no aparece escrita en la página)." }));
@@ -1452,7 +1637,7 @@ function renderFilaLista(f) {
   $(".puntos", fila).replaceWith(puntos(f.paleta));
   const tags = $(".etiquetas", fila);
   $$(".tag.falta", tags).forEach((t) => t.remove());
-  if (sinTitulo(f)) tags.append(el("span", { class: "tag falta", texto: "Sin título" }));
+  if (sinTitulo(f)) tags.append(etiquetaSinTitulo(f));
   if (!(f.categorias || []).length) tags.append(el("span", { class: "tag falta", texto: "Sin categoría" }));
 }
 function cargarImagen(url) {
@@ -1505,7 +1690,16 @@ function abrirVarias() {
   cuerpo.replaceChildren();
   $("#varias-titulo").textContent = "Editar " + plural(elegidas.size, "foto", "fotos");
   cuerpo.append(el("p", { class: "nota", texto: "Solo se cambia lo que completes. Lo que dejes vacío queda como está en cada foto." }));
-  const datos = { lugar: "", anio: "", soporte: "", camara: "", sumar: new Set(), quitar: new Set(), serie: "__igual", oculta: "__igual" };
+  const datos = { lugar: "", anio: "", soporte: "", camara: "", sumar: new Set(), quitar: new Set(), serie: "__igual", oculta: "__igual", titulos: "__igual" };
+  const selTit = el("select", { id: "varias-titulos" }, [
+    el("option", { value: "__igual", texto: "(no cambiar)" }),
+    el("option", { value: "vacias", texto: "Generar uno para las que no tienen título" }),
+    el("option", { value: "todas", texto: "Generar uno nuevo para todas" }),
+    el("option", { value: "sin", texto: "Dejarlas «Sin título» (usan el de su serie)" })
+  ]);
+  selTit.addEventListener("change", () => { datos.titulos = selTit.value; });
+  cuerpo.append(el("div", { class: "campo" }, [el("label", { for: "varias-titulos", texto: "Títulos" }), selTit,
+    el("p", { class: "ayuda", texto: "Los generados no se repiten entre fotos. Después podés cambiar cualquiera desde la foto." })]));
   cuerpo.append(el("div", { class: "fila-campos" }, [
     campoTexto("Lugar", "", (v) => { datos.lugar = v; }),
     campoTexto("Año", "", (v) => { datos.anio = v; }, { inputmode: "numeric" })
@@ -1539,6 +1733,8 @@ function abrirVarias() {
   cuerpo.append(el("div", { class: "campo" }, [el("label", { for: "varias-oculta", texto: "Visibilidad" }), vis]));
   $("#varias-aplicar").onclick = () => {
     const orden = doc.categorias.map((c) => c.id);
+    // títulos que ya están en uso (se van sumando los nuevos para no repetir)
+    const usados = new Set(doc.fotos.filter((f) => !sinTitulo(f) && !(datos.titulos === "todas" && elegidas.has(f.n))).map((f) => normal(f.titulo)));
     doc.fotos.forEach((f) => {
       if (!elegidas.has(f.n)) return;
       ["lugar", "anio", "soporte", "camara"].forEach((k) => { if (datos[k].trim()) f[k] = datos[k].trim(); });
@@ -1549,6 +1745,13 @@ function abrirVarias() {
       }
       if (datos.serie !== "__igual") f.serie = datos.serie || null;
       if (datos.oculta !== "__igual") f.oculta = datos.oculta === "ocultar";
+      // va después de la serie, así el generador usa la serie nueva
+      if (datos.titulos === "sin") { f.titulo = "Sin título"; f.title = "Untitled"; }
+      else if (datos.titulos === "todas" || (datos.titulos === "vacias" && sinTitulo(f))) {
+        const t = generarTitulo(f, usados);
+        f.titulo = t[0]; f.title = t[1];
+        usados.add(normal(t[0]));
+      }
     });
     const k = elegidas.size;
     cerrarHojas();
@@ -1784,7 +1987,13 @@ function renderAjustes() {
   const sitio = campoTexto("Dirección de la página", a.sitio, (v) => { a.sitio = v.trim(); cambio(); }, { tipo: "url", placeholder: "https://…", ayuda: "Se usa en los links que se comparten. Si algún día comprás un dominio (ej.: ojodecristi.com.ar), cambialo acá." });
   sitio.querySelector("input").addEventListener("blur", (e) => { const n = normalizarSitio(e.target.value); if (n && n !== a.sitio) { a.sitio = n; e.target.value = n; cambio(); } });
   cont.append(sitio);
-  $("#sesion-texto").textContent = usuario ? "Entraste como @" + usuario + ". El token está guardado en este dispositivo." : "";
+  const hayFotos = doc.fotos.length || base.contenido.fotos.length;
+  $("#numeracion-texto").textContent = (hayFotos
+    ? "La próxima foto que subas va a ser la N.° " + n3(siguienteNumero()) + ". Los números no se repiten mientras haya fotos en la página, así un número que ya compartiste nunca cae en otra foto."
+    : "No hay ninguna foto: la próxima que subas va a ser la N.° 001.")
+    + (puedeRenumerar() ? " Como todavía no publicaste ninguna, podés volver a numerar las nuevas desde el 1 (en el orden en que las subiste)." : "");
+  $("#btn-renumerar").hidden = !puedeRenumerar();
+  $("#sesion-texto").textContent = usuario ?"Entraste como @" + usuario + ". El token está guardado en este dispositivo." : "";
   cargarHistorial();
 }
 async function cargarHistorial() {
@@ -2199,6 +2408,7 @@ $("#btn-nueva-serie").addEventListener("click", () => {
   if (t) { const i = $("input", t); i.focus(); i.select(); }
 });
 $("#btn-deshacer").addEventListener("click", deshacerUltima);
+$("#btn-renumerar").addEventListener("click", renumerarDesdeUno);
 $("#btn-publicar").addEventListener("click", publicar);
 $("#btn-previa").addEventListener("click", abrirPrevia);
 $("#previa-cerrar").addEventListener("click", cerrarPrevia);

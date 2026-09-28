@@ -121,6 +121,7 @@ section[id] { scroll-margin-top: 84px; }
 .versal { font: 500 12px/1.4 var(--titulo); letter-spacing: .28em; text-transform: uppercase; }
 .foto-num { font: 500 11px/1 var(--titulo); letter-spacing: .3em; text-transform: uppercase; color: var(--tinta-2); font-variant-numeric: tabular-nums; }
 .foto-en { font: italic 400 18px/1.3 var(--serif); color: var(--tinta-2); }
+.foto-en:empty { display: none; }
 
 /* Adorno: línea · rombo · línea */
 .ornamento { display: flex; align-items: center; justify-content: center; gap: 14px; }
@@ -850,7 +851,7 @@ section[id] { scroll-margin-top: 84px; }
       "",
       ""
     ],
-    "ultimoNumero": 20
+    "ultimoNumero": 0
   },
   "textos": {
     "marca.nombre": "ojodecristi",
@@ -969,9 +970,19 @@ const CONFIG = {
 };
 const CATEGORIAS = Array.isArray(CONTENIDO.categorias) ? CONTENIDO.categorias : [];
 const SERIES = Array.isArray(CONTENIDO.series) ? CONTENIDO.series : [];
+/* Una foto sin título propio muestra el título de su serie (o «Sin título» si no tiene serie) */
+const faltaTitulo = (t) => { const s = String(t || "").trim().toLowerCase(); return !s || s === "sin título" || s === "sin titulo" || s === "untitled"; };
+function conTitulo(f) {
+  if (faltaTitulo(f.titulo)) {
+    const s = SERIES.find((x) => x.id === f.serie);
+    if (s && !faltaTitulo(s.titulo)) { f.titulo = s.titulo; f.title = s.title || ""; }
+    else { f.titulo = "Sin título"; f.title = faltaTitulo(f.title) ? "Untitled" : f.title; }
+  } else if (faltaTitulo(f.title)) f.title = ""; // no mostrar «Untitled» debajo de un título que sí tiene
+  return f;
+}
 const FOTOS = (Array.isArray(CONTENIDO.fotos) ? CONTENIDO.fotos : [])
   .filter((f) => f && f.n && !f.oculta)
-  .map((f) => Object.assign({}, f, { categorias: Array.isArray(f.categorias) ? f.categorias : [], paleta: Array.isArray(f.paleta) && f.paleta.length ? f.paleta : null }));
+  .map((f) => conTitulo(Object.assign({}, f, { categorias: Array.isArray(f.categorias) ? f.categorias : [], paleta: Array.isArray(f.paleta) && f.paleta.length ? f.paleta : null })));
 
 /* ==============================================================
    De acá para abajo no hace falta tocar nada
