@@ -690,6 +690,7 @@ section[id] { scroll-margin-top: 84px; }
         <p class="capitulo-nota" data-t="series.nota">Grupos de fotos que comparten un tema o un recorrido.</p>
       </div>
       <div class="series-grilla" id="series-grilla"></div>
+      <div class="ver-mas" id="ver-mas-series" hidden><button type="button" class="btn btn-linea" id="btn-ver-mas-series" aria-expanded="false" aria-controls="series-grilla"></button></div>
     </div>
   </section>
 
@@ -884,6 +885,8 @@ section[id] { scroll-margin-top: 84px; }
     "archivo.vacio-titulo": "Esta parte del archivo todavía se está revelando",
     "archivo.vacio-texto": "Pronto va a haber fotos acá. Mientras tanto, mirá el archivo completo.",
     "series.titulo": "Las series",
+    "series.ver-todas": "Ver todas",
+    "series.ver-menos": "Ver menos",
     "series.ingles": "The Series",
     "series.nota": "Grupos de fotos que comparten un tema o un recorrido.",
     "cuadros.titulo": "Cómo pedir un cuadro",
@@ -4081,8 +4084,9 @@ const rellenar = (plantilla, datos) => String(plantilla || "").replace(/\{([a-z�
 
 document.documentElement.lang = "es";
 
-const estado = { filtro: { tipo: "todo" }, lista: FOTOS.slice(), visorLista: FOTOS, indice: -1, verTodo: false };
-const FOTOS_VISIBLES = 15; // en el archivo se ven estas, y un botón «Ver todo» muestra el resto
+const estado = { filtro: { tipo: "todo" }, lista: FOTOS.slice(), visorLista: FOTOS, indice: -1, verTodo: false, verSeries: false };
+const FOTOS_VISIBLES = 12;
+const SERIES_VISIBLES = 6; // igual con las series: «Ver todas» muestra el resto // en el archivo se ven estas, y un botón «Ver todo» muestra el resto
 
 /* ---------- Guardado local (solo comodidad para quien visita) ---------- */
 const CLAVE = "ojodecristi-seleccion";
@@ -4322,7 +4326,14 @@ function aplicarFiltro(filtro, opciones) {
 
 /* ---------- Series ---------- */
 function renderSeries() {
-  const html = SERIES.map((s) => {
+  const conFotos = SERIES.filter((s) => FOTOS.some((f) => f.serie === s.id));
+  const cortada = conFotos.length > SERIES_VISIBLES && !estado.verSeries;
+  const mostradas = cortada ? conFotos.slice(0, SERIES_VISIBLES) : conFotos;
+  const boton = $("#btn-ver-mas-series");
+  $("#ver-mas-series").hidden = conFotos.length <= SERIES_VISIBLES;
+  boton.textContent = cortada ? texto("series.ver-todas", "Ver todas") + " (" + conFotos.length + ")" : texto("series.ver-menos", "Ver menos");
+  boton.setAttribute("aria-expanded", String(!cortada));
+  const html = mostradas.map((s) => {
     const fotos = FOTOS.filter((f) => f.serie === s.id);
     if (!fotos.length) return "";
     const tapa = fotos[0];
@@ -4338,7 +4349,7 @@ function renderSeries() {
     '</button>';
   }).join("");
   $("#series-grilla").innerHTML = html;
-  SERIES.forEach((s) => {
+  mostradas.forEach((s) => {
     const hueco = $$("[data-puntos-serie]").find((el) => el.dataset.puntosSerie === s.id);
     if (!hueco) return;
     const colores = [];
@@ -4639,6 +4650,12 @@ document.addEventListener("click", (e) => {
   if (t.closest("#nav-movil a")) cerrarMenu();
 });
 
+$("#btn-ver-mas-series").addEventListener("click", () => {
+  estado.verSeries = !estado.verSeries;
+  renderSeries();
+  anunciar(estado.verSeries ? "Se muestran todas las series" : "Se muestran las primeras " + SERIES_VISIBLES + " series");
+  if (!estado.verSeries) $("#series").scrollIntoView({ behavior: pocoMovimiento ? "auto" : "smooth", block: "start" });
+});
 $("#btn-ver-mas").addEventListener("click", () => {
   estado.verTodo = !estado.verTodo;
   pintarGrilla();

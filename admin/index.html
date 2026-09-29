@@ -166,6 +166,11 @@ main.contenido { padding-block: 26px 150px; }
 /* Lista de fotos */
 .herramientas { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
 .buscar { flex: 1 1 220px; max-width: 360px; }
+.filtros { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px 10px; margin: 12px 0 4px; }
+.filtros label { display: grid; gap: 3px; font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--tinta-2); }
+.filtros select { font-size: 14px; letter-spacing: 0; text-transform: none; }
+.filtros-pie { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin: 4px 0 12px; font-size: 13.5px; color: var(--tinta-2); }
+.filtros-pie button { color: var(--acento); }
 .lista-fotos { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
 .item-foto { display: grid; grid-template-columns: auto 92px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 8px; background: var(--papel); border: 1px solid var(--linea); }
 .item-foto.oculta { opacity: .6; }
@@ -419,6 +424,8 @@ main.contenido { padding-block: 26px 150px; }
           <input type="text" class="buscar" id="buscar" placeholder="Buscar por título, lugar o número" aria-label="Buscar fotos">
           <button type="button" class="btn btn-chico" id="btn-elegir">Elegir varias</button>
         </div>
+        <div class="filtros" id="filtros" role="group" aria-label="Filtrar fotos"></div>
+        <div class="filtros-pie"><span id="filtros-cuenta" aria-live="polite"></span><button type="button" class="btn-texto" id="filtros-limpiar" hidden>Limpiar filtros</button></div>
         <ol class="lista-fotos" id="lista-fotos"></ol>
         <p class="suave chico" id="lista-vacia" hidden>No hay fotos que coincidan.</p>
       </div>
@@ -1248,9 +1255,54 @@ function elegirPortada(n) {
   cambio({ lista: true });
 }
 
+/* Filtros de la lista de fotos (se combinan entre sí y con el buscador) */
+const filtros = { categoria: "", serie: "", estado: "", anio: "", soporte: "" };
+const ESTADOS_FILTRO = [
+  ["", "Todas"], ["nuevas", "Nuevas (sin publicar)"], ["oculta", "Ocultas"], ["portada", "En la portada"],
+  ["sin-titulo", "Sin título"], ["sin-categoria", "Sin categoría"], ["sin-serie", "Sin serie"], ["sin-lugar", "Sin lugar"], ["sin-paleta", "Sin paleta"]
+];
+const hayFiltros = () => !!($("#buscar").value.trim() || Object.values(filtros).some(Boolean));
 function fotosFiltradas() {
   const q = $("#buscar").value.trim().toLowerCase();
-  return doc.fotos.filter((f) => !q || [f.n, f.titulo, f.title, f.lugar, f.anio].join(" ").toLowerCase().indexOf(q) >= 0);
+  const portada = doc.ajustes.portada || [];
+  return doc.fotos.filter((f) => {
+    if (q && [f.n, f.titulo, f.title, f.lugar, f.anio].join(" ").toLowerCase().indexOf(q) < 0) return false;
+    if (filtros.categoria === "__ninguna" ? (f.categorias || []).length : filtros.categoria && (f.categorias || []).indexOf(filtros.categoria) < 0) return false;
+    if (filtros.serie === "__ninguna" ? f.serie : filtros.serie && f.serie !== filtros.serie) return false;
+    if (filtros.anio && String(f.anio || "") !== filtros.anio) return false;
+    if (filtros.soporte && String(f.soporte || "") !== filtros.soporte) return false;
+    switch (filtros.estado) {
+      case "nuevas": return nuevas.has(f.n) && !publicada(f.n);
+      case "oculta": return !!f.oculta;
+      case "portada": return portada.indexOf(f.n) >= 0;
+      case "sin-titulo": return sinTitulo(f);
+      case "sin-categoria": return !(f.categorias || []).length;
+      case "sin-serie": return !f.serie;
+      case "sin-lugar": return !String(f.lugar || "").trim();
+      case "sin-paleta": return !(f.paleta || []).length;
+    }
+    return true;
+  });
+}
+/* Arma los desplegables con lo que hay en las fotos (categorías, series, años, soportes) */
+function pintarFiltros() {
+  const cont = $("#filtros");
+  const unicos = (k) => [...new Set(doc.fotos.map((f) => String(f[k] || "").trim()).filter(Boolean))].sort();
+  const campos = [
+    ["estado", "Mostrar", ESTADOS_FILTRO],
+    ["categoria", "Categoría", [["", "Todas"], ["__ninguna", "Sin categoría"]].concat(doc.categorias.map((c) => [c.id, c.nombre]))],
+    ["serie", "Serie", [["", "Todas"], ["__ninguna", "Sin serie"]].concat(doc.series.map((x) => [x.id, x.titulo]))],
+    ["anio", "Año", [["", "Todos"]].concat(unicos("anio").reverse().map((a) => [a, a]))],
+    ["soporte", "Soporte", [["", "Todos"]].concat(unicos("soporte").map((a) => [a, a]))]
+  ];
+  cont.replaceChildren();
+  campos.forEach(([k, etiqueta, opciones]) => {
+    if (!opciones.some((o) => o[0] === filtros[k])) filtros[k] = ""; // la opción ya no existe
+    const sel = el("select", { "data-filtro": k }, opciones.map((o) => el("option", { value: o[0], texto: o[1] })));
+    sel.value = filtros[k];
+    sel.addEventListener("change", () => { filtros[k] = sel.value; renderFotos(); });
+    cont.append(el("label", {}, [document.createTextNode(etiqueta), sel]));
+  });
 }
 let eligiendo = false;
 let ancla = null; // la última foto que se tocó al elegir (para elegir un tramo con Shift)
@@ -1267,7 +1319,8 @@ function elegirConClick(n, marcar, conShift) {
 const elegidas = new Set();
 function renderFotos() {
   const lista = $("#lista-fotos");
-  const q = $("#buscar").value.trim().toLowerCase();
+  const q = hayFiltros();
+  pintarFiltros();
   const portada = doc.ajustes.portada || [];
   lista.classList.toggle("eligiendo", eligiendo);
   lista.replaceChildren();
@@ -1305,6 +1358,8 @@ function renderFotos() {
     ]));
   });
   $("#lista-vacia").hidden = visibles.length > 0;
+  $("#filtros-cuenta").textContent = q ? visibles.length + " de " + doc.fotos.length + " fotos" : doc.fotos.length + " fotos";
+  $("#filtros-limpiar").hidden = !q;
   $("#cuenta-fotos").textContent = "(" + doc.fotos.length + ")";
 }
 function iconoSvg(id) {
@@ -1938,7 +1993,9 @@ const ESQUEMA = [
   { grupo: "Capítulo · Las series", campos: [
     ["series.titulo", "Título", "linea", true],
     ["series.ingles", "Título en inglés", "linea"],
-    ["series.nota", "Texto", "texto"]
+    ["series.nota", "Texto", "texto"],
+    ["series.ver-todas", "Botón «Ver todas» (cuando hay más de 6 series)", "linea", true],
+    ["series.ver-menos", "Botón «Ver menos»", "linea", true]
   ] },
   { grupo: "Capítulo · Cómo pedir un cuadro", campos: [
     ["cuadros.titulo", "Título", "linea", true],
@@ -2531,6 +2588,9 @@ const zona = $("#zona-subir");
 ["dragleave", "drop"].forEach((t) => zona.addEventListener(t, (e) => { e.preventDefault(); zona.classList.remove("encima"); }));
 zona.addEventListener("drop", (e) => subirArchivos(e.dataTransfer && e.dataTransfer.files));
 $("#buscar").addEventListener("input", renderFotos);
+$("#filtros-limpiar").addEventListener("click", () => {
+  $("#buscar").value = ""; Object.keys(filtros).forEach((k) => { filtros[k] = ""; }); renderFotos();
+});
 $("#btn-elegir").addEventListener("click", () => modoEleccion(!eligiendo));
 $("#btn-cancelar-eleccion").addEventListener("click", () => modoEleccion(false));
 $("#btn-elegir-todas").addEventListener("click", () => { fotosFiltradas().forEach((f) => elegidas.add(f.n)); actualizarEleccion(); renderFotos(); });
