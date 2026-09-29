@@ -30,8 +30,9 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@1,400;1,500&family=Jost:wght@300..700&display=swap">
 <style>
 /* ============ Paletas (cada una sale de una foto) ============
-   Por defecto: "Rayas de domingo" (N.° 004). Las otras se activan con
-   data-paleta="mar" (N.° 005) o data-paleta="estrellas" (N.° 001) en <html>. */
+   Por defecto: "Pastel de Cristi" (id rayas). Las otras se activan con
+   data-paleta="mar" ("Girasoles de Cristi") o data-paleta="estrellas" ("El mar de mi hogar") en <html>.
+   Los ids no cambian para que no se pierda la paleta que ya eligió cada visitante. */
 :root {
   color-scheme: light;
   --fondo: #F7D8CB;
@@ -587,9 +588,9 @@ section[id] { scroll-margin-top: 84px; }
   <div class="envoltorio">
     <span>Paleta<span class="resto"> del sitio</span>:</span>
     <div class="paletas" role="group" aria-label="Paleta de colores del sitio">
-      <button type="button" class="paleta-btn" data-paleta-sitio="rayas" aria-pressed="true"><span aria-hidden="true"><i style="--c:#F7D8CB"></i><i style="--c:#A9CFE2"></i><i style="--c:#B8404F"></i></span><span>Rayas<span class="resto"> de domingo</span></span></button>
-      <button type="button" class="paleta-btn" data-paleta-sitio="mar" aria-pressed="false"><span aria-hidden="true"><i style="--c:#F5E2A5"></i><i style="--c:#AED6C8"></i><i style="--c:#2E6F77"></i></span><span><span class="resto">El </span>Mar<span class="resto"> todo lo cura</span></span></button>
-      <button type="button" class="paleta-btn" data-paleta-sitio="estrellas" aria-pressed="false"><span aria-hidden="true"><i style="--c:#CFE3EC"></i><i style="--c:#F4D98A"></i><i style="--c:#C4452F"></i></span><span>Estrellas<span class="resto"> de viento</span></span></button>
+      <button type="button" class="paleta-btn" data-paleta-sitio="rayas" aria-pressed="true"><span aria-hidden="true"><i style="--c:#F7D8CB"></i><i style="--c:#A9CFE2"></i><i style="--c:#B8404F"></i></span><span>Pastel<span class="resto"> de Cristi</span></span></button>
+      <button type="button" class="paleta-btn" data-paleta-sitio="mar" aria-pressed="false"><span aria-hidden="true"><i style="--c:#F5E2A5"></i><i style="--c:#AED6C8"></i><i style="--c:#2E6F77"></i></span><span>Girasoles<span class="resto"> de Cristi</span></span></button>
+      <button type="button" class="paleta-btn" data-paleta-sitio="estrellas" aria-pressed="false"><span aria-hidden="true"><i style="--c:#CFE3EC"></i><i style="--c:#F4D98A"></i><i style="--c:#C4452F"></i></span><span>El mar<span class="resto"> de mi hogar</span></span></button>
     </div>
   </div>
 </div>
