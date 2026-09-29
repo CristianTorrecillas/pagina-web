@@ -896,7 +896,7 @@ function bloqueSeo(c) {
     '<meta property="og:title" content="' + attr(titulo) + '">',
     '<meta property="og:description" content="' + attr(desc) + '">',
     sitio && '<meta property="og:url" content="' + attr(sitio) + '">',
-    sitio && '<meta property="og:image" content="' + attr(sitio + "compartir.jpg") + '">',
+    sitio && '<meta property="og:image" content="' + attr(sitio + "compartir.jpg" + (a.compartirFoto ? "?v=" + a.compartirFoto : "")) + '">',
     '<meta property="og:image:width" content="1200">',
     '<meta property="og:image:height" content="630">',
     '<meta property="og:image:alt" content="' + attr(t["portada.creditos"] || titulo) + '">',
@@ -2377,10 +2377,47 @@ function pasosPublicar(lista, activo) {
   ol.replaceChildren();
   lista.forEach((t, i) => ol.append(el("li", { class: i < activo ? "hecho" : i === activo ? "activo" : "", texto: t })));
 }
+/* ---------- Imagen para compartir el link (WhatsApp, Instagram…) ----------
+   Se arma sola al publicar con la foto principal de la portada: sobre «compartir-base.png»
+   (el texto y el sello, con el hueco de la foto) se pone la foto con su paspartú y su paleta. */
+function fotoDeCompartir(c) {
+  const vis = (n) => c.fotos.find((f) => f.n === n && !f.oculta);
+  const a = c.ajustes || {};
+  if (a.portadaModo === "carrusel") { const f = (a.carrusel || []).map(vis).filter(Boolean); if (f.length >= 3) return f[0]; }
+  const p = a.portada || [];
+  return vis(p[1]) || vis(p[0]) || vis(p[2]) || c.fotos.find((f) => !f.oculta) || null;
+}
+async function hacerImagenCompartir(f, commit) {
+  const plantilla = await cargarImagen(RAW + "/" + REPO.dueno + "/" + REPO.nombre + "/" + commit + "/compartir-base.png");
+  const foto = nuevas.has(f.n) ? await decodificar(nuevas.get(f.n).mini) : await cargarImagen(RAW + "/" + REPO.dueno + "/" + REPO.nombre + "/" + commit + "/fotos/mini/" + f.n + ".jpg");
+  const W = 1200, H = 630, c = document.createElement("canvas");
+  c.width = W; c.height = H;
+  const x = c.getContext("2d");
+  x.drawImage(plantilla, 0, 0, W, H);
+  // paspartú: el color de la foto, aclarado
+  const p0 = (f.paleta || []).find((k) => HEX.test(k)) || "#d9cdb8";
+  const rgb = [1, 3, 5].map((i) => parseInt(p0.slice(i, i + 2), 16));
+  const mezcla = (t) => "rgb(" + rgb.map((v) => Math.round(v + (255 - v) * t)).join(",") + ")";
+  const BX = 624, BY = 116, BW = 512, BH = 398;
+  x.fillStyle = mezcla(.8); x.fillRect(BX, BY, BW, BH);
+  // la foto entra entera en una ventana de 430 × 286
+  const ar = (f.ancho > 0 && f.alto > 0 ? f.ancho / f.alto : (foto.width || 3) / (foto.height || 2));
+  let w = 430, h = Math.round(w / ar);
+  if (h > 286) { h = 286; w = Math.round(h * ar); }
+  const px = BX + (BW - w) / 2, py = 157 + (286 - h) / 2;
+  x.drawImage(foto, px, py, w, h);
+  x.strokeStyle = "rgba(60,36,39,.45)"; x.lineWidth = 1;
+  x.strokeRect(px - 6.5, py - 6.5, w + 13, h + 13);
+  const dots = (f.paleta || []).filter((k) => HEX.test(k)).slice(0, 5);
+  dots.forEach((k, i) => { x.beginPath(); x.arc(BX + BW / 2 + (i - (dots.length - 1) / 2) * 22, 473, 7, 0, Math.PI * 2); x.fillStyle = k; x.fill(); });
+  if (foto.close) foto.close();
+  return await new Promise((ok, mal) => c.toBlob((b) => (b ? ok(b) : mal(new Error("imagen"))), "image/jpeg", .9));
+}
 /* Arma la lista de cambios de archivos para el commit, sobre la versión publicada «actual» */
-function armarArbol(actual, final, altas) {
+function armarArbol(actual, final, altas, compartirSha) {
   const html = armarHtml(actual.html, final);
   const arbol = [{ path: "index.html", mode: "100644", type: "blob", content: html }];
+  if (compartirSha) arbol.push({ path: "compartir.jpg", mode: "100644", type: "blob", sha: compartirSha });
   altas.forEach((f) => {
     const v = nuevas.get(f.n);
     arbol.push({ path: "fotos/web/" + f.n + ".jpg", mode: "100644", type: "blob", sha: v.blobWeb });
@@ -2443,10 +2480,24 @@ async function publicar() {
     }
     // 3. Armar la nueva versión y publicarla en un solo paso
     pasosPublicar(nombresPasos, 2);
+    // La imagen que se ve al compartir el link sigue a la foto principal de la portada (si falla, no frena la publicación)
+    let compartirSha = null;
+    try {
+      const fc = fotoDeCompartir(final);
+      if (fc && actual.archivos.has("compartir-base.png")) {
+        if (fc.n !== (actual.contenido.ajustes || {}).compartirFoto || !actual.archivos.has("compartir.jpg")) {
+          $("#publicar-detalle").textContent = "Armando la imagen para compartir el link…";
+          const blob = await hacerImagenCompartir(fc, actual.commit);
+          const r = await ghEscribir(rutaRepo("/git/blobs"), { method: "POST", body: { content: await blobABase64(blob), encoding: "base64" } });
+          compartirSha = r.sha;
+        }
+        final.ajustes.compartirFoto = fc.n;
+      }
+    } catch (_) { compartirSha = null; }
     $("#publicar-detalle").textContent = "Guardando textos y datos…";
     const mensaje = PREFIJO_COMMIT + (partes.join(", ") || "cambios");
     for (let intento = 0; intento < 3 && !hecho; intento++) {
-      const armado = armarArbol(actual, final, altas);
+      const armado = armarArbol(actual, final, altas, compartirSha);
       const t = await ghEscribir(rutaRepo("/git/trees"), { method: "POST", body: { base_tree: actual.arbol, tree: armado.arbol } });
       const c = await ghEscribir(rutaRepo("/git/commits"), { method: "POST", body: { message: mensaje, tree: t.sha, parents: [actual.commit] } });
       try {
