@@ -25,6 +25,9 @@
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
+<meta name="color-scheme" content="only light">
+<meta name="supported-color-schemes" content="light">
+<meta name="darkreader-lock">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@1,400;1,500&family=Jost:wght@300..700&display=swap">
@@ -34,7 +37,7 @@
    data-paleta="mar" ("Girasoles de Cristi") o data-paleta="estrellas" ("El mar de mi hogar") en <html>.
    Los ids no cambian para que no se pierda la paleta que ya eligió cada visitante. */
 :root {
-  color-scheme: light;
+  color-scheme: only light; /* los navegadores no la oscurecen solos: las paletas claras se ven igual en celu y en compu */
   --fondo: #F7D8CB;
   --superficie: #FCEBE3;
   --tinta: #3A2426;
@@ -51,6 +54,8 @@
   --pie-tinta: #F7D8CB;
   --pie-tinta-2: #D9B3A7;
   --velo: rgba(58, 36, 38, .45);
+  --relleno: var(--tinta);          /* fondo de barras, botones al pasar el mouse y chips elegidos */
+  --sobre-relleno: var(--superficie); /* texto que va encima */
   --titulo: "Jost", "Futura", "Century Gothic", "Avenir Next", sans-serif;
   --serif: "EB Garamond", Garamond, Georgia, serif;
 }
@@ -73,22 +78,25 @@
   --velo: rgba(30, 52, 51, .45);
 }
 :root[data-paleta="estrellas"] {
-  --fondo: #CFE3EC;
-  --superficie: #EAF3F7;
-  --tinta: #1B2F3D;
-  --tinta-2: #45596A;
-  --linea: rgba(27, 47, 61, .2);
-  --linea-fuerte: rgba(27, 47, 61, .5);
+  color-scheme: dark; /* esta paleta es oscura de verdad */
+  --fondo: #24353C;
+  --superficie: #202629;
+  --tinta: #D5EBFD;
+  --tinta-2: #A2B7CA;
+  --linea: rgba(213, 235, 253, .2);
+  --linea-fuerte: rgba(213, 235, 253, .5);
   --acento: #C4452F;
   --acento-texto: #FFF7F3;
-  --bloque-1: #F4D98A;
-  --bloque-2: #F3BBA9;
-  --bloque-3: #C3DAB4;
-  --seccion: #F4D98A;
+  --bloque-1: #2E4A5A;
+  --bloque-2: #5B362A;
+  --bloque-3: #2B4A48;
+  --seccion: #2A4152;
   --pie: #1B2F3D;
   --pie-tinta: #CFE3EC;
   --pie-tinta-2: #9FB6C4;
-  --velo: rgba(27, 47, 61, .45);
+  --velo: rgba(8, 16, 22, .62);
+  --relleno: #1B2F3D;
+  --sobre-relleno: #CFE3EC;
 }
 
 /* ============ Base ============ */
@@ -142,9 +150,9 @@ section[id] { scroll-margin-top: 84px; }
   transition: background-color .2s ease, color .2s ease, border-color .2s ease;
 }
 .btn-lleno { background: var(--acento); border-color: var(--acento); color: var(--acento-texto); }
-.btn-lleno:hover { background: var(--tinta); border-color: var(--tinta); color: var(--superficie); }
+.btn-lleno:hover { background: var(--relleno); border-color: var(--relleno); color: var(--sobre-relleno); }
 .btn-linea { background: transparent; color: var(--tinta); }
-.btn-linea:hover { background: var(--tinta); color: var(--superficie); }
+.btn-linea:hover { background: var(--relleno); border-color: var(--relleno); color: var(--sobre-relleno); }
 .btn-texto {
   background: none; border: 0; padding: 6px 0; cursor: pointer;
   font: 500 11.5px/1.4 var(--titulo); letter-spacing: .22em; text-transform: uppercase; color: var(--tinta);
@@ -154,7 +162,7 @@ section[id] { scroll-margin-top: 84px; }
 @keyframes aparecer { from { opacity: 0; } to { opacity: 1; } }
 
 /* ============ Barra de arriba: paleta del sitio ============ */
-.barra-paleta { background: var(--tinta); color: var(--superficie); font: 500 10.5px/1.4 var(--titulo); letter-spacing: .18em; text-transform: uppercase; }
+.barra-paleta { background: var(--relleno); color: var(--sobre-relleno); font: 500 10.5px/1.4 var(--titulo); letter-spacing: .18em; text-transform: uppercase; }
 .barra-paleta .envoltorio { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 12px; padding-block: 8px; text-align: center; }
 .paletas { display: inline-flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px; }
 .paleta-btn {
@@ -162,11 +170,11 @@ section[id] { scroll-margin-top: 84px; }
   background: transparent; color: inherit; border: 1px solid rgba(255, 255, 255, .35); font: inherit; letter-spacing: .14em; text-transform: uppercase;
   transition: background-color .2s, color .2s, border-color .2s;
 }
-.paleta-btn:hover { border-color: var(--superficie); }
+.paleta-btn:hover { border-color: var(--sobre-relleno); }
 .paleta-btn > span:first-child { display: inline-flex; }
 .paleta-btn i { width: 10px; height: 10px; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 1px rgba(0, 0, 0, .2); }
 .paleta-btn i + i { margin-left: -3px; }
-.paleta-btn[aria-pressed="true"] { background: var(--superficie); color: var(--tinta); border-color: var(--superficie); }
+.paleta-btn[aria-pressed="true"] { background: var(--sobre-relleno); color: var(--relleno); border-color: var(--sobre-relleno); }
 @media (max-width: 600px) {
   .barra-paleta .resto { display: none; }
   .barra-paleta .envoltorio { gap: 6px 10px; }
@@ -276,7 +284,7 @@ section[id] { scroll-margin-top: 84px; }
 .chip:hover { border-color: var(--tinta); }
 .chip-n { font-size: 10.5px; letter-spacing: .04em; color: var(--tinta-2); font-variant-numeric: tabular-nums; }
 .chip.vacia { border-style: dashed; color: var(--tinta-2); }
-.chip[aria-pressed="true"] { background: var(--tinta); border-color: var(--tinta); color: var(--superficie); }
+.chip[aria-pressed="true"] { background: var(--relleno); border-color: var(--relleno); color: var(--sobre-relleno); }
 .chip[aria-pressed="true"] .chip-n { color: inherit; opacity: .75; }
 @media (max-width: 700px) {
   .chips {
@@ -311,7 +319,7 @@ section[id] { scroll-margin-top: 84px; }
   display: grid; place-items: center; cursor: pointer; background: var(--superficie); color: var(--tinta); border: 1px solid var(--tinta);
   transition: background-color .15s, color .15s, border-color .15s;
 }
-.foto-sumar:hover { background: var(--tinta); color: var(--superficie); }
+.foto-sumar:hover { background: var(--relleno); color: var(--sobre-relleno); }
 .foto-sumar .ico-ok, .foto-sumar[aria-pressed="true"] .ico-mas { display: none; }
 .foto-sumar[aria-pressed="true"] .ico-ok { display: block; }
 .foto-sumar[aria-pressed="true"] { background: var(--acento); border-color: var(--acento); color: var(--acento-texto); }
@@ -463,7 +471,7 @@ section[id] { scroll-margin-top: 84px; }
 .ficha-paleta-ayuda { margin-top: 8px; font-size: 12.5px; color: var(--tinta-2); }
 .ficha-acciones { display: grid; gap: 10px; margin-top: 24px; }
 .ficha-acciones .btn { width: 100%; padding-inline: 16px; letter-spacing: .14em; }
-#ficha-sumar[aria-pressed="true"] { background: var(--tinta); border-color: var(--tinta); color: var(--superficie); }
+#ficha-sumar[aria-pressed="true"] { background: var(--relleno); border-color: var(--relleno); color: var(--sobre-relleno); }
 .ficha-nota { margin-top: 14px; font-size: 13.5px; color: var(--tinta-2); }
 .ficha-compartir { display: inline-flex; align-items: center; gap: 8px; margin-top: 16px; }
 .ficha-compartir .ico { width: 15px; height: 15px; }
@@ -485,7 +493,7 @@ section[id] { scroll-margin-top: 84px; }
 .pastilla {
   position: fixed; left: 50%; z-index: 40; bottom: calc(env(safe-area-inset-bottom, 0px) + 18px); transform: translateX(-50%);
   display: inline-flex; align-items: center; gap: 14px; width: max-content; max-width: calc(100% - 32px); padding: 7px 20px 7px 7px; cursor: pointer;
-  background: var(--tinta); color: var(--superficie); border: 0;
+  background: var(--relleno); color: var(--sobre-relleno); border: 0;
   font: 500 11.5px/1.2 var(--titulo); letter-spacing: .2em; text-transform: uppercase; white-space: nowrap;
   box-shadow: 0 10px 30px rgba(0, 0, 0, .18);
   animation: subir .3s cubic-bezier(.2, .7, .2, 1);
@@ -541,7 +549,7 @@ section[id] { scroll-margin-top: 84px; }
   position: fixed; left: 50%; z-index: 80; bottom: calc(env(safe-area-inset-bottom, 0px) + 86px); transform: translateX(-50%);
   width: max-content; max-width: min(calc(100% - 32px), 460px);
   display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px 14px; padding: 13px 18px; text-align: center;
-  background: var(--tinta); color: var(--superficie); font-size: 14.5px; line-height: 1.45; box-shadow: 0 10px 30px rgba(0, 0, 0, .18);
+  background: var(--relleno); color: var(--sobre-relleno); font-size: 14.5px; line-height: 1.45; box-shadow: 0 10px 30px rgba(0, 0, 0, .18);
   animation: subir .25s ease;
 }
 .aviso button { padding: 8px 12px; border: 1px solid currentColor; background: none; color: inherit; cursor: pointer; font: 500 10.5px/1 var(--titulo); letter-spacing: .2em; text-transform: uppercase; }
@@ -590,7 +598,7 @@ section[id] { scroll-margin-top: 84px; }
     <div class="paletas" role="group" aria-label="Paleta de colores del sitio">
       <button type="button" class="paleta-btn" data-paleta-sitio="rayas" aria-pressed="true"><span aria-hidden="true"><i style="--c:#F7D8CB"></i><i style="--c:#A9CFE2"></i><i style="--c:#B8404F"></i></span><span>Pastel<span class="resto"> de Cristi</span></span></button>
       <button type="button" class="paleta-btn" data-paleta-sitio="mar" aria-pressed="false"><span aria-hidden="true"><i style="--c:#F5E2A5"></i><i style="--c:#AED6C8"></i><i style="--c:#2E6F77"></i></span><span>Girasoles<span class="resto"> de Cristi</span></span></button>
-      <button type="button" class="paleta-btn" data-paleta-sitio="estrellas" aria-pressed="false"><span aria-hidden="true"><i style="--c:#CFE3EC"></i><i style="--c:#F4D98A"></i><i style="--c:#C4452F"></i></span><span>El mar<span class="resto"> de mi hogar</span></span></button>
+      <button type="button" class="paleta-btn" data-paleta-sitio="estrellas" aria-pressed="false"><span aria-hidden="true"><i style="--c:#24353C"></i><i style="--c:#2A4152"></i><i style="--c:#C4452F"></i></span><span>El mar<span class="resto"> de mi hogar</span></span></button>
     </div>
   </div>
 </div>
@@ -3624,7 +3632,8 @@ function aplicarPaletaSitio(id, guardar) {
     renderCajon();
   }
 }
-const colorMat = (paleta) => colorPastel(paleta, 0.85, tonoFondo);
+const LUZ_MAT = { rayas: 0.85, mar: 0.85, estrellas: 0.2 }; // el paspartú es oscuro en la paleta oscura
+const colorMat = (paleta) => colorPastel(paleta, LUZ_MAT[paletaActual] || 0.85, tonoFondo);
 
 /* ---------- Colores ---------- */
 const hexARgb = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
@@ -3857,7 +3866,7 @@ function mostrarEnVisor(direccion) {
   const lamina = $("#visor-lamina");
   lamina.style.setProperty("--fondo-foto", (f.paleta || [])[0] || "");
   lamina.style.setProperty("--ar", proporcion(f).toFixed(4));
-  const tono = colorPastel(f.paleta, 0.82);
+  const tono = colorPastel(f.paleta, paletaActual === "estrellas" ? 0.16 : 0.82);
   if (tono) $("#visor").style.setProperty("--tono", tono); else $("#visor").style.removeProperty("--tono");
   img.classList.remove("pan-der", "pan-izq");
   img.classList.add("cargando");
