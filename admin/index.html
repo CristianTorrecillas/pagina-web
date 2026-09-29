@@ -153,6 +153,19 @@ main.contenido { padding-block: 26px 150px; }
 .slot-img { aspect-ratio: 3 / 2; background: var(--fondo) center / cover no-repeat; display: grid; place-items: center; color: var(--tinta-2); font-size: 13px; }
 .slot.centro .slot-img { outline: 2px solid var(--acento); outline-offset: -2px; }
 .slot .versal { font-size: 10px; letter-spacing: .18em; }
+.modo-portada { display: flex; flex-wrap: wrap; gap: 8px; }
+#portada-triptico, #portada-carrusel { display: grid; gap: 12px; }
+#portada-triptico[hidden], #portada-carrusel[hidden] { display: none; }
+.carrusel-lista .fila-mini .btn-icono:nth-child(-n+2) svg { transform: rotate(-90deg); }
+.modo-portada .btn[aria-pressed="true"] { background: var(--tinta); color: var(--papel); }
+.carrusel-lista { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; }
+.carrusel-lista li { display: grid; gap: 5px; padding: 6px; border: 1px solid var(--linea); background: var(--superficie); font-size: 12.5px; }
+.carrusel-lista img { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; display: block; }
+.carrusel-lista .fila-mini { display: flex; justify-content: space-between; align-items: center; gap: 4px; }
+.carrusel-lista .btn-icono { width: 30px; height: 30px; }
+.grilla-eleccion button[aria-pressed="true"] { border-color: var(--acento); box-shadow: inset 0 0 0 2px var(--acento); }
+.grilla-eleccion button[aria-pressed="true"] span::before { content: "✓ "; color: var(--acento); font-weight: 700; }
+.tag.carrusel { background: #d9ecf5; border-color: rgba(0, 0, 0, .1); }
 
 /* Subida */
 .zona-subir { display: grid; justify-items: center; gap: 10px; padding: 22px 16px; text-align: center; border: 1px dashed var(--linea-fuerte); background: var(--superficie); }
@@ -400,9 +413,21 @@ main.contenido { padding-block: 26px 150px; }
 
       <div class="bloque">
         <h3>Portada</h3>
-        <p class="ayuda-bloque">Las tres fotos de arriba de todo. La del centro es la grande.</p>
-        <div class="portada-slots" id="portada-slots"></div>
-        <p class="nota alerta" id="portada-aviso" hidden></p>
+        <div class="modo-portada" role="group" aria-label="Estilo de la portada">
+          <button type="button" class="btn btn-chico" data-modo-portada="triptico" aria-pressed="true">Tres fotos</button>
+          <button type="button" class="btn btn-chico" data-modo-portada="carrusel" aria-pressed="false">Carrusel (ruleta)</button>
+        </div>
+        <div id="portada-triptico" class="bloque-interno">
+          <p class="ayuda-bloque">Las tres fotos de arriba de todo. La del centro es la grande.</p>
+          <div class="portada-slots" id="portada-slots"></div>
+          <p class="nota alerta" id="portada-aviso" hidden></p>
+        </div>
+        <div id="portada-carrusel" hidden>
+          <p class="ayuda-bloque">Las fotos giran como una ruleta con profundidad. Elegí al menos 3; se muestran en este orden. Con menos de 3, la portada vuelve a las tres fotos.</p>
+          <ol class="carrusel-lista" id="carrusel-lista"></ol>
+          <p class="nota" id="carrusel-aviso" hidden></p>
+          <div><button type="button" class="btn btn-chico" id="btn-carrusel-elegir">Elegir fotos del carrusel</button></div>
+        </div>
       </div>
 
       <div class="bloque">
@@ -558,6 +583,25 @@ main.contenido { padding-block: 26px 150px; }
     <div class="hoja-pie">
       <button type="button" class="btn btn-chico btn-peligro" id="varias-borrar">Borrar las elegidas</button>
       <button type="button" class="btn btn-chico btn-lleno" id="varias-aplicar">Aplicar cambios</button>
+    </div>
+  </div>
+</div>
+
+<!-- Elegir fotos para el carrusel -->
+<div class="hoja" id="hoja-carrusel" role="dialog" aria-modal="true" aria-labelledby="carrusel-titulo" hidden>
+  <div class="hoja-fondo" data-cerrar-hoja></div>
+  <div class="hoja-panel">
+    <div class="hoja-cabeza">
+      <h2 id="carrusel-titulo">Fotos del carrusel</h2>
+      <button type="button" class="btn-icono" data-cerrar-hoja aria-label="Cerrar"><svg class="ico"><use href="#i-cerrar"/></svg></button>
+    </div>
+    <div class="hoja-cuerpo">
+      <p class="nota" id="carrusel-cuenta-eleccion">Tocá las fotos para sumarlas o sacarlas.</p>
+      <div class="grilla-eleccion" id="grilla-carrusel"></div>
+    </div>
+    <div class="hoja-pie">
+      <button type="button" class="btn btn-chico" id="carrusel-vaciar">Sacar todas</button>
+      <button type="button" class="btn btn-chico btn-oscuro" data-cerrar-hoja>Listo</button>
     </div>
   </div>
 </div>
@@ -813,8 +857,11 @@ function extraerContenido(html) {
   c.categorias = Array.isArray(c.categorias) ? c.categorias : [];
   c.series = Array.isArray(c.series) ? c.series : [];
   c.fotos = Array.isArray(c.fotos) ? c.fotos : [];
+  // textos que se agregaron después: si la página todavía no los tiene, se completan solos
+  Object.keys(TEXTOS_NUEVOS).forEach((k) => { if (!String(c.textos[k] || "").trim()) c.textos[k] = TEXTOS_NUEVOS[k]; });
   return c;
 }
+const TEXTOS_NUEVOS = { "archivo.ver-todo": "Ver todo", "archivo.ver-menos": "Ver menos", "series.ver-todas": "Ver todas", "series.ver-menos": "Ver menos" };
 const serializar = (c) => JSON.stringify(c, null, 2).replace(/</g, "\\u003c");
 /* Limpia lo que es solo del panel (vistas previas) */
 function paraGuardar(c) {
@@ -1133,6 +1180,7 @@ function resolverChoques() {
     nuevas.delete(viejo); BD.borrar(viejo);
     registrarNueva(n, { web: datos.web, mini: datos.mini, blobWeb: datos.blobWeb || null, blobMini: datos.blobMini || null });
     doc.ajustes.portada = (doc.ajustes.portada || []).map((x) => (x === viejo ? n : x));
+    if (doc.ajustes.carrusel) doc.ajustes.carrusel = doc.ajustes.carrusel.map((x) => (x === viejo ? n : x));
     doc.ajustes.ultimoNumero = numero;
     f.n = n;
   });
@@ -1159,8 +1207,8 @@ function resumen() {
   if (textos) partes.push(plural(textos, "texto", "textos"));
   if (!igual(a.categorias, b.categorias)) partes.push("categorías");
   if (!igual(a.series, b.series)) partes.push("series");
-  if (!igual(a.ajustes.portada, b.ajustes.portada)) partes.push("portada");
-  const sinPortada = (x) => { const c = Object.assign({}, x); delete c.portada; delete c.ultimoNumero; return c; };
+  if (!igual(a.ajustes.portada, b.ajustes.portada) || !igual(a.ajustes.carrusel, b.ajustes.carrusel) || a.ajustes.portadaModo !== b.ajustes.portadaModo) partes.push("portada");
+  const sinPortada = (x) => { const c = Object.assign({}, x); delete c.portada; delete c.carrusel; delete c.portadaModo; delete c.ultimoNumero; return c; };
   if (!igual(sinPortada(a.ajustes), sinPortada(b.ajustes))) partes.push("ajustes");
   return partes;
 }
@@ -1174,10 +1222,10 @@ function actualizarBarra() {
   const marcas = { fotos: false, textos: false, grupos: false, ajustes: false };
   if (hay) {
     const a = base.contenido, b = paraGuardar(doc);
-    marcas.fotos = !igual(a.fotos, b.fotos) || !igual(a.ajustes.portada, b.ajustes.portada);
+    marcas.fotos = !igual(a.fotos, b.fotos) || !igual(a.ajustes.portada, b.ajustes.portada) || !igual(a.ajustes.carrusel, b.ajustes.carrusel) || a.ajustes.portadaModo !== b.ajustes.portadaModo;
     marcas.textos = !igual(a.textos, b.textos);
     marcas.grupos = !igual(a.categorias, b.categorias) || !igual(a.series, b.series);
-    const sinP = (x) => { const c = Object.assign({}, x); delete c.portada; delete c.ultimoNumero; return c; };
+    const sinP = (x) => { const c = Object.assign({}, x); delete c.portada; delete c.carrusel; delete c.portadaModo; delete c.ultimoNumero; return c; };
     marcas.ajustes = !igual(sinP(a.ajustes), sinP(b.ajustes));
   }
   $$(".pestana").forEach((p) => { $(".punto", p).hidden = !marcas[p.dataset.pestana]; });
@@ -1209,7 +1257,60 @@ function puntos(paleta) {
   (paleta || []).forEach((c) => { const i = document.createElement("i"); i.style.setProperty("--c", c); s.append(i); });
   return s;
 }
+/* ---------- Carrusel de la portada (ajustes.carrusel = números en orden; ajustes.portadaModo = "carrusel") ---------- */
+const enCarrusel = (n) => (doc.ajustes.carrusel || []).indexOf(n) >= 0;
+function ponerCarrusel(lista) {
+  if (lista.length) doc.ajustes.carrusel = lista; else delete doc.ajustes.carrusel;
+}
+function renderCarruselAdmin() {
+  const modo = doc.ajustes.portadaModo === "carrusel" ? "carrusel" : "triptico";
+  $$("[data-modo-portada]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.modoPortada === modo)));
+  $("#portada-triptico").hidden = modo !== "triptico";
+  $("#portada-carrusel").hidden = modo !== "carrusel";
+  const lista = $("#carrusel-lista");
+  lista.replaceChildren();
+  const ns = doc.ajustes.carrusel || [];
+  ns.forEach((n, i) => {
+    const f = doc.fotos.find((x) => x.n === n);
+    if (!f) return;
+    const mover = (paso) => { const l = ns.slice(); const j = i + paso; if (j < 0 || j >= l.length) return; l.splice(i, 1); l.splice(j, 0, n); ponerCarrusel(l); cambio({ lista: true, portada: true }); };
+    lista.append(el("li", {}, [
+      el("img", { src: urlMini(f), alt: "", loading: "lazy" }),
+      el("span", { texto: (i + 1) + ". N.° " + f.n + (f.oculta ? " · oculta" : "") }),
+      el("span", { class: "fila-mini" }, [
+        el("button", { type: "button", class: "btn-icono", "aria-label": "Mover antes N.° " + n, disabled: i === 0, onclick: () => mover(-1) }, [iconoSvg("i-arriba")]),
+        el("button", { type: "button", class: "btn-icono", "aria-label": "Mover después N.° " + n, disabled: i === ns.length - 1, onclick: () => mover(1) }, [iconoSvg("i-abajo")]),
+        el("button", { type: "button", class: "btn-icono", "aria-label": "Sacar del carrusel N.° " + n, onclick: () => { ponerCarrusel(ns.filter((x) => x !== n)); cambio({ lista: true, portada: true }); } }, [iconoSvg("i-cerrar")])
+      ])
+    ]));
+  });
+  const visibles = ns.filter((n) => doc.fotos.some((x) => x.n === n && !x.oculta)).length;
+  const aviso = $("#carrusel-aviso");
+  aviso.hidden = modo !== "carrusel" || visibles >= 3;
+  aviso.textContent = !ns.length ? "Todavía no elegiste fotos: mientras tanto se ven las tres fotos de siempre."
+    : "Hay " + visibles + " foto" + (visibles === 1 ? "" : "s") + " visible" + (visibles === 1 ? "" : "s") + " en el carrusel; hacen falta al menos 3.";
+}
+function abrirEleccionCarrusel() {
+  const g = $("#grilla-carrusel");
+  g.replaceChildren();
+  const cuenta = () => { const k = (doc.ajustes.carrusel || []).length; $("#carrusel-cuenta-eleccion").textContent = k ? k + " elegida" + (k === 1 ? "" : "s") + ". Tocá para sumar o sacar." : "Tocá las fotos para sumarlas o sacarlas."; };
+  doc.fotos.filter((f) => !f.oculta).forEach((f) => {
+    const b = el("button", { type: "button", "aria-pressed": String(enCarrusel(f.n)), onclick: () => {
+      const l = (doc.ajustes.carrusel || []).slice();
+      const i = l.indexOf(f.n);
+      if (i >= 0) l.splice(i, 1); else l.push(f.n);
+      ponerCarrusel(l);
+      b.setAttribute("aria-pressed", String(i < 0));
+      cuenta();
+      cambio({ lista: true, portada: true });
+    } }, [el("img", { src: urlMini(f), alt: "", loading: "lazy" }), el("span", { texto: "N.° " + f.n + " · " + (f.titulo || "") })]);
+    g.append(b);
+  });
+  cuenta();
+  abrirHoja("#hoja-carrusel");
+}
 function renderPortada() {
+  renderCarruselAdmin();
   const cont = $("#portada-slots");
   cont.replaceChildren();
   const nombres = ["Izquierda", "Centro · grande", "Derecha"];
@@ -1258,7 +1359,7 @@ function elegirPortada(n) {
 /* Filtros de la lista de fotos (se combinan entre sí y con el buscador) */
 const filtros = { categoria: "", serie: "", estado: "", anio: "", soporte: "" };
 const ESTADOS_FILTRO = [
-  ["", "Todas"], ["nuevas", "Nuevas (sin publicar)"], ["oculta", "Ocultas"], ["portada", "En la portada"],
+  ["", "Todas"], ["nuevas", "Nuevas (sin publicar)"], ["oculta", "Ocultas"], ["portada", "En la portada"], ["carrusel", "En el carrusel"],
   ["sin-titulo", "Sin título"], ["sin-categoria", "Sin categoría"], ["sin-serie", "Sin serie"], ["sin-lugar", "Sin lugar"], ["sin-paleta", "Sin paleta"]
 ];
 const hayFiltros = () => !!($("#buscar").value.trim() || Object.values(filtros).some(Boolean));
@@ -1275,6 +1376,7 @@ function fotosFiltradas() {
       case "nuevas": return nuevas.has(f.n) && !publicada(f.n);
       case "oculta": return !!f.oculta;
       case "portada": return portada.indexOf(f.n) >= 0;
+      case "carrusel": return enCarrusel(f.n);
       case "sin-titulo": return sinTitulo(f);
       case "sin-categoria": return !(f.categorias || []).length;
       case "sin-serie": return !f.serie;
@@ -1332,6 +1434,7 @@ function renderFotos() {
     const pos = portada.indexOf(f.n);
     if (pos >= 0) tags.append(el("span", { class: "tag portada", texto: "Portada" }));
     if (f.oculta) tags.append(el("span", { class: "tag oculta", texto: "Oculta" }));
+    if (enCarrusel(f.n)) tags.append(el("span", { class: "tag carrusel", texto: "Carrusel" }));
     if (sinTitulo(f)) tags.append(etiquetaSinTitulo(f));
     if (!(f.categorias || []).length) tags.append(el("span", { class: "tag falta", texto: "Sin categoría" }));
     const check = el("input", { type: "checkbox", class: "sel", "aria-label": "Elegir N.° " + f.n });
@@ -1411,6 +1514,7 @@ async function hacerRenumerarPublicadas() {
     const final = clonar(actual.contenido);
     final.fotos.forEach((f) => { f.n = mapa.get(f.n); });
     final.ajustes.portada = (final.ajustes.portada || []).map((x) => mapa.get(x) || "");
+    if (final.ajustes.carrusel) final.ajustes.carrusel = final.ajustes.carrusel.map((x) => mapa.get(x)).filter(Boolean);
     final.ajustes.ultimoNumero = orden.length;
     final.publicado = new Date().toISOString();
     const html = armarHtml(actual.html, final);
@@ -1447,6 +1551,7 @@ async function renumerarDesdeUno() {
   datos.forEach((v, viejo) => registrarNueva(mapa.get(viejo), v));
   doc.fotos.forEach((f) => { f.n = mapa.get(f.n); });
   doc.ajustes.portada = (doc.ajustes.portada || []).map((x) => mapa.get(x) || (x && !mapa.has(x) ? x : ""));
+  if (doc.ajustes.carrusel) doc.ajustes.carrusel = doc.ajustes.carrusel.map((x) => mapa.get(x) || x);
   doc.ajustes.ultimoNumero = orden.length;
   elegidas.clear();
   guardarBorrador(true);
@@ -1846,6 +1951,7 @@ function borrarFotos(ns, alTerminar) {
       const set = new Set(ns);
       doc.fotos = doc.fotos.filter((f) => !set.has(f.n));
       doc.ajustes.portada = (doc.ajustes.portada || []).map((n) => (set.has(n) ? "" : n));
+      ponerCarrusel((doc.ajustes.carrusel || []).filter((n) => !set.has(n)));
       ns.forEach((n) => {
         if (!publicada(n)) {
           const v = nuevas.get(n);
@@ -1879,7 +1985,7 @@ function abrirVarias() {
   cuerpo.replaceChildren();
   $("#varias-titulo").textContent = "Editar " + plural(elegidas.size, "foto", "fotos");
   cuerpo.append(el("p", { class: "nota", texto: "Solo se cambia lo que completes. Lo que dejes vacío queda como está en cada foto." }));
-  const datos = { titulo: "", title: "", lugar: "", anio: "", soporte: "", camara: "", sumar: new Set(), quitar: new Set(), serie: "__igual", oculta: "__igual", titulos: "__igual" };
+  const datos = { titulo: "", title: "", lugar: "", anio: "", soporte: "", camara: "", sumar: new Set(), quitar: new Set(), serie: "__igual", oculta: "__igual", titulos: "__igual", carrusel: "__igual" };
   cuerpo.append(el("div", { class: "fila-campos" }, [
     campoTexto("Título", "", (v) => { datos.titulo = v; }, { ayuda: "El mismo para todas las elegidas." }),
     campoTexto("Título en inglés", "", (v) => { datos.title = v; }, { placeholder: "Opcional" })
@@ -1925,6 +2031,9 @@ function abrirVarias() {
   const vis = el("select", { id: "varias-oculta" }, [el("option", { value: "__igual", texto: "(no cambiar)" }), el("option", { value: "mostrar", texto: "Mostrar en la página" }), el("option", { value: "ocultar", texto: "Ocultar de la página" })]);
   vis.addEventListener("change", () => { datos.oculta = vis.value; });
   cuerpo.append(el("div", { class: "campo" }, [el("label", { for: "varias-oculta", texto: "Visibilidad" }), vis]));
+  const selCarr = el("select", { id: "varias-carrusel" }, [el("option", { value: "__igual", texto: "(no cambiar)" }), el("option", { value: "sumar", texto: "Sumarlas al carrusel" }), el("option", { value: "sacar", texto: "Sacarlas del carrusel" })]);
+  selCarr.addEventListener("change", () => { datos.carrusel = selCarr.value; });
+  cuerpo.append(el("div", { class: "campo" }, [el("label", { for: "varias-carrusel", texto: "Carrusel de la portada" }), selCarr]));
   $("#varias-aplicar").onclick = () => {
     const orden = doc.categorias.map((c) => c.id);
     // títulos que ya están en uso (se van sumando los nuevos para no repetir)
@@ -1949,6 +2058,8 @@ function abrirVarias() {
         usados.add(normal(t[0]));
       }
     });
+    if (datos.carrusel === "sumar") ponerCarrusel((doc.ajustes.carrusel || []).concat(doc.fotos.filter((f) => elegidas.has(f.n) && !enCarrusel(f.n)).map((f) => f.n)));
+    else if (datos.carrusel === "sacar") ponerCarrusel((doc.ajustes.carrusel || []).filter((n) => !elegidas.has(n)));
     const k = elegidas.size;
     cerrarHojas();
     modoEleccion(false);
@@ -2599,6 +2710,17 @@ $("#editor-ant").addEventListener("click", () => { const i = doc.fotos.findIndex
 $("#editor-sig").addEventListener("click", () => { const i = doc.fotos.findIndex((f) => f.n === editando); if (i < doc.fotos.length - 1) { editando = doc.fotos[i + 1].n; renderEditor(); $("#hoja-editor .hoja-panel").scrollTop = 0; } });
 $("#editor-borrar").addEventListener("click", () => borrarFotos([editando], () => cerrarHojas()));
 $("#portada-quitar").addEventListener("click", () => elegirPortada(""));
+$$("[data-modo-portada]").forEach((b) => b.addEventListener("click", () => {
+  if (b.dataset.modoPortada === "carrusel") doc.ajustes.portadaModo = "carrusel"; else delete doc.ajustes.portadaModo;
+  cambio({ lista: true, portada: true });
+}));
+$("#btn-carrusel-elegir").addEventListener("click", abrirEleccionCarrusel);
+$("#carrusel-vaciar").addEventListener("click", () => {
+  ponerCarrusel([]);
+  $$("#grilla-carrusel button").forEach((b) => b.setAttribute("aria-pressed", "false"));
+  $("#carrusel-cuenta-eleccion").textContent = "Tocá las fotos para sumarlas o sacarlas.";
+  cambio({ lista: true, portada: true });
+});
 $("#form-categoria").addEventListener("submit", (e) => {
   e.preventDefault();
   const nombre = $("#nueva-categoria").value.trim();

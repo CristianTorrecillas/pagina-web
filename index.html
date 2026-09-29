@@ -244,6 +244,30 @@ section[id] { scroll-margin-top: 84px; }
 .cuadro.angosta .cuadro-linea, .foto.angosta .marco-linea, .serie.angosta .marco-linea { width: fit-content; max-width: 100%; margin-inline: auto; }
 .cuadro.angosta img { width: auto; max-width: 100%; height: calc((100cqw - 12px) / 1.5); aspect-ratio: var(--ar); }
 .cuadro:hover .cuadro-linea { border-color: var(--tinta); }
+/* Carrusel de la portada: una ruleta con profundidad (se prende desde el panel) */
+.portada { overflow-x: clip; }
+.triptico[hidden], .carrusel[hidden] { display: none; }
+.carrusel { position: relative; margin-top: clamp(26px, 4vw, 48px); --h: clamp(190px, 24vw, 330px); -webkit-user-select: none; user-select: none; }
+.carrusel-escena { position: relative; height: calc(var(--h) * 1.55); perspective: 1700px; perspective-origin: 50% 50%; touch-action: pan-y; outline: none; }
+.carrusel-escena:focus-visible { outline: 2px solid var(--tinta); outline-offset: 6px; }
+.c-item {
+  position: absolute; left: 50%; top: 50%; padding: calc(var(--h) * .075); border: 0; cursor: pointer;
+  background: var(--mat, var(--superficie)); will-change: transform, opacity; backface-visibility: hidden;
+  box-shadow: 0 34px 50px -34px rgba(0, 0, 0, .5); transition: background-color .45s ease;
+}
+.c-item::after { content: ""; position: absolute; inset: 0; background: var(--fondo); opacity: var(--niebla, 0); pointer-events: none; }
+.c-item .cuadro-linea { display: block; padding: 5px; border: 1px solid var(--linea-fuerte); transition: border-color .3s; }
+.c-item img { display: block; height: var(--h); width: calc(var(--h) * var(--ar)); max-width: calc(var(--h) * 1.62); object-fit: cover; background: var(--linea); }
+.c-item.c-centro { cursor: zoom-in; }
+.c-item.c-centro .cuadro-linea { border-color: var(--tinta); }
+.carrusel-flechas { display: flex; justify-content: center; align-items: center; gap: 16px; margin-top: 8px; }
+.carrusel-flecha {
+  width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; cursor: pointer;
+  background: transparent; color: var(--tinta); border: 1px solid var(--tinta); transition: background-color .15s, color .15s;
+}
+.carrusel-flecha:hover { background: var(--relleno); color: var(--sobre-relleno); }
+.carrusel-cuenta { min-width: 64px; font: 500 11px/1 var(--titulo); letter-spacing: .22em; color: var(--tinta-2); }
+@media (max-width: 700px) { .carrusel { --h: 44vw; } .carrusel-escena { height: calc(var(--h) * 1.4); } }
 .portada-pie { display: grid; justify-items: center; gap: 7px; margin-top: 24px; }
 .portada-titulo { font: 500 15px/1.3 var(--titulo); letter-spacing: .2em; margin-right: -.2em; text-transform: uppercase; }
 .intro { max-width: 52ch; margin: 38px auto 0; font-size: 18px; line-height: 1.65; }
@@ -309,6 +333,12 @@ section[id] { scroll-margin-top: 84px; }
 .foto-marco img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .6s cubic-bezier(.2, .7, .2, 1); }
 .foto.angosta .foto-marco { aspect-ratio: var(--ar); height: calc((100cqw - 12px) / 1.5); }
 .foto:hover .foto-marco img { transform: scale(1.025); }
+@media (hover: hover) {
+  .foto:hover { z-index: 3; }
+  .marco { transition: transform .55s cubic-bezier(.2, .7, .2, 1), box-shadow .55s ease; }
+  .foto:hover .marco { transform: scale(1.06); box-shadow: 0 26px 44px -26px rgba(0, 0, 0, .45); }
+  .foto:hover .foto-marco img { transform: scale(1.05); }
+}
 .foto-abrir { position: absolute; inset: 0; z-index: 1; width: 100%; padding: 0; background: transparent; border: 0; cursor: zoom-in; }
 .foto-abrir:focus-visible { outline-offset: -5px; }
 .foto-sumar {
@@ -646,6 +676,14 @@ section[id] { scroll-margin-top: 84px; }
       <h1 data-t="portada.titulo">Ve lo que yo veo</h1>
       <p class="traduccion" data-t="portada.traduccion">See what I see</p>
       <div class="triptico" id="triptico"></div>
+      <div class="carrusel" id="carrusel" hidden>
+        <div class="carrusel-escena" id="carrusel-escena" tabindex="0" role="group" aria-roledescription="carrusel" aria-label="Fotos destacadas. Usá las flechas del teclado para girar y Enter para ver la foto grande."></div>
+        <div class="carrusel-flechas">
+          <button type="button" class="carrusel-flecha" id="carrusel-ant" aria-label="Foto anterior"><svg class="ico" aria-hidden="true"><use href="#i-izq"/></svg></button>
+          <span class="carrusel-cuenta" id="carrusel-cuenta" aria-hidden="true"></span>
+          <button type="button" class="carrusel-flecha" id="carrusel-sig" aria-label="Foto siguiente"><svg class="ico" aria-hidden="true"><use href="#i-der"/></svg></button>
+        </div>
+      </div>
       <div class="portada-pie" id="portada-pie"></div>
       <p class="intro" data-t="portada.intro">Fotografío paisajes, naturaleza y escenas de todos los días, en Mar del Plata y donde me lleve el camino. Cada foto tiene su paleta de colores, y cualquiera se puede pedir como cuadro.</p>
       <div class="acciones">
@@ -5824,6 +5862,7 @@ const esc = (t) => String(t == null ? "" : t).replace(/[&<>"']/g, (c) => ({ "&":
 const pocoMovimiento = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const porNumero = new Map(FOTOS.map((f) => [f.n, f]));
 const PORTADA = (Array.isArray(AJUSTES.portada) ? AJUSTES.portada : []).filter((n) => porNumero.has(n));
+const CARRUSEL = (Array.isArray(AJUSTES.carrusel) ? AJUSTES.carrusel : []).filter((n) => porNumero.has(n));
 /* En la vista previa del panel, las fotos nuevas todavía no están en el servidor */
 const rutaMini = (f) => f._mini || "fotos/mini/" + f.n + ".jpg";
 const rutaWeb = (f) => f._web || "fotos/web/" + f.n + ".jpg";
@@ -5989,10 +6028,24 @@ function paletaAutomatica(f, img) {
 }
 
 /* ---------- Portada: tríptico ---------- */
+function pieDePortada(f) {
+  const pie = $("#portada-pie");
+  pie.hidden = false;
+  pie.innerHTML = '<span class="foto-num">N.° ' + esc(f.n) + '</span><span class="portada-titulo">' + esc(f.titulo) + '</span><span class="foto-en">' + esc(f.title) + '</span>';
+  pie.append(crearPuntos(f.paleta, f.n));
+}
 function renderPortada() {
-  const fotos = PORTADA.map((n) => porNumero.get(n)).filter(Boolean);
   const t = $("#triptico");
+  const deCarrusel = CARRUSEL.map((n) => porNumero.get(n)).filter(Boolean);
+  if (AJUSTES.portadaModo === "carrusel" && deCarrusel.length >= 3) {
+    t.hidden = true; t.innerHTML = "";
+    renderCarrusel(deCarrusel);
+    return;
+  }
+  $("#carrusel").hidden = true;
+  const fotos = PORTADA.map((n) => porNumero.get(n)).filter(Boolean);
   if (!fotos.length) { t.hidden = true; $("#portada-pie").hidden = true; return; }
+  t.hidden = false;
   const lista = fotos.length === 3 ? fotos : [fotos[0]];
   const medio = lista.length === 3 ? 1 : 0;
   t.classList.toggle("solo", lista.length !== 3);
@@ -6002,11 +6055,171 @@ function renderPortada() {
       '<span class="cuadro-linea"><img src="' + esc(i === medio ? rutaWeb(f) : rutaMini(f)) + '" alt="" width="' + m[0] + '" height="' + m[1] + '"' + (i === medio ? ' fetchpriority="high"' : "") + ' draggable="false"></span>' +
     '</button>';
   }).join("");
-  const f = lista[medio];
-  const pie = $("#portada-pie");
-  pie.innerHTML = '<span class="foto-num">N.° ' + esc(f.n) + '</span><span class="portada-titulo">' + esc(f.titulo) + '</span><span class="foto-en">' + esc(f.title) + '</span>';
-  pie.append(crearPuntos(f.paleta, f.n));
+  pieDePortada(lista[medio]);
 }
+
+/* ---------- Portada: carrusel ----------
+   Las fotos giran como una ruleta con profundidad. Con el mouse encima, la del centro se agranda
+   y al mover el mouse a los costados la ruleta gira para ese lado. En el celu se desliza con el dedo. */
+const carr = { lista: [], clave: "", pos: 0, meta: 0, zoom: 0, zoomMeta: 0, encima: false, mouseX: null, ultimoMov: 0,
+  arrastre: null, movio: false, centro: -1, raf: 0, visible: true, foco: false, t: 0, base: 400 };
+const envolver = (x, n) => ((x % n) + n) % n;
+function desvio(i, pos, n) { let d = envolver(i - pos, n); if (d > n / 2) d -= n; return d; }
+function renderCarrusel(fotos) {
+  const cont = $("#carrusel");
+  cont.hidden = false;
+  const escena = $("#carrusel-escena");
+  const clave = fotos.map((f) => f.n).join(",");
+  if (clave !== carr.clave) {
+    carr.clave = clave; carr.lista = fotos; carr.centro = -1;
+    carr.pos = carr.meta = Math.round(carr.meta) % fotos.length || 0;
+    escena.innerHTML = fotos.map((f, i) => {
+      const m = medidas(f, 800);
+      return '<button type="button" class="c-item protegida" tabindex="-1" data-i="' + i + '" data-n="' + esc(f.n) + '" style="--ar:' + proporcion(f).toFixed(4) + '" aria-label="N.° ' + esc(f.n) + ', ' + esc(f.titulo) + '">' +
+        '<span class="cuadro-linea"><img src="' + esc(rutaMini(f)) + '" alt="" width="' + m[0] + '" height="' + m[1] + '"' + (i < 4 || i > fotos.length - 3 ? "" : ' loading="lazy"') + ' draggable="false"></span></button>';
+    }).join("");
+  }
+  // el color del paspartú sigue a la paleta de la página
+  $$(".c-item", escena).forEach((b, i) => b.style.setProperty("--mat", colorMat(fotos[i].paleta)));
+  medirCarrusel();
+  pintarCarrusel();
+  moverCarrusel();
+}
+function medirCarrusel() {
+  const img = $(".c-item img"); // offsetHeight no cambia con las transformaciones
+  const h = (img && img.offsetHeight) || $("#carrusel-escena").clientHeight / 1.5;
+  carr.base = h * 1.62 + h * .15 + 12; // ancho de una foto horizontal con su paspartú
+}
+function pintarCarrusel() {
+  const n = carr.lista.length;
+  if (!n) return;
+  const R = carr.base * 1.5, paso = 30 * Math.PI / 180;
+  $$(".c-item", $("#carrusel-escena")).forEach((b, i) => {
+    const d = desvio(i, carr.pos, n), ad = Math.abs(d);
+    let o = Math.min(1, Math.max(0, 1 - (ad - 1.7) / .8));
+    o *= Math.min(1, Math.max(0, (n / 2 - ad) / .5 + (n > 5 ? 1 : 0)));
+    if (o <= 0) { b.style.visibility = "hidden"; return; }
+    b.style.visibility = "";
+    const th = d * paso;
+    const x = R * Math.sin(th), z = R * (Math.cos(th) - 1);
+    const cerca = Math.max(0, 1 - ad);
+    const esc2 = 1 + carr.zoom * .24 * cerca * cerca;
+    b.style.transform = "translate(-50%, -50%) translate3d(" + x.toFixed(1) + "px, 0, " + (z + carr.zoom * 40 * cerca).toFixed(1) + "px) rotateY(" + (th * 180 / Math.PI * .9).toFixed(2) + "deg) scale(" + esc2.toFixed(4) + ")";
+    b.style.opacity = o.toFixed(3);
+    b.style.zIndex = String(100 - Math.round(ad * 10));
+    b.style.setProperty("--niebla", Math.min(.5, ad * .24).toFixed(3));
+  });
+  const c = envolver(Math.round(carr.pos), n);
+  if (c !== carr.centro) {
+    const prev = $(".c-item.c-centro"); if (prev) prev.classList.remove("c-centro");
+    const b = $('.c-item[data-i="' + c + '"]'); if (b) b.classList.add("c-centro");
+    carr.centro = c;
+    pieDePortada(carr.lista[c]);
+    $("#carrusel-cuenta").textContent = (c + 1) + " / " + n;
+  }
+}
+function moverCarrusel() { if (!carr.raf) { carr.t = 0; carr.raf = requestAnimationFrame(pasoCarrusel); } }
+function pasoCarrusel(ahora) {
+  const dt = carr.t ? Math.min(64, ahora - carr.t) : 16.7;
+  carr.t = ahora;
+  if (!carr.arrastre && ahora - carr.ultimoMov > 170) carr.meta = Math.round(carr.meta); // se acomoda en una foto
+  const k = pocoMovimiento ? 1 : 1 - Math.pow(1 - .14, dt / 16.7);
+  carr.pos += (carr.meta - carr.pos) * k;
+  carr.zoom += (carr.zoomMeta - carr.zoom) * (pocoMovimiento ? 1 : 1 - Math.pow(1 - .12, dt / 16.7));
+  const quieto = Math.abs(carr.meta - carr.pos) < .0015 && Math.abs(carr.zoomMeta - carr.zoom) < .002 && !carr.arrastre && ahora - carr.ultimoMov > 170;
+  if (quieto) { carr.pos = carr.meta; carr.zoom = carr.zoomMeta; }
+  pintarCarrusel();
+  if (quieto) { carr.raf = 0; enAltaCarrusel(); return; }
+  carr.raf = requestAnimationFrame(pasoCarrusel);
+}
+/* Cuando la ruleta se detiene, la del centro se cambia por la versión grande */
+function enAltaCarrusel() {
+  const b = $('.c-item[data-i="' + carr.centro + '"]');
+  if (!b || b.dataset.hd) return;
+  b.dataset.hd = "1";
+  const f = carr.lista[carr.centro], pre = new Image();
+  pre.onload = () => { const img = $("img", b); if (img) img.src = pre.src; };
+  pre.src = rutaWeb(f);
+}
+function girarCarrusel(pasos) {
+  const n = carr.lista.length; if (!n) return;
+  carr.meta = Math.round(carr.meta) + pasos;
+  carr.ultimoMov = 0;
+  moverCarrusel();
+}
+function irACarrusel(i) { girarCarrusel(Math.round(desvio(i, carr.meta, carr.lista.length))); }
+(function () {
+  const escena = $("#carrusel-escena");
+  escena.addEventListener("pointerenter", (e) => {
+    if (e.pointerType !== "mouse") return;
+    carr.encima = true; carr.zoomMeta = 1; carr.mouseX = e.clientX; moverCarrusel();
+  });
+  escena.addEventListener("pointerleave", (e) => {
+    if (e.pointerType !== "mouse") return;
+    carr.encima = false; carr.zoomMeta = 0; carr.mouseX = null; moverCarrusel();
+  });
+  escena.addEventListener("pointermove", (e) => {
+    if (e.pointerType === "mouse" && !carr.arrastre) {
+      // mover el mouse gira la ruleta hacia el mismo lado
+      if (carr.mouseX != null) {
+        const dx = e.clientX - carr.mouseX;
+        if (dx) { carr.meta -= dx / (carr.base * .32); carr.ultimoMov = performance.now(); moverCarrusel(); }
+      }
+      carr.mouseX = e.clientX;
+      return;
+    }
+    const a = carr.arrastre;
+    if (!a || a.id !== e.pointerId) return;
+    const dx = e.clientX - a.x;
+    if (Math.abs(e.clientX - a.x0) > 8) carr.movio = true;
+    const ahora = performance.now();
+    a.v = Math.max(-2, Math.min(2, dx / Math.max(8, ahora - a.t))); a.t = ahora; a.x = e.clientX;
+    carr.meta -= dx / (carr.base * .62);
+    carr.ultimoMov = ahora;
+    moverCarrusel();
+  });
+  escena.addEventListener("pointerdown", (e) => {
+    if (e.pointerType === "mouse") return;
+    carr.arrastre = { id: e.pointerId, x: e.clientX, x0: e.clientX, t: performance.now(), v: 0 };
+    carr.movio = false;
+  });
+  const soltar = (e) => {
+    const a = carr.arrastre;
+    if (!a || a.id !== e.pointerId) return;
+    carr.meta -= a.v * 120 / (carr.base * .62); // un empujón con el envión del dedo
+    carr.arrastre = null; carr.ultimoMov = performance.now() - 120;
+    moverCarrusel();
+  };
+  escena.addEventListener("pointerup", soltar);
+  escena.addEventListener("pointercancel", soltar);
+  escena.addEventListener("click", (e) => {
+    const b = e.target.closest(".c-item");
+    if (!b) return;
+    e.stopPropagation();
+    if (carr.movio) { carr.movio = false; return; }
+    const i = +b.dataset.i;
+    if (i === carr.centro) abrirVisor(carr.lista[i].n, carr.lista);
+    else irACarrusel(i);
+  });
+  escena.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowRight") { e.preventDefault(); girarCarrusel(1); }
+    else if (e.key === "ArrowLeft") { e.preventDefault(); girarCarrusel(-1); }
+    else if (e.key === "Enter" || e.key === " ") { e.preventDefault(); if (carr.lista.length) abrirVisor(carr.lista[carr.centro].n, carr.lista); }
+  });
+  escena.addEventListener("focusin", () => { carr.foco = true; });
+  escena.addEventListener("focusout", () => { carr.foco = false; });
+  $("#carrusel-ant").addEventListener("click", () => girarCarrusel(-1));
+  $("#carrusel-sig").addEventListener("click", () => girarCarrusel(1));
+  window.addEventListener("resize", () => { if (carr.lista.length && !$("#carrusel").hidden) { medirCarrusel(); pintarCarrusel(); } });
+  if ("IntersectionObserver" in window) new IntersectionObserver((es) => { carr.visible = es[0].isIntersecting; }).observe($("#carrusel"));
+  // gira sola despacito cuando nadie la está usando
+  setInterval(() => {
+    if (pocoMovimiento || $("#carrusel").hidden || carr.encima || carr.foco || carr.arrastre || !carr.visible) return;
+    if (document.visibilityState !== "visible" || !$("#visor").hidden) return;
+    if (performance.now() - carr.ultimoMov < 4000) return;
+    girarCarrusel(1);
+  }, 4500);
+})();
 
 /* ---------- Categorías y grilla ---------- */
 function renderChips() {
