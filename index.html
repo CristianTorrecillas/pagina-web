@@ -34,7 +34,7 @@
 <style>
 /* ============ Paletas (cada una sale de una foto) ============
    Por defecto: "Pastel de Cristi" (id rayas). Las otras se activan con
-   data-paleta="mar" ("Girasoles de Cristi") o data-paleta="estrellas" ("El mar de mi hogar") en <html>.
+   data-paleta="mar" ("Girasoles de Cristi") o data-paleta="estrellas" ("El mar de mi hogar", celeste de verano) en <html>.
    Los ids no cambian para que no se pierda la paleta que ya eligió cada visitante. */
 :root {
   color-scheme: only light; /* los navegadores no la oscurecen solos: las paletas claras se ven igual en celu y en compu */
@@ -78,25 +78,22 @@
   --velo: rgba(30, 52, 51, .45);
 }
 :root[data-paleta="estrellas"] {
-  color-scheme: dark; /* esta paleta es oscura de verdad */
-  --fondo: #24353C;
-  --superficie: #202629;
-  --tinta: #D5EBFD;
-  --tinta-2: #A2B7CA;
-  --linea: rgba(213, 235, 253, .2);
-  --linea-fuerte: rgba(213, 235, 253, .5);
+  --fondo: #CFE3EC;
+  --superficie: #EAF3F7;
+  --tinta: #1B2F3D;
+  --tinta-2: #45596A;
+  --linea: rgba(27, 47, 61, .2);
+  --linea-fuerte: rgba(27, 47, 61, .5);
   --acento: #C4452F;
   --acento-texto: #FFF7F3;
-  --bloque-1: #2E4A5A;
-  --bloque-2: #5B362A;
-  --bloque-3: #2B4A48;
-  --seccion: #2A4152;
+  --bloque-1: #F4D98A;
+  --bloque-2: #F3BBA9;
+  --bloque-3: #C3DAB4;
+  --seccion: #F4D98A;
   --pie: #1B2F3D;
   --pie-tinta: #CFE3EC;
   --pie-tinta-2: #9FB6C4;
-  --velo: rgba(8, 16, 22, .62);
-  --relleno: #1B2F3D;
-  --sobre-relleno: #CFE3EC;
+  --velo: rgba(27, 47, 61, .45);
 }
 
 /* ============ Base ============ */
@@ -337,6 +334,7 @@ section[id] { scroll-margin-top: 84px; }
 .foto-lugar { font-size: 13.5px; line-height: 1.45; color: var(--tinta-2); }
 .foto-texto .puntos { margin-top: 5px; }
 
+.ver-mas { display: flex; justify-content: center; margin-top: clamp(28px, 4vw, 44px); }
 .vacio {
   display: grid; justify-items: center; gap: 14px; max-width: 620px; margin: 40px auto 0; padding: clamp(30px, 5vw, 48px);
   text-align: center; border: 1px solid var(--linea-fuerte); outline: 1px solid var(--linea-fuerte); outline-offset: 4px;
@@ -598,7 +596,7 @@ section[id] { scroll-margin-top: 84px; }
     <div class="paletas" role="group" aria-label="Paleta de colores del sitio">
       <button type="button" class="paleta-btn" data-paleta-sitio="rayas" aria-pressed="true"><span aria-hidden="true"><i style="--c:#F7D8CB"></i><i style="--c:#A9CFE2"></i><i style="--c:#B8404F"></i></span><span>Pastel<span class="resto"> de Cristi</span></span></button>
       <button type="button" class="paleta-btn" data-paleta-sitio="mar" aria-pressed="false"><span aria-hidden="true"><i style="--c:#F5E2A5"></i><i style="--c:#AED6C8"></i><i style="--c:#2E6F77"></i></span><span>Girasoles<span class="resto"> de Cristi</span></span></button>
-      <button type="button" class="paleta-btn" data-paleta-sitio="estrellas" aria-pressed="false"><span aria-hidden="true"><i style="--c:#24353C"></i><i style="--c:#2A4152"></i><i style="--c:#C4452F"></i></span><span>El mar<span class="resto"> de mi hogar</span></span></button>
+      <button type="button" class="paleta-btn" data-paleta-sitio="estrellas" aria-pressed="false"><span aria-hidden="true"><i style="--c:#CFE3EC"></i><i style="--c:#F4D98A"></i><i style="--c:#C4452F"></i></span><span>El mar<span class="resto"> de mi hogar</span></span></button>
     </div>
   </div>
 </div>
@@ -673,6 +671,7 @@ section[id] { scroll-margin-top: 84px; }
         <button type="button" class="btn-texto" data-cat="todo">Ver todo el archivo</button>
       </div>
       <div class="grilla" id="grilla"></div>
+      <div class="ver-mas" id="ver-mas" hidden><button type="button" class="btn btn-linea" id="btn-ver-mas" aria-expanded="false" aria-controls="grilla"></button></div>
       <div class="vacio" id="vacio" hidden>
         <svg viewBox="0 0 200 200" aria-hidden="true"><use href="#escudo"/></svg>
         <p class="vacio-titulo" data-t="archivo.vacio-titulo">Esta parte del archivo todavía se está revelando</p>
@@ -880,6 +879,8 @@ section[id] { scroll-margin-top: 84px; }
     "archivo.ingles": "The Archive",
     "archivo.nota": "Tocá una foto para verla grande con su paleta. Con ＋ la sumás a tu selección y después me la mandás por WhatsApp.",
     "archivo.todo": "Todo",
+    "archivo.ver-todo": "Ver todo",
+    "archivo.ver-menos": "Ver menos",
     "archivo.vacio-titulo": "Esta parte del archivo todavía se está revelando",
     "archivo.vacio-texto": "Pronto va a haber fotos acá. Mientras tanto, mirá el archivo completo.",
     "series.titulo": "Las series",
@@ -4036,7 +4037,8 @@ const faltaTitulo = (t) => { const s = String(t || "").trim().toLowerCase(); ret
 function conTitulo(f) {
   if (faltaTitulo(f.titulo)) {
     const s = SERIES.find((x) => x.id === f.serie);
-    if (s && !faltaTitulo(s.titulo)) { f.titulo = s.titulo; f.title = s.title || ""; }
+    // f.sinTituloFijo: la foto se queda en «Sin título» aunque esté en una serie
+    if (s && !faltaTitulo(s.titulo) && !f.sinTituloFijo) { f.titulo = s.titulo; f.title = s.title || ""; }
     else { f.titulo = "Sin título"; f.title = faltaTitulo(f.title) ? "Untitled" : f.title; }
   } else if (faltaTitulo(f.title)) f.title = ""; // no mostrar «Untitled» debajo de un título que sí tiene
   return f;
@@ -4079,7 +4081,8 @@ const rellenar = (plantilla, datos) => String(plantilla || "").replace(/\{([a-z�
 
 document.documentElement.lang = "es";
 
-const estado = { filtro: { tipo: "todo" }, lista: FOTOS.slice(), visorLista: FOTOS, indice: -1 };
+const estado = { filtro: { tipo: "todo" }, lista: FOTOS.slice(), visorLista: FOTOS, indice: -1, verTodo: false };
+const FOTOS_VISIBLES = 15; // en el archivo se ven estas, y un botón «Ver todo» muestra el resto
 
 /* ---------- Guardado local (solo comodidad para quien visita) ---------- */
 const CLAVE = "ojodecristi-seleccion";
@@ -4122,12 +4125,11 @@ function aplicarPaletaSitio(id, guardar) {
   if (guardar) {
     guardarLocal("ojodecristi-paleta", id);
     renderPortada();
-    aplicarFiltro(estado.filtro, { hash: false });
+    aplicarFiltro(estado.filtro, { hash: false, conservar: true });
     renderCajon();
   }
 }
-const LUZ_MAT = { rayas: 0.85, mar: 0.85, estrellas: 0.2 }; // el paspartú es oscuro en la paleta oscura
-const colorMat = (paleta) => colorPastel(paleta, LUZ_MAT[paletaActual] || 0.85, tonoFondo);
+const colorMat = (paleta) => colorPastel(paleta, 0.85, tonoFondo);
 
 /* ---------- Colores ---------- */
 const hexARgb = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
@@ -4280,9 +4282,21 @@ function etiquetaSumar(f, elegida) {
   return elegida ? "Quitar N.° " + f.n + " de tu selección" : "Sumar N.° " + f.n + " a tu selección";
 }
 
+function pintarGrilla() {
+  const grilla = $("#grilla");
+  const lista = estado.lista;
+  const cortada = lista.length > FOTOS_VISIBLES && !estado.verTodo;
+  grilla.innerHTML = "";
+  (cortada ? lista.slice(0, FOTOS_VISIBLES) : lista).forEach((f, i) => grilla.append(tarjeta(f, i)));
+  const cont = $("#ver-mas"), boton = $("#btn-ver-mas");
+  cont.hidden = lista.length <= FOTOS_VISIBLES;
+  boton.textContent = cortada ? texto("archivo.ver-todo", "Ver todo") + " (" + lista.length + ")" : texto("archivo.ver-menos", "Ver menos");
+  boton.setAttribute("aria-expanded", String(!cortada));
+}
 function aplicarFiltro(filtro, opciones) {
   opciones = opciones || {};
   estado.filtro = filtro;
+  if (!opciones.conservar) estado.verTodo = false; // al cambiar de categoría vuelve a mostrar las primeras
   if (filtro.tipo === "cat") estado.lista = FOTOS.filter((f) => f.categorias.indexOf(filtro.id) >= 0);
   else if (filtro.tipo === "serie") estado.lista = FOTOS.filter((f) => f.serie === filtro.id);
   else estado.lista = FOTOS.slice();
@@ -4298,9 +4312,7 @@ function aplicarFiltro(filtro, opciones) {
     fs.hidden = false;
   } else fs.hidden = true;
 
-  const grilla = $("#grilla");
-  grilla.innerHTML = "";
-  estado.lista.forEach((f, i) => grilla.append(tarjeta(f, i)));
+  pintarGrilla();
   $("#vacio").hidden = estado.lista.length > 0;
 
   if (opciones.hash !== false) ponerHash(filtro.tipo === "todo" ? "archivo" : filtro.id);
@@ -4360,7 +4372,7 @@ function mostrarEnVisor(direccion) {
   const lamina = $("#visor-lamina");
   lamina.style.setProperty("--fondo-foto", (f.paleta || [])[0] || "");
   lamina.style.setProperty("--ar", proporcion(f).toFixed(4));
-  const tono = colorPastel(f.paleta, paletaActual === "estrellas" ? 0.16 : 0.82);
+  const tono = colorPastel(f.paleta, 0.82);
   if (tono) $("#visor").style.setProperty("--tono", tono); else $("#visor").style.removeProperty("--tono");
   img.classList.remove("pan-der", "pan-izq");
   img.classList.add("cargando");
@@ -4627,6 +4639,12 @@ document.addEventListener("click", (e) => {
   if (t.closest("#nav-movil a")) cerrarMenu();
 });
 
+$("#btn-ver-mas").addEventListener("click", () => {
+  estado.verTodo = !estado.verTodo;
+  pintarGrilla();
+  anunciar(estado.verTodo ? "Se muestran las " + estado.lista.length + " fotos" : "Se muestran las primeras " + FOTOS_VISIBLES + " fotos");
+  if (!estado.verTodo) $("#archivo").scrollIntoView({ behavior: pocoMovimiento ? "auto" : "smooth", block: "start" }); // al plegar, vuelve al principio del archivo
+});
 $("#btn-seleccion").addEventListener("click", abrirCajon);
 $("#pastilla").addEventListener("click", abrirCajon);
 $("#btn-menu").addEventListener("click", () => {
@@ -4651,7 +4669,7 @@ $("#cajon-vaciar").addEventListener("click", () => {
     b.setAttribute("aria-label", etiquetaSumar(porNumero.get(n), false));
   }));
   refrescarSeleccion();
-  avisar("Vaciaste tu selección.", { texto: "Deshacer", fn: () => { seleccion = antes; guardarLocal(CLAVE, seleccion); aplicarFiltro(estado.filtro, { hash: false }); refrescarSeleccion(); } });
+  avisar("Vaciaste tu selección.", { texto: "Deshacer", fn: () => { seleccion = antes; guardarLocal(CLAVE, seleccion); aplicarFiltro(estado.filtro, { hash: false, conservar: true }); refrescarSeleccion(); } });
 });
 $("#cajon-wa").addEventListener("click", (e) => {
   if (!seleccion.length) { e.preventDefault(); avisar("Elegí al menos una foto para consultar."); }
