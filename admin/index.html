@@ -333,6 +333,20 @@ main.contenido { padding-block: 26px 150px; }
 .muestra-cuadro.madera { border-image: repeating-linear-gradient(0deg, color-mix(in srgb, var(--c) 82%, #6b4423) 0 1px, var(--c) 1px 3px) 8; }
 .muestra-cuadro input { position: absolute; inset: -8px; width: calc(100% + 16px); height: calc(100% + 16px); opacity: 0; cursor: pointer; }
 .cuadros-pie { display: flex; flex-wrap: wrap; gap: 8px; }
+/* Ajustes · Ambientes */
+.amb-lista { display: grid; gap: 10px; }
+.amb-fila { display: grid; gap: 12px; padding: 12px; background: var(--superficie); border: 1px solid var(--linea); }
+.amb-fila.con-error { border-color: var(--error); background: var(--error-fondo); }
+.amb-arriba { display: flex; align-items: center; gap: 10px; }
+.amb-n { min-width: 22px; font: 500 13px/1 var(--titulo); letter-spacing: .1em; color: var(--tinta-2); }
+.amb-fotos { display: flex; align-items: center; gap: 5px; flex: 1; min-width: 0; overflow: hidden; }
+.amb-fotos img { width: 60px; height: 42px; object-fit: cover; background: var(--linea); border: 1px solid var(--linea); }
+.amb-fotos img:first-child { outline: 2px solid var(--acento); outline-offset: 1px; }
+.amb-botones { display: flex; gap: 6px; }
+.amb-botones .btn-icono { width: 34px; height: 34px; }
+.amb-campos { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; }
+.amb-campo { display: grid; gap: 5px; font-size: 13px; color: var(--tinta-2); }
+.amb-campo input, .amb-campo select { min-height: 40px; padding: 7px 10px; color: var(--tinta); }
 @media (max-width: 640px) {
   .tamano-fila { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto; }
   .tamano-fila .uso { grid-column: 1 / -1; }
@@ -524,6 +538,7 @@ main.contenido { padding-block: 26px 150px; }
       </div>
       <div class="bloque" id="form-ajustes"></div>
       <div class="bloque" id="bloque-cuadros"></div>
+      <div class="bloque" id="bloque-ambientes"></div>
       <div class="bloque" id="bloque-numeracion">
         <h3>Numeración de las fotos</h3>
         <p class="ayuda-bloque" id="numeracion-texto"></p>
@@ -889,6 +904,13 @@ function extraerContenido(html) {
 const TEXTOS_NUEVOS = {
   "archivo.ver-todo": "Ver todo", "archivo.ver-menos": "Ver menos", "series.ver-todas": "Ver todas", "series.ver-menos": "Ver menos",
   "pared.boton": "Ver en mi pared",
+  "ambientes.etiqueta": "Ambientes",
+  "ambientes.titulo": "Ideas para tu pared",
+  "ambientes.ingles": "Ideas for your wall",
+  "ambientes.texto": "Composiciones armadas para cada lugar de la casa. Tocá una para verla en grande y cambiarle el tamaño, el marco o las fotos.",
+  "colores.titulo": "Buscar por color",
+  "colores.texto": "Elegí hasta 3 colores de tu ambiente (el sillón, la pared, las cortinas) y te muestro las fotos que mejor combinan.",
+  "whatsapp.flotante": "Consultar",
   "whatsapp.composicion": "¡Hola {nombre}! Me gustaría armar {composicion} de cuadros de {medida}, con marco {marco}:\n\n{lista}\n\n¿Me pasás el precio?\n{enlace}",
   "medidas.etiqueta": "Tamaños y marcos",
   "medidas.titulo": "Elegí la medida para tu pared",
@@ -1233,6 +1255,7 @@ function resolverChoques() {
     registrarNueva(n, { web: datos.web, mini: datos.mini, blobWeb: datos.blobWeb || null, blobMini: datos.blobMini || null });
     doc.ajustes.portada = (doc.ajustes.portada || []).map((x) => (x === viejo ? n : x));
     if (doc.ajustes.carrusel) doc.ajustes.carrusel = doc.ajustes.carrusel.map((x) => (x === viejo ? n : x));
+    cambiarFotosAmbientes(doc, (x) => (x === viejo ? n : x));
     doc.ajustes.ultimoNumero = numero;
     f.n = n;
   });
@@ -1567,6 +1590,7 @@ async function hacerRenumerarPublicadas() {
     final.fotos.forEach((f) => { f.n = mapa.get(f.n); });
     final.ajustes.portada = (final.ajustes.portada || []).map((x) => mapa.get(x) || "");
     if (final.ajustes.carrusel) final.ajustes.carrusel = final.ajustes.carrusel.map((x) => mapa.get(x)).filter(Boolean);
+    cambiarFotosAmbientes(final, (x) => mapa.get(x) || "");
     final.ajustes.ultimoNumero = orden.length;
     final.publicado = new Date().toISOString();
     const html = armarHtml(actual.html, final);
@@ -1579,6 +1603,19 @@ async function hacerRenumerarPublicadas() {
     }));
     nuevos.forEach((sha, ruta) => { if (actual.archivos.get(ruta) !== sha) arbol.push({ path: ruta, mode: "100644", type: "blob", sha: sha }); });
     orden.forEach((viejo) => ["web", "mini"].forEach((t) => { const ruta = "fotos/" + t + "/" + viejo + ".jpg"; if (!nuevos.has(ruta)) arbol.push({ path: ruta, mode: "100644", type: "blob", sha: null }); }));
+    // la vista previa de cada foto: la imagen se mueve con su número nuevo y la página de cada foto se rehace
+    const movidas = new Map();
+    orden.forEach((viejo) => { const sha = actual.archivos.get("fotos/tarjeta/" + viejo + ".jpg"); if (sha) movidas.set("fotos/tarjeta/" + mapa.get(viejo) + ".jpg", sha); });
+    movidas.forEach((sha, ruta) => { if (actual.archivos.get(ruta) !== sha) arbol.push({ path: ruta, mode: "100644", type: "blob", sha: sha }); });
+    orden.forEach((viejo) => { const ruta = "fotos/tarjeta/" + viejo + ".jpg"; if (actual.archivos.has(ruta) && !movidas.has(ruta)) arbol.push({ path: ruta, mode: "100644", type: "blob", sha: null }); });
+    if (actual.archivos.has("fotos/tarjeta/registro.json")) {
+      const reg = await leerRegistroTarjetas(actual.archivos), movido = {};
+      orden.forEach((viejo) => { if (reg[viejo]) movido[mapa.get(viejo)] = reg[viejo]; });
+      arbol.push({ path: "fotos/tarjeta/registro.json", mode: "100644", type: "blob", content: textoRegistro(movido) });
+    }
+    if (normalizarSitio(final.ajustes.sitio) && actual.archivos.has("tarjeta-base.png") && window.crypto && crypto.subtle) {
+      await paginasDeFotos(final, actual.archivos, (n) => movidas.get("fotos/tarjeta/" + n + ".jpg") || "", arbol, new Map());
+    }
     const t = await ghEscribir(rutaRepo("/git/trees"), { method: "POST", body: { base_tree: actual.arbol, tree: arbol } });
     const c = await ghEscribir(rutaRepo("/git/commits"), { method: "POST", body: { message: PREFIJO_COMMIT + "fotos renumeradas (001 a " + n3(orden.length) + ")", tree: t.sha, parents: [actual.commit] } });
     await ghEscribir(rutaRepo("/git/refs/heads/" + REPO.rama), { method: "PATCH", body: { sha: c.sha, force: false } });
@@ -1604,6 +1641,7 @@ async function renumerarDesdeUno() {
   doc.fotos.forEach((f) => { f.n = mapa.get(f.n); });
   doc.ajustes.portada = (doc.ajustes.portada || []).map((x) => mapa.get(x) || (x && !mapa.has(x) ? x : ""));
   if (doc.ajustes.carrusel) doc.ajustes.carrusel = doc.ajustes.carrusel.map((x) => mapa.get(x) || x);
+  cambiarFotosAmbientes(doc, (x) => mapa.get(x) || x);
   doc.ajustes.ultimoNumero = orden.length;
   elegidas.clear();
   guardarBorrador(true);
@@ -2004,6 +2042,7 @@ function borrarFotos(ns, alTerminar) {
       doc.fotos = doc.fotos.filter((f) => !set.has(f.n));
       doc.ajustes.portada = (doc.ajustes.portada || []).map((n) => (set.has(n) ? "" : n));
       ponerCarrusel((doc.ajustes.carrusel || []).filter((n) => !set.has(n)));
+      cambiarFotosAmbientes(doc, (n) => (set.has(n) ? "" : n));
       ns.forEach((n) => {
         if (!publicada(n)) {
           const v = nuevas.get(n);
@@ -2151,7 +2190,15 @@ const ESQUEMA = [
     ["archivo.ver-todo", "Botón «Ver todo» (cuando hay más de 15 fotos)", "linea", true],
     ["archivo.ver-menos", "Botón «Ver menos»", "linea", true],
     ["archivo.vacio-titulo", "Categoría sin fotos · título", "linea"],
-    ["archivo.vacio-texto", "Categoría sin fotos · texto", "texto"]
+    ["archivo.vacio-texto", "Categoría sin fotos · texto", "texto"],
+    ["colores.titulo", "Buscar por color · título", "linea", false, "Dejalo vacío (junto con el texto de abajo) si no querés el título."],
+    ["colores.texto", "Buscar por color · texto de ayuda", "texto"]
+  ] },
+  { grupo: "Ambientes (composiciones listas)", ayuda: "La sección de arriba del archivo con composiciones colgadas en su pared. Se arma y se prende en la pestaña Ajustes.", campos: [
+    ["ambientes.etiqueta", "Etiqueta chica", "linea"],
+    ["ambientes.titulo", "Título", "linea"],
+    ["ambientes.ingles", "Título en inglés", "linea"],
+    ["ambientes.texto", "Texto", "texto"]
   ] },
   { grupo: "Capítulo · Las series", campos: [
     ["series.titulo", "Título", "linea", true],
@@ -2202,7 +2249,8 @@ const ESQUEMA = [
     ["pared.boton", "Botón «Ver en mi pared»", "linea", true]
   ] },
   { grupo: "Mensajes de WhatsApp", ayuda: "Lo que le queda escrito a quien te contacta. {nombre} es tu nombre (de Ajustes).", campos: [
-    ["whatsapp.general", "Consulta general", "texto", true],
+    ["whatsapp.general", "Consulta general", "texto", true, "Es el mensaje del botón de WhatsApp del pie y del botón flotante del celu."],
+    ["whatsapp.flotante", "Botón flotante del celu", "linea", false, "El botón rojo que queda siempre abajo a la derecha en el celu. Vacío = solo el ícono."],
     ["whatsapp.trabajo", "Consulta por un trabajo", "texto", true],
     ["whatsapp.foto", "Consulta por una foto", "texto", true, "Podés usar {n} (número), {titulo}, {lugar}, {medida} (el tamaño que eligieron), {marco} y {enlace} (link directo a la foto)."],
     ["whatsapp.seleccion", "Consulta por una selección", "texto", true, "{lista} es la lista de fotos elegidas, cada una con su tamaño y su marco (y el comentario, si dejan uno). {enlace} es un link que te abre esa misma selección en la página."],
@@ -2514,6 +2562,142 @@ function renderCuadros() {
     el("div", {}, [fabrica])
   );
   marcarErroresCuadros();
+  renderAmbientesPanel(); // los tamaños y marcos de los ambientes salen de acá
+}
+
+/* ---------- Ambientes: composiciones listas (ajustes.ambientes) ----------
+   { mostrar: true/false, lista: [{ titulo, texto, escena: clara|calida|oscura, medida: "30x40", marco: "negro", fotos: ["022", "023", "020"] }] }
+   La primera foto de cada ambiente es la principal: en un trío va al medio. */
+const ESCENAS_AMB = [{ id: "clara", nombre: "Clara · living" }, { id: "calida", nombre: "Cálida · comedor" }, { id: "oscura", nombre: "Oscura · dormitorio" }];
+const LUGAR_AMB = { clara: "el living", calida: "el comedor", oscura: "el dormitorio" };
+const numFoto = (x) => { x = String(x == null ? "" : x).trim(); return /^\d{1,3}$/.test(x) ? n3(parseInt(x, 10)) : x; };
+const fotosDeTexto = (t) => String(t || "").split(/[^0-9]+/).filter(Boolean).map(numFoto);
+const ambientesDoc = () => doc.ajustes.ambientes || { mostrar: false, lista: [] };
+/* Cuando una foto cambia de número o se borra, los ambientes que la usan se actualizan solos */
+function cambiarFotosAmbientes(c, fn) {
+  const a = c && c.ajustes && c.ajustes.ambientes;
+  if (!a || !Array.isArray(a.lista)) return;
+  a.lista.forEach((x) => { if (x) x.fotos = (Array.isArray(x.fotos) ? x.fotos : fotosDeTexto(x.fotos)).map(numFoto).map(fn).filter(Boolean); });
+}
+function editarAmbientes(fn, redibujar) {
+  if (!doc.ajustes.ambientes || typeof doc.ajustes.ambientes !== "object") doc.ajustes.ambientes = { mostrar: false, lista: [] };
+  if (!Array.isArray(doc.ajustes.ambientes.lista)) doc.ajustes.ambientes.lista = [];
+  fn(doc.ajustes.ambientes);
+  cambio();
+  if (redibujar) renderAmbientesPanel(); else marcarErroresAmbientes();
+}
+function erroresAmbientes(a) {
+  const lista = [];
+  if (!a || !Array.isArray(a.lista)) return lista;
+  const c = cuadrosDoc(), medidas = c.medidas.map(idTamano), marcos = c.marcos.map((m) => idMarcoCuadro(m.nombre));
+  a.lista.forEach((x, i) => {
+    x = x || {};
+    const nombre = "El ambiente " + (i + 1) + (String(x.titulo || "").trim() ? " («" + String(x.titulo).trim() + "»)" : "");
+    const fs = (Array.isArray(x.fotos) ? x.fotos : []).map(numFoto);
+    if (!fs.length) lista.push({ i: i, txt: nombre + " todavía no tiene fotos: no se muestra." });
+    fs.forEach((n) => {
+      const f = doc.fotos.find((g) => g.n === n);
+      if (!f) lista.push({ i: i, txt: nombre + " usa la N.° " + n + ", que no existe." });
+      else if (f.oculta) lista.push({ i: i, txt: nombre + " usa la N.° " + n + ", que está oculta: no se muestra en el ambiente." });
+    });
+    if (fs.length > 3) lista.push({ i: i, txt: nombre + " tiene más de 3 fotos: se usan las 3 primeras." });
+    if (x.medida && medidas.indexOf(x.medida) < 0) lista.push({ i: i, txt: nombre + " usa un tamaño que ya no está: se muestra con el inicial." });
+    if (x.marco && marcos.indexOf(x.marco) < 0) lista.push({ i: i, txt: nombre + " usa un marco que ya no está: se muestra con el inicial." });
+  });
+  return lista;
+}
+function marcarErroresAmbientes() {
+  const errores = erroresAmbientes(doc.ajustes.ambientes);
+  $$("#bloque-ambientes .amb-fila").forEach((f) => f.classList.toggle("con-error", errores.some((e) => e.i === +f.dataset.i)));
+  const p = $("#amb-errores");
+  if (p) { p.hidden = !errores.length; p.textContent = errores.map((e) => e.txt).join(" "); }
+}
+/* Un link de «Compartir cómo queda» (…#pared-022_30x40_negro_clara_c023-020) se convierte en un ambiente */
+function ambienteDeLink(t) {
+  let s = String(t || "").trim();
+  try { s = decodeURIComponent(s); } catch (_) {}
+  const m = /#pared-(\d{1,4})_([0-9.,]+x[0-9.,]+)_([a-z0-9-]+)(?:_([a-z]+))?(?:_c([0-9-]+))?/i.exec(s);
+  if (!m) return null;
+  const fotos = [numFoto(m[1])].concat(m[5] ? m[5].split("-").filter(Boolean).map(numFoto) : []).filter((n, i, l) => l.indexOf(n) === i).slice(0, 3);
+  const escena = ESCENAS_AMB.some((e) => e.id === m[4]) ? m[4] : "clara";
+  const k = fotos.length;
+  return { titulo: (k === 3 ? "Trío" : k === 2 ? "Dupla" : "Un cuadro") + " para " + LUGAR_AMB[escena], texto: "", escena: escena, medida: m[2].replace(",", "."), marco: m[3].toLowerCase(), fotos: fotos };
+}
+const ICO_SUBIR = '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg>';
+const ICO_BAJAR = '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
+const ICO_QUITAR = '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+function filaAmbiente(x, i, total, c) {
+  x = x || {};
+  const fs = (Array.isArray(x.fotos) ? x.fotos : []).map(numFoto);
+  const enDoc = fs.map((n) => doc.fotos.find((g) => g.n === n)).filter(Boolean);
+  const miniaturas = el("div", { class: "amb-fotos" }, enDoc.length
+    ? enDoc.map((f) => el("img", { src: urlMini(f), alt: "N.° " + f.n, title: "N.° " + f.n + (f.titulo ? " · " + f.titulo : ""), loading: "lazy" }))
+    : [el("span", { class: "chico suave", texto: "Sin fotos todavía" })]);
+  const entrada = (valor, ph, etiqueta, alCambiar, evento) => {
+    const e = el("input", { type: "text", placeholder: ph, autocomplete: "off", "aria-label": etiqueta + " del ambiente " + (i + 1) });
+    e.value = valor || "";
+    e.addEventListener(evento || "input", () => alCambiar(e.value));
+    return e;
+  };
+  const elegir = (opciones, valor, etiqueta, alCambiar) => {
+    const s = el("select", { "aria-label": etiqueta + " del ambiente " + (i + 1) });
+    if (valor && !opciones.some((o) => o[0] === valor)) opciones = [[valor, valor.replace("x", " × ") + " (ya no está)"]].concat(opciones);
+    opciones.forEach((o) => { const op = el("option", { value: o[0], texto: o[1] }); if (o[0] === valor) op.selected = true; s.append(op); });
+    s.addEventListener("change", () => alCambiar(s.value));
+    return s;
+  };
+  const campo = (t, control) => el("label", { class: "amb-campo" }, [el("span", { texto: t }), control]);
+  const mover = (d) => editarAmbientes((a) => { const it = a.lista.splice(i, 1)[0]; a.lista.splice(i + d, 0, it); }, true);
+  return el("div", { class: "amb-fila", "data-i": i }, [
+    el("div", { class: "amb-arriba" }, [
+      el("span", { class: "amb-n", texto: String(i + 1) }), miniaturas,
+      el("div", { class: "amb-botones" }, [
+        el("button", { type: "button", class: "btn-icono", "aria-label": "Subir", title: "Subir", disabled: i === 0, html: ICO_SUBIR, onclick: () => mover(-1) }),
+        el("button", { type: "button", class: "btn-icono", "aria-label": "Bajar", title: "Bajar", disabled: i === total - 1, html: ICO_BAJAR, onclick: () => mover(1) }),
+        el("button", { type: "button", class: "btn-icono", "aria-label": "Quitar este ambiente", title: "Quitar", html: ICO_QUITAR, onclick: () => editarAmbientes((a) => { a.lista.splice(i, 1); }, true) })
+      ])
+    ]),
+    el("div", { class: "amb-campos" }, [
+      campo("Título", entrada(x.titulo, "Ej.: Trío para el living", "Título", (v) => editarAmbientes((a) => { a.lista[i].titulo = v; }))),
+      campo("Texto (opcional)", entrada(x.texto, "Una línea que lo cuente", "Texto", (v) => editarAmbientes((a) => { a.lista[i].texto = v; }))),
+      campo("Fotos: de 1 a 3 (la primera va al medio)", entrada(fs.join(", "), "Ej.: 022, 023, 020", "Fotos", (v) => editarAmbientes((a) => { a.lista[i].fotos = fotosDeTexto(v); }, true), "change")),
+      campo("Pared", elegir(ESCENAS_AMB.map((e) => [e.id, e.nombre]), x.escena || "clara", "Pared", (v) => editarAmbientes((a) => { a.lista[i].escena = v; }))),
+      campo("Tamaño", elegir(c.medidas.map((m) => [idTamano(m), numCm(m.corto) + " × " + numCm(m.largo) + " cm"]), x.medida || c.medidaInicial, "Tamaño", (v) => editarAmbientes((a) => { a.lista[i].medida = v; }))),
+      campo("Marco", elegir(c.marcos.map((m) => [idMarcoCuadro(m.nombre), m.nombre]), x.marco || c.marcoInicial, "Marco", (v) => editarAmbientes((a) => { a.lista[i].marco = v; })))
+    ])
+  ]);
+}
+function renderAmbientesPanel() {
+  const cont = $("#bloque-ambientes");
+  if (!cont) return;
+  const a = ambientesDoc(), c = cuadrosDoc(), lista = Array.isArray(a.lista) ? a.lista : [];
+  const interruptor = el("input", { type: "checkbox" });
+  interruptor.checked = !!a.mostrar;
+  interruptor.addEventListener("change", () => editarAmbientes((x) => { x.mostrar = interruptor.checked; }, true));
+  const pegar = el("input", { type: "url", placeholder: "Pegá acá el link de «Compartir cómo queda»", "aria-label": "Link de una composición en la pared", autocomplete: "off" });
+  const agregar = () => {
+    const nuevo = ambienteDeLink(pegar.value);
+    if (!nuevo) { avisar("Ese link no es de «Ver en mi pared». Abrí una foto en la pared, tocá «Compartir cómo queda» y pegá el link que se copia.", true); return; }
+    editarAmbientes((x) => { x.lista.push(nuevo); }, true);
+    avisar("Listo: se agregó «" + nuevo.titulo + "». Miralo con «Vista previa».");
+  };
+  pegar.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); agregar(); } });
+  const filas = el("div", { class: "amb-lista" });
+  lista.forEach((x, i) => filas.append(filaAmbiente(x, i, lista.length, c)));
+  cont.replaceChildren(
+    el("h3", { texto: "Ambientes: composiciones listas" }),
+    el("p", { class: "ayuda-bloque", texto: "Una sección arriba del archivo con composiciones armadas por vos, cada una colgada en su pared a escala. Quien la toca la abre en «Ver en mi pared» y puede cambiarle el tamaño, el marco o las fotos. Mientras esté apagada, no se ve en la página." }),
+    el("label", { class: "check" }, [interruptor, document.createTextNode("Mostrar los ambientes en la página")]),
+    el("div", { class: "campo" }, [
+      el("span", { class: "etiqueta", texto: "Cargar uno desde la página" }),
+      el("div", { class: "clave-fila" }, [pegar, el("button", { type: "button", class: "btn btn-chico", texto: "Agregar", onclick: agregar })]),
+      el("p", { class: "ayuda", texto: "En la página, abrí una foto en «Ver en mi pared» y elegí dupla o trío, el tamaño, el marco y la pared. Tocá «Compartir cómo queda» y pegá acá el link que se copia." })
+    ]),
+    lista.length ? filas : el("p", { class: "chico suave", texto: "Todavía no hay ambientes." }),
+    el("div", { class: "cuadros-pie" }, [el("button", { type: "button", class: "btn btn-chico", texto: "Sumar un ambiente vacío", onclick: () => editarAmbientes((x) => { x.lista.push({ titulo: "", texto: "", escena: "clara", medida: c.medidaInicial, marco: c.marcoInicial, fotos: [] }); }, true) })]),
+    el("p", { class: "nota error", id: "amb-errores", hidden: true })
+  );
+  marcarErroresAmbientes();
 }
 async function cargarHistorial() {
   const ol = $("#historial");
@@ -2617,11 +2801,158 @@ async function hacerImagenCompartir(f, commit) {
   if (foto.close) foto.close();
   return await new Promise((ok, mal) => c.toBlob((b) => (b ? ok(b) : mal(new Error("imagen"))), "image/jpeg", .9));
 }
+/* ---------- Vista previa de cada foto al mandar su link (foto/NNN/ y fotos/tarjeta/NNN.jpg) ----------
+   Cada foto tiene una página corta con su propia imagen, que es la que muestran WhatsApp, Instagram, etc.;
+   esa página lleva a la foto en el sitio. La imagen se arma sobre «tarjeta-base.png» con la foto, su paspartú
+   y su paleta, y se rehace sola cuando cambia la foto o su paleta (fotos/tarjeta/registro.json lleva la cuenta). */
+const TARJETAS_POR_VEZ = 60;
+const textoABytes = (t) => new TextEncoder().encode(t);
+async function shaGit(bytes) {
+  const cab = textoABytes("blob " + bytes.length + "\0");
+  const todo = new Uint8Array(cab.length + bytes.length);
+  todo.set(cab); todo.set(bytes, cab.length);
+  const h = await crypto.subtle.digest("SHA-1", todo);
+  return Array.from(new Uint8Array(h)).map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+function paginaDeFoto(f, c, firma) {
+  const a = c.ajustes || {}, t = c.textos || {};
+  const sitio = normalizarSitio(a.sitio);
+  const marca = t["marca.nombre"] || "ojodecristi";
+  const titulo = String(f.titulo || "").trim() || "Sin título";
+  const nombre = "N.° " + f.n + " — " + titulo;
+  const autor = a.nombreCompleto || a.nombre || marca;
+  const lugar = [String(f.lugar || "").trim(), String(f.anio || "").trim()].filter(Boolean).join(" · ");
+  const desc = (lugar ? lugar + ". " : "") + "Fotografía de " + autor + ". Pedila como cuadro.";
+  const url = sitio + "foto/" + f.n + "/";
+  const img = firma ? sitio + "fotos/tarjeta/" + f.n + ".jpg?v=" + firma : sitio + "fotos/web/" + f.n + ".jpg";
+  const lineas = [
+    "<!doctype html>",
+    '<html lang="es">',
+    "<head>",
+    '<meta charset="utf-8">',
+    '<meta name="viewport" content="width=device-width, initial-scale=1">',
+    "<title>" + esc(nombre + " · " + marca) + "</title>",
+    '<meta name="description" content="' + attr(desc) + '">',
+    '<link rel="canonical" href="' + attr(url) + '">',
+    '<meta property="og:type" content="website">',
+    '<meta property="og:site_name" content="' + attr(marca) + '">',
+    '<meta property="og:locale" content="es_AR">',
+    '<meta property="og:title" content="' + attr(nombre) + '">',
+    '<meta property="og:description" content="' + attr(desc) + '">',
+    '<meta property="og:url" content="' + attr(url) + '">',
+    '<meta property="og:image" content="' + attr(img) + '">'
+  ];
+  if (firma) lineas.push('<meta property="og:image:width" content="1200">', '<meta property="og:image:height" content="630">');
+  lineas.push(
+    '<meta property="og:image:alt" content="' + attr(f.alt || nombre) + '">',
+    '<meta name="twitter:card" content="summary_large_image">',
+    '<meta name="theme-color" content="#F7D8CB">',
+    '<script>location.replace("../../" + (location.hash.length > 1 ? location.hash : "#foto-' + f.n + '"));</' + 'script>',
+    "</head>",
+    '<body style="margin:0;min-height:100vh;display:grid;place-items:center;background:#F7D8CB;color:#3A2426;font:17px/1.5 sans-serif">',
+    '<a href="../../#foto-' + f.n + '" style="color:inherit">Ver la foto N.° ' + f.n + " en " + esc(marca) + "</a>",
+    "</body>",
+    "</html>",
+    ""
+  );
+  return lineas.join("\n");
+}
+/* El mismo dibujo que se usó para armar las primeras tarjetas: la foto entera dentro de su paspartú, con la paleta abajo */
+async function hacerTarjeta(f, plantilla, foto) {
+  const W = 1200, H = 630, CX = 400, CY = 315, MAXW = 620, MAXH = 430, P = 44, PB = 64;
+  const c = document.createElement("canvas");
+  c.width = W; c.height = H;
+  const x = c.getContext("2d");
+  x.drawImage(plantilla, 0, 0, W, H);
+  const ar = f.ancho > 0 && f.alto > 0 ? f.ancho / f.alto : (foto.width || 3) / (foto.height || 2);
+  let w = MAXW, h = Math.round(w / ar);
+  if (h > MAXH) { h = MAXH; w = Math.round(h * ar); }
+  const mw = w + 2 * P, mh = h + P + PB, mx = Math.round(CX - mw / 2), my = Math.round(CY - mh / 2);
+  const paleta = (f.paleta || []).filter((k) => HEX.test(k));
+  const rgb = [1, 3, 5].map((i) => parseInt((paleta[0] || "#d9cdb8").slice(i, i + 2), 16));
+  x.save();
+  x.shadowColor = "rgba(58,36,38,.28)"; x.shadowBlur = 36; x.shadowOffsetY = 14;
+  x.fillStyle = "rgb(" + rgb.map((v) => Math.round(v + (255 - v) * .8)).join(",") + ")";
+  x.fillRect(mx, my, mw, mh);
+  x.restore();
+  const px = mx + P, py = my + P;
+  x.imageSmoothingQuality = "high";
+  x.drawImage(foto, px, py, w, h);
+  x.strokeStyle = "rgba(60,36,39,.45)"; x.lineWidth = 1;
+  x.strokeRect(px - 6.5, py - 6.5, w + 13, h + 13);
+  paleta.slice(0, 5).forEach((k, i, l) => { x.beginPath(); x.arc(CX + (i - (l.length - 1) / 2) * 22, py + h + PB / 2, 7, 0, Math.PI * 2); x.fillStyle = k; x.fill(); });
+  return await new Promise((ok, mal) => c.toBlob((b) => (b ? ok(b) : mal(new Error("imagen"))), "image/jpeg", .86));
+}
+async function leerRegistroTarjetas(archivos) {
+  const sha = archivos.get("fotos/tarjeta/registro.json");
+  if (!sha) return {};
+  try { const r = JSON.parse(b64aTexto((await gh(rutaRepo("/git/blobs/" + sha))).content)); return r && typeof r === "object" ? r : {}; } catch (_) { return {}; }
+}
+const textoRegistro = (r) => { const o = {}; Object.keys(r).sort().forEach((k) => { o[k] = r[k]; }); return JSON.stringify(o, null, 1) + "\n"; };
+/* Páginas de cada foto: se reescriben solo las que cambiaron (se compara el contenido con lo publicado) */
+async function paginasDeFotos(final, archivos, shaTarjeta, entradas, shas) {
+  const visibles = new Set();
+  for (const f of final.fotos) {
+    if (f.oculta) continue;
+    visibles.add(f.n);
+    const ruta = "foto/" + f.n + "/index.html", html = paginaDeFoto(f, final, String(shaTarjeta(f.n) || "").slice(0, 10));
+    const sha = await shaGit(textoABytes(html));
+    if (archivos.get(ruta) !== sha) { entradas.push({ path: ruta, mode: "100644", type: "blob", content: html }); shas.set(ruta, sha); }
+  }
+  archivos.forEach((sha, ruta) => {
+    const m = /^foto\/([^/]+)\/index\.html$/.exec(ruta);
+    if (m && !visibles.has(m[1])) { entradas.push({ path: ruta, mode: "100644", type: "blob", sha: null }); shas.set(ruta, null); }
+  });
+  return visibles;
+}
+/* Al publicar: arma las tarjetas que falten (o que cambiaron) y las páginas de cada foto. Si algo falla, no frena la publicación */
+async function prepararTarjetas(final, actual, altas, alEsperar) {
+  const sitio = normalizarSitio(final.ajustes.sitio), arch = actual.archivos;
+  if (!sitio || !arch.has("tarjeta-base.png") || !window.crypto || !crypto.subtle) return null;
+  const registro = await leerRegistroTarjetas(arch), nuevo = Object.assign({}, registro);
+  const entradas = [], shas = new Map();
+  const visibles = final.fotos.filter((f) => !f.oculta);
+  const webDe = (f) => { const v = nuevas.get(f.n); return v && v.blobWeb && altas.some((g) => g.n === f.n) ? v.blobWeb : arch.get("fotos/web/" + f.n + ".jpg"); };
+  const firmaDe = (f) => webDe(f) + "|" + (f.paleta || []).join(",");
+  const pendientes = visibles.filter((f) => webDe(f) && (registro[f.n] !== firmaDe(f) || !arch.has("fotos/tarjeta/" + f.n + ".jpg"))).slice(0, TARJETAS_POR_VEZ);
+  if (pendientes.length) {
+    const plantilla = await cargarImagen(RAW + "/" + REPO.dueno + "/" + REPO.nombre + "/" + actual.commit + "/tarjeta-base.png");
+    let k = 0;
+    for (const f of pendientes) {
+      $("#publicar-detalle").textContent = "Armando la vista previa de cada link: " + (++k) + " de " + pendientes.length + "…";
+      try {
+        const foto = nuevas.has(f.n) ? await decodificar(nuevas.get(f.n).mini) : await cargarImagen(RAW + "/" + REPO.dueno + "/" + REPO.nombre + "/" + actual.commit + "/fotos/mini/" + f.n + ".jpg");
+        const blob = await hacerTarjeta(f, plantilla, foto);
+        if (foto.close) foto.close();
+        const r = await ghEscribir(rutaRepo("/git/blobs"), { method: "POST", body: { content: await blobABase64(blob), encoding: "base64" } }, alEsperar);
+        const ruta = "fotos/tarjeta/" + f.n + ".jpg";
+        entradas.push({ path: ruta, mode: "100644", type: "blob", sha: r.sha });
+        shas.set(ruta, r.sha);
+        nuevo[f.n] = firmaDe(f);
+      } catch (e) { console.error("No se pudo armar la tarjeta de la N.° " + f.n, e); }
+    }
+  }
+  const tarjetaDe = (n) => (shas.has("fotos/tarjeta/" + n + ".jpg") ? shas.get("fotos/tarjeta/" + n + ".jpg") : arch.get("fotos/tarjeta/" + n + ".jpg")) || "";
+  const enPagina = await paginasDeFotos(final, arch, tarjetaDe, entradas, shas);
+  // las fotos que se borraron u ocultaron se quedan sin tarjeta
+  arch.forEach((sha, ruta) => {
+    const m = /^fotos\/tarjeta\/(\d+)\.jpg$/.exec(ruta);
+    if (m && !enPagina.has(m[1])) { entradas.push({ path: ruta, mode: "100644", type: "blob", sha: null }); shas.set(ruta, null); delete nuevo[m[1]]; }
+  });
+  Object.keys(nuevo).forEach((n) => { if (!enPagina.has(n)) delete nuevo[n]; });
+  if (textoRegistro(nuevo) !== textoRegistro(registro)) {
+    const texto = textoRegistro(nuevo);
+    entradas.push({ path: "fotos/tarjeta/registro.json", mode: "100644", type: "blob", content: texto });
+    shas.set("fotos/tarjeta/registro.json", await shaGit(textoABytes(texto)));
+  }
+  return { entradas: entradas, shas: shas };
+}
 /* Arma la lista de cambios de archivos para el commit, sobre la versión publicada «actual» */
-function armarArbol(actual, final, altas, compartirSha) {
+function armarArbol(actual, final, altas, compartirSha, tarjetas) {
   const html = armarHtml(actual.html, final);
   const arbol = [{ path: "index.html", mode: "100644", type: "blob", content: html }];
   if (compartirSha) arbol.push({ path: "compartir.jpg", mode: "100644", type: "blob", sha: compartirSha });
+  if (tarjetas) tarjetas.entradas.forEach((e) => arbol.push(e));
   altas.forEach((f) => {
     const v = nuevas.get(f.n);
     arbol.push({ path: "fotos/web/" + f.n + ".jpg", mode: "100644", type: "blob", sha: v.blobWeb });
@@ -2655,7 +2986,7 @@ async function publicar() {
   const final = paraGuardar(doc);
   final.publicado = new Date().toISOString();
   const partes = resumen();
-  let hecho = null, arbolFinal = null, htmlFinal = null, actual = null, altas = [];
+  let hecho = null, arbolFinal = null, htmlFinal = null, actual = null, altas = [], tarjetas = null;
   try {
     // 1. ¿Cambió algo en GitHub desde que abrí el panel?
     actual = await leerRepo();
@@ -2698,10 +3029,14 @@ async function publicar() {
         final.ajustes.compartirFoto = fc.n;
       }
     } catch (_) { compartirSha = null; }
+    // La vista previa de cada foto al mandar su link (si falla, tampoco frena la publicación)
+    try {
+      tarjetas = await prepararTarjetas(final, actual, altas, (s) => { $("#publicar-detalle").textContent = "GitHub pidió una pausa: sigo en " + s + " segundos…"; });
+    } catch (e) { console.error(e); tarjetas = null; }
     $("#publicar-detalle").textContent = "Guardando textos y datos…";
     const mensaje = PREFIJO_COMMIT + (partes.join(", ") || "cambios");
     for (let intento = 0; intento < 3 && !hecho; intento++) {
-      const armado = armarArbol(actual, final, altas, compartirSha);
+      const armado = armarArbol(actual, final, altas, compartirSha, tarjetas);
       const t = await ghEscribir(rutaRepo("/git/trees"), { method: "POST", body: { base_tree: actual.arbol, tree: armado.arbol } });
       const c = await ghEscribir(rutaRepo("/git/commits"), { method: "POST", body: { message: mensaje, tree: t.sha, parents: [actual.commit] } });
       try {
@@ -2747,6 +3082,7 @@ async function publicar() {
     altas.forEach((f) => { const v = nuevas.get(f.n); archivos.set("fotos/web/" + f.n + ".jpg", v.blobWeb); archivos.set("fotos/mini/" + f.n + ".jpg", v.blobMini); });
     const quedan = new Set(final.fotos.map((f) => f.n));
     actual.contenido.fotos.forEach((f) => { if (!quedan.has(f.n)) { archivos.delete("fotos/web/" + f.n + ".jpg"); archivos.delete("fotos/mini/" + f.n + ".jpg"); } });
+    if (tarjetas) tarjetas.shas.forEach((sha, ruta) => { if (sha) archivos.set(ruta, sha); else archivos.delete(ruta); });
     const contenido = extraerContenido(htmlFinal);
     base = { commit: hecho, arbol: arbolFinal, mensaje: "", archivos: archivos, html: htmlFinal, contenido: contenido, texto: JSON.stringify(contenido) };
     doc = clonar(base.contenido);

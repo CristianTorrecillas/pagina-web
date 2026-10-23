@@ -38,6 +38,9 @@ a.btn:hover { background: var(--tinta); }
     var partes = location.pathname.split("/").filter(Boolean);
     var base = location.hostname.slice(-10) === ".github.io" && partes.length ? "/" + partes[0] + "/" : "/";
     document.getElementById("volver").href = base;
+    /* Un link a una foto (…/foto/022/) que todavía no tiene su página: se abre la foto en el sitio */
+    var foto = location.pathname.match(/\/foto\/(\d{1,4})\/?(?:index\.html)?$/);
+    if (foto) location.replace(base + (location.hash.length > 1 ? location.hash : "#foto-" + foto[1]));
   })();
 </script>
 </body>
