@@ -836,7 +836,7 @@ section[id] { scroll-margin-top: 84px; }
 .tira button[aria-pressed="true"] { border-color: var(--tinta); box-shadow: inset 0 0 0 1px var(--tinta); }
 .tira img { display: block; width: 100%; aspect-ratio: 3 / 2; object-fit: cover; pointer-events: none; }
 .tira span { display: block; margin-top: 4px; font: 500 9.5px/1 var(--titulo); letter-spacing: .14em; color: var(--tinta-2); text-align: center; }
-/* Composición: un cuadro solo, una dupla o un trío colgados juntos */
+/* Composición: un cuadro solo, una dupla o tres colgados juntos */
 .pared-panel .comps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
 .pared-panel .comps .op { flex-direction: column; justify-content: center; gap: 9px; min-height: 80px; padding: 11px 6px 10px; text-align: center; font-size: 10.5px; letter-spacing: .12em; }
 .muestra-comp { display: flex; align-items: flex-end; gap: 3px; height: 26px; }
@@ -1353,7 +1353,7 @@ section[id] { scroll-margin-top: 84px; }
         <div class="comps" role="group" aria-label="Composición">
           <button type="button" class="op" data-comp="1" aria-pressed="true"><span class="muestra-comp" aria-hidden="true"><i class="es"></i></span>Sola</button>
           <button type="button" class="op" data-comp="2" aria-pressed="false"><span class="muestra-comp" aria-hidden="true"><i class="es"></i><i></i></span>Dupla</button>
-          <button type="button" class="op" data-comp="3" aria-pressed="false"><span class="muestra-comp" aria-hidden="true"><i></i><i class="es"></i><i></i></span>Trío</button>
+          <button type="button" class="op" data-comp="3" aria-pressed="false"><span class="muestra-comp" aria-hidden="true"><i></i><i class="es"></i><i></i></span>Tres</button>
         </div>
         <div class="compas" id="pared-compas" hidden>
           <p>La acompañan estas fotos, con el mismo tamaño y marco. Tocá una para cambiarla por otra.</p>
@@ -1465,7 +1465,7 @@ section[id] { scroll-margin-top: 84px; }
       "mostrar": false,
       "lista": [
         {
-          "titulo": "Trío para el living",
+          "titulo": "Tres cuadros para el living",
           "texto": "Atardeceres en el campo, arriba de un sillón de 2 m.",
           "escena": "clara",
           "medida": "30x40",
@@ -1488,7 +1488,7 @@ section[id] { scroll-margin-top: 84px; }
           ]
         },
         {
-          "titulo": "Trío para el comedor",
+          "titulo": "Tres cuadros para el comedor",
           "texto": "Los cerros de colores de Jujuy, arriba de un aparador.",
           "escena": "calida",
           "medida": "30x40",
@@ -1551,7 +1551,7 @@ section[id] { scroll-margin-top: 84px; }
     "whatsapp.trabajo": "¡Hola {nombre}! Vi tu web y quería consultarte por un trabajo de fotos.",
     "whatsapp.foto": "¡Hola {nombre}! Vi la foto N.° {n} — {titulo} ({lugar}) y me interesa como cuadro de {medida}, con marco {marco}. ¿Me pasás el precio?\n{enlace}",
     "whatsapp.seleccion": "¡Hola {nombre}! Vi tus fotos en la web y me gustaría pedir estos cuadros:\n\n{lista}\n\n¿Me pasás el precio?\n\nMi selección: {enlace}",
-    "whatsapp.composicion": "¡Hola {nombre}! Me gustaría armar {composicion} de cuadros de {medida}, con marco {marco}:\n\n{lista}\n\n¿Me pasás el precio?\n{enlace}",
+    "whatsapp.composicion": "¡Hola {nombre}! Me gustaría armar {composicion} de {medida}, con marco {marco}:\n\n{lista}\n\n¿Me pasás el precio?\n{enlace}",
     "ambientes.etiqueta": "Ambientes",
     "ambientes.titulo": "Ideas para tu pared",
     "ambientes.ingles": "Ideas for your wall",
@@ -8272,8 +8272,8 @@ function mensajeFoto(f) {
 function mensajeComposicion(fs) {
   const o = opcionDe(fs[0].n);
   const lista = fs.map((g) => "• N.° " + g.n + " — " + g.titulo + (g.lugar ? " (" + g.lugar + ")" : "")).join("\n");
-  const plantilla = texto("whatsapp.composicion", "¡Hola {nombre}! Me gustaría armar {composicion} de cuadros de {medida}, con marco {marco}:\n\n{lista}\n\n¿Me pasás el precio?\n{enlace}");
-  let m = rellenar(plantilla, { nombre: CONFIG.nombre, composicion: fs.length === 2 ? "una dupla" : "un trío", medida: textoMedida(o.medida), marco: o.marco.nombre.toLowerCase(), lista: lista, enlace: enlaceVista() });
+  const plantilla = texto("whatsapp.composicion", "¡Hola {nombre}! Me gustaría armar {composicion} de {medida}, con marco {marco}:\n\n{lista}\n\n¿Me pasás el precio?\n{enlace}");
+  let m = rellenar(plantilla, { nombre: CONFIG.nombre, composicion: fs.length === 2 ? "una dupla de cuadros" : "tres cuadros", medida: textoMedida(o.medida), marco: o.marco.nombre.toLowerCase(), lista: lista, enlace: enlaceVista() });
   if (plantilla.indexOf("{lista}") < 0) m += "\n\n" + lista;
   return limpiar(m);
 }
@@ -8677,7 +8677,7 @@ function candidatasComp(f) {
   sugeridas.set(f.n, l);
   return l;
 }
-/* Siempre hay dos compañeras listas, así pasar de dupla a trío no cambia la primera */
+/* Siempre hay dos compañeras listas, así pasar de dupla a tres no cambia la primera */
 function companeras() {
   const f = pared.lista[pared.i];
   if (!f) return [];
@@ -8698,9 +8698,9 @@ function cambiarCompanera(k) {
   anunciar("Ahora la acompaña la N.° " + n + (g ? ", " + g.titulo : ""));
 }
 const enComposicion = () => pared.modo === "una" && pared.comp > 1;
-const nombreComp = (k) => (k === 2 ? "dupla" : "trío");
-/* «la dupla», «un trío», «esta dupla»… */
-const compCon = (k, art) => ({ el: k === 2 ? "la" : "el", un: k === 2 ? "una" : "un", este: k === 2 ? "esta" : "este" })[art] + " " + nombreComp(k);
+const nombreComp = (k) => (k === 2 ? "dupla" : "tres cuadros");
+/* «la dupla», «los tres cuadros», «esta dupla»… */
+const compCon = (k, art) => (k === 2 ? { el: "la", un: "una", este: "esta" }[art] + " dupla" : { el: "los tres cuadros", un: "tres cuadros", este: "estos tres cuadros" }[art]);
 const metros = (v) => (v / 100).toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + "\u00a0m";
 /* El tamaño y el marco los manda la foto principal: las compañeras van iguales */
 const opcionPared = (f) => opcionDe(pared.modo === "una" && pared.lista[pared.i] ? pared.lista[pared.i].n : f.n);
@@ -8712,7 +8712,7 @@ function elegirComp(k) {
   pared.cerca = false;
   pintarPanelPared();
   pintarPared();
-  anunciar(pared.comp === 1 ? "Un cuadro solo" : compCon(pared.comp, "un") + " de cuadros");
+  anunciar(pared.comp === 1 ? "Un cuadro solo" : (pared.comp === 2 ? "Una dupla de cuadros" : "Tres cuadros juntos"));
 }
 function sumarComposicion() {
   const fs = fotosPared();
@@ -8778,7 +8778,7 @@ function pintarPared(sinTransicion) {
   const comp = enComposicion() && fotos.length > 1;
   escena.classList.toggle("comp", comp);
   const items = fotos.map((f) => { const o = opcionPared(f), d = enCuadro(f, o.medida); return { f: f, o: o, w: d.w, h: d.h, m: d.m, W: d.w + 2 * d.m, H: d.h + 2 * d.m }; });
-  if (comp && items.length === 3) items.splice(0, 2, items[1], items[0]); // en el trío, la principal va al medio
+  if (comp && items.length === 3) items.splice(0, 2, items[1], items[0]); // con tres, la principal va al medio
   const lay = disponer(items, comp ? Infinity : mia ? pared.ancho * .7 : e.fila);
   let s, ox, oy, base;
   if (mia) {
@@ -8873,12 +8873,12 @@ function pintarPanelPared(soloEstado) {
   $("#pared-comp").hidden = todas;
   $$("[data-comp]").forEach((x) => x.setAttribute("aria-pressed", String(+x.dataset.comp === (comp ? fotos.length : 1))));
   const ancho = comp ? anchoGrupo(fotos, opcionDe(f.n).medida) : 0;
-  $("#pared-comp-valor").textContent = comp ? (fotos.length === 2 ? "Dupla" : "Trío") + " · " + metros(ancho) + " de ancho" : "Un cuadro";
+  $("#pared-comp-valor").textContent = comp ? (fotos.length === 2 ? "Dupla" : "Tres") + " · " + metros(ancho) + " de ancho" : "Un cuadro";
   $("#pared-compas").hidden = !comp;
   $("#pared-compas-tira").innerHTML = cs.map((g, j) => '<button type="button" data-compa="' + j + '" aria-label="Cambiar la N.° ' + esc(g.n) + ", " + esc(g.titulo) + ', por otra foto"><img src="' + esc(rutaMini(g)) + '" alt="" draggable="false"><span>N.° ' + esc(g.n) + "</span></button>").join("");
   $("#pared-ref").textContent = pared.escena === "mia"
     ? "El cuadro se muestra según el ancho de pared que indicaste."
-    : escenaActual().ref + (comp ? " " + compCon(fotos.length, "el").replace(/^./, (c) => c.toUpperCase()) + " ocupa " + metros(ancho) + "." : "") + (todas && k > fotos.length ? " Se ven los primeros " + fotos.length + " cuadros." : "");
+    : escenaActual().ref + (comp ? " " + compCon(fotos.length, "el").replace(/^./, (c) => c.toUpperCase()) + (fotos.length === 2 ? " ocupa " : " ocupan ") + metros(ancho) + "." : "") + (todas && k > fotos.length ? " Se ven los primeros " + fotos.length + " cuadros." : "");
   const b = $("#pared-sumar"), elegida = comp ? fotos.every((g) => seleccion.indexOf(g.n) >= 0) : seleccion.indexOf(f.n) >= 0;
   b.hidden = todas;
   b.setAttribute("aria-pressed", String(elegida));
@@ -9117,12 +9117,12 @@ function leerAmbientes() {
   }).filter((x) => x.fotos.length);
 }
 const AMBIENTES = leerAmbientes();
-const tituloAmbiente = (a) => a.titulo || (a.fotos.length === 3 ? "Un trío" : a.fotos.length === 2 ? "Una dupla" : "Un cuadro") + " para " + LUGAR_ESCENA[a.escena];
+const tituloAmbiente = (a) => a.titulo || (a.fotos.length === 3 ? "Tres cuadros" : a.fotos.length === 2 ? "Una dupla" : "Un cuadro") + " para " + LUGAR_ESCENA[a.escena];
 /* La misma pared del visor, en chiquito: la escala va en «cqw», así se acomoda sola al ancho de la tarjeta */
 function miniEscena(a, idx) {
   const e = ESCENAS.find((x) => x.id === a.escena) || ESCENAS[0], m = medidaPorId(a.medida), marco = marcoPorId(a.marco);
   const items = a.fotos.map((n) => { const f = porNumero.get(n), d = enCuadro(f, m); return { f: f, w: d.w, h: d.h, m: d.m, W: d.w + 2 * d.m, H: d.h + 2 * d.m }; });
-  if (items.length === 3) items.splice(0, 2, items[1], items[0]); // en el trío, la primera va al medio
+  if (items.length === 3) items.splice(0, 2, items[1], items[0]); // con tres, la primera va al medio
   const lay = disponer(items, Infinity);
   const base = e.base + sobreMueble(e, lay.ancho);
   const k = Math.min(1 / Math.max(e.ver, lay.ancho * 1.3), 0.75 / (base + lay.alto + 26 + PISO_CM)); // fracción del ancho por cm

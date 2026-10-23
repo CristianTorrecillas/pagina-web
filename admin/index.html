@@ -911,7 +911,7 @@ const TEXTOS_NUEVOS = {
   "colores.titulo": "Buscar por color",
   "colores.texto": "Elegí hasta 3 colores de tu ambiente (el sillón, la pared, las cortinas) y te muestro las fotos que mejor combinan.",
   "whatsapp.flotante": "Consultar",
-  "whatsapp.composicion": "¡Hola {nombre}! Me gustaría armar {composicion} de cuadros de {medida}, con marco {marco}:\n\n{lista}\n\n¿Me pasás el precio?\n{enlace}",
+  "whatsapp.composicion": "¡Hola {nombre}! Me gustaría armar {composicion} de {medida}, con marco {marco}:\n\n{lista}\n\n¿Me pasás el precio?\n{enlace}",
   "medidas.etiqueta": "Tamaños y marcos",
   "medidas.titulo": "Elegí la medida para tu pared",
   "medidas.texto": "Así se ven los tamaños, uno al lado del otro y a escala. La medida es la de la foto: el marco suma unos centímetros por lado.",
@@ -2254,7 +2254,7 @@ const ESQUEMA = [
     ["whatsapp.trabajo", "Consulta por un trabajo", "texto", true],
     ["whatsapp.foto", "Consulta por una foto", "texto", true, "Podés usar {n} (número), {titulo}, {lugar}, {medida} (el tamaño que eligieron), {marco} y {enlace} (link directo a la foto)."],
     ["whatsapp.seleccion", "Consulta por una selección", "texto", true, "{lista} es la lista de fotos elegidas, cada una con su tamaño y su marco (y el comentario, si dejan uno). {enlace} es un link que te abre esa misma selección en la página."],
-    ["whatsapp.composicion", "Consulta por una dupla o un trío", "texto", true, "Se manda desde el visor de pared cuando eligen una dupla o un trío. {composicion} dice «una dupla» o «un trío»; {lista}, las fotos; {medida} y {marco}, los que eligieron para todas; {enlace} abre esa misma composición en la pared."]
+    ["whatsapp.composicion", "Consulta por una dupla o tres cuadros", "texto", true, "Se manda desde el visor de pared cuando eligen una dupla o tres cuadros. {composicion} dice «una dupla de cuadros» o «tres cuadros»; {lista}, las fotos; {medida} y {marco}, los que eligieron para todas; {enlace} abre esa misma composición en la pared."]
   ] },
   { grupo: "Google y links compartidos", ayuda: "Cómo aparece la página en Google y en la vista previa cuando mandás el link por WhatsApp o Instagram.", campos: [
     ["seo.titulo", "Título", "linea", true, "Ideal: menos de 60 letras."],
@@ -2567,7 +2567,7 @@ function renderCuadros() {
 
 /* ---------- Ambientes: composiciones listas (ajustes.ambientes) ----------
    { mostrar: true/false, lista: [{ titulo, texto, escena: clara|calida|oscura, medida: "30x40", marco: "negro", fotos: ["022", "023", "020"] }] }
-   La primera foto de cada ambiente es la principal: en un trío va al medio. */
+   La primera foto de cada ambiente es la principal: con tres, va al medio. */
 const ESCENAS_AMB = [{ id: "clara", nombre: "Clara · living" }, { id: "calida", nombre: "Cálida · comedor" }, { id: "oscura", nombre: "Oscura · dormitorio" }];
 const LUGAR_AMB = { clara: "el living", calida: "el comedor", oscura: "el dormitorio" };
 const numFoto = (x) => { x = String(x == null ? "" : x).trim(); return /^\d{1,3}$/.test(x) ? n3(parseInt(x, 10)) : x; };
@@ -2621,7 +2621,7 @@ function ambienteDeLink(t) {
   const fotos = [numFoto(m[1])].concat(m[5] ? m[5].split("-").filter(Boolean).map(numFoto) : []).filter((n, i, l) => l.indexOf(n) === i).slice(0, 3);
   const escena = ESCENAS_AMB.some((e) => e.id === m[4]) ? m[4] : "clara";
   const k = fotos.length;
-  return { titulo: (k === 3 ? "Trío" : k === 2 ? "Dupla" : "Un cuadro") + " para " + LUGAR_AMB[escena], texto: "", escena: escena, medida: m[2].replace(",", "."), marco: m[3].toLowerCase(), fotos: fotos };
+  return { titulo: (k === 3 ? "Tres cuadros" : k === 2 ? "Dupla" : "Un cuadro") + " para " + LUGAR_AMB[escena], texto: "", escena: escena, medida: m[2].replace(",", "."), marco: m[3].toLowerCase(), fotos: fotos };
 }
 const ICO_SUBIR = '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg>';
 const ICO_BAJAR = '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
@@ -2658,7 +2658,7 @@ function filaAmbiente(x, i, total, c) {
       ])
     ]),
     el("div", { class: "amb-campos" }, [
-      campo("Título", entrada(x.titulo, "Ej.: Trío para el living", "Título", (v) => editarAmbientes((a) => { a.lista[i].titulo = v; }))),
+      campo("Título", entrada(x.titulo, "Ej.: Tres cuadros para el living", "Título", (v) => editarAmbientes((a) => { a.lista[i].titulo = v; }))),
       campo("Texto (opcional)", entrada(x.texto, "Una línea que lo cuente", "Texto", (v) => editarAmbientes((a) => { a.lista[i].texto = v; }))),
       campo("Fotos: de 1 a 3 (la primera va al medio)", entrada(fs.join(", "), "Ej.: 022, 023, 020", "Fotos", (v) => editarAmbientes((a) => { a.lista[i].fotos = fotosDeTexto(v); }, true), "change")),
       campo("Pared", elegir(ESCENAS_AMB.map((e) => [e.id, e.nombre]), x.escena || "clara", "Pared", (v) => editarAmbientes((a) => { a.lista[i].escena = v; }))),
@@ -2691,7 +2691,7 @@ function renderAmbientesPanel() {
     el("div", { class: "campo" }, [
       el("span", { class: "etiqueta", texto: "Cargar uno desde la página" }),
       el("div", { class: "clave-fila" }, [pegar, el("button", { type: "button", class: "btn btn-chico", texto: "Agregar", onclick: agregar })]),
-      el("p", { class: "ayuda", texto: "En la página, abrí una foto en «Ver en mi pared» y elegí dupla o trío, el tamaño, el marco y la pared. Tocá «Compartir cómo queda» y pegá acá el link que se copia." })
+      el("p", { class: "ayuda", texto: "En la página, abrí una foto en «Ver en mi pared» y elegí dupla o tres, el tamaño, el marco y la pared. Tocá «Compartir cómo queda» y pegá acá el link que se copia." })
     ]),
     lista.length ? filas : el("p", { class: "chico suave", texto: "Todavía no hay ambientes." }),
     el("div", { class: "cuadros-pie" }, [el("button", { type: "button", class: "btn btn-chico", texto: "Sumar un ambiente vacío", onclick: () => editarAmbientes((x) => { x.lista.push({ titulo: "", texto: "", escena: "clara", medida: c.medidaInicial, marco: c.marcoInicial, fotos: [] }); }, true) })]),
