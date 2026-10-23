@@ -743,6 +743,21 @@ section[id] { scroll-margin-top: 84px; }
 .tira button[aria-pressed="true"] { border-color: var(--tinta); box-shadow: inset 0 0 0 1px var(--tinta); }
 .tira img { display: block; width: 100%; aspect-ratio: 3 / 2; object-fit: cover; pointer-events: none; }
 .tira span { display: block; margin-top: 4px; font: 500 9.5px/1 var(--titulo); letter-spacing: .14em; color: var(--tinta-2); text-align: center; }
+/* Composición: un cuadro solo, una dupla o un trío colgados juntos */
+.pared-panel .comps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.pared-panel .comps .op { flex-direction: column; justify-content: center; gap: 9px; min-height: 80px; padding: 11px 6px 10px; text-align: center; font-size: 10.5px; letter-spacing: .12em; }
+.muestra-comp { display: flex; align-items: flex-end; gap: 3px; height: 26px; }
+.muestra-comp i { display: block; width: 10px; height: 14px; border: 1.5px solid currentColor; opacity: .55; }
+.muestra-comp i.es { width: 12px; height: 17px; opacity: 1; background: currentColor; }
+.op[aria-pressed="true"] .muestra-comp i { opacity: 1; }
+.compas { display: grid; gap: 8px; margin-top: 14px; }
+.compas p { font-size: 13px; line-height: 1.4; color: var(--tinta-2); }
+.compas .tira button span::before { content: "↻ "; }
+.compas .tira button:hover { border-color: var(--tinta); }
+/* con una composición, en lugar de cada medida se ve el ancho total */
+.cota-total { display: none; left: calc(var(--s) * var(--x, 0)); right: auto; width: calc(var(--s) * var(--w, 0)); bottom: calc(var(--s) * var(--y, 0) + 8px); }
+.escena.comp .cota-total { display: block; }
+.escena.comp .cp .cota { opacity: 0; }
 .mi-pared { display: grid; gap: 10px; padding: 14px 16px 12px; background: var(--fondo); text-align: left; }
 .mi-pared label { display: flex; justify-content: space-between; gap: 10px; font: 500 10.5px/1.3 var(--titulo); letter-spacing: .2em; text-transform: uppercase; }
 .mi-pared label strong { font-weight: 500; letter-spacing: .06em; text-transform: none; font-size: 13px; }
@@ -1190,7 +1205,7 @@ section[id] { scroll-margin-top: 84px; }
           <div class="escena-sombra"></div>
           <div class="escena-origen" id="escena-origen">
             <div class="escena-mueble" id="escena-mueble" aria-hidden="true"></div>
-            <div class="escena-grupo" id="escena-grupo"></div>
+            <div class="escena-grupo" id="escena-grupo"><span class="cota cota-h cota-total" id="escena-total"><span></span></span></div>
           </div>
         </div>
         <div class="escena-herr">
@@ -1211,6 +1226,18 @@ section[id] { scroll-margin-top: 84px; }
       </div>
       <div class="tira" id="pared-tira" role="group" aria-label="Elegí qué cuadro querés cambiar" hidden></div>
       <div class="opciones" id="pared-opciones"></div>
+      <div class="opcion" id="pared-comp">
+        <div class="opcion-cabeza"><p class="foto-num">Composición</p><p class="opcion-valor" id="pared-comp-valor"></p></div>
+        <div class="comps" role="group" aria-label="Composición">
+          <button type="button" class="op" data-comp="1" aria-pressed="true"><span class="muestra-comp" aria-hidden="true"><i class="es"></i></span>Sola</button>
+          <button type="button" class="op" data-comp="2" aria-pressed="false"><span class="muestra-comp" aria-hidden="true"><i class="es"></i><i></i></span>Dupla</button>
+          <button type="button" class="op" data-comp="3" aria-pressed="false"><span class="muestra-comp" aria-hidden="true"><i></i><i class="es"></i><i></i></span>Trío</button>
+        </div>
+        <div class="compas" id="pared-compas" hidden>
+          <p>La acompañan estas fotos, con el mismo tamaño y marco. Tocá una para cambiarla por otra.</p>
+          <div class="tira" id="pared-compas-tira" role="group" aria-label="Fotos que la acompañan"></div>
+        </div>
+      </div>
       <div class="opcion">
         <div class="opcion-cabeza"><p class="foto-num">Pared</p><p class="opcion-valor" id="pared-valor"></p></div>
         <div class="paredes" id="pared-paredes" role="group" aria-label="Pared"></div>
@@ -1362,6 +1389,7 @@ section[id] { scroll-margin-top: 84px; }
     "whatsapp.trabajo": "¡Hola {nombre}! Vi tu web y quería consultarte por un trabajo de fotos.",
     "whatsapp.foto": "¡Hola {nombre}! Vi la foto N.° {n} — {titulo} ({lugar}) y me interesa como cuadro de {medida}, con marco {marco}. ¿Me pasás el precio?\n{enlace}",
     "whatsapp.seleccion": "¡Hola {nombre}! Vi tus fotos en la web y me gustaría pedir estos cuadros:\n\n{lista}\n\n¿Me pasás el precio?\n\nMi selección: {enlace}",
+    "whatsapp.composicion": "¡Hola {nombre}! Me gustaría armar {composicion} de cuadros de {medida}, con marco {marco}:\n\n{lista}\n\n¿Me pasás el precio?\n{enlace}",
     "seo.titulo": "Cristian Torrecillas · Fotografía de autor — ojodecristi",
     "seo.descripcion": "Fotografía de autor de Cristian Torrecillas en Mar del Plata y de cada lugar que recorro. Cada foto tiene su número único, y cualquiera puede avivar tu espacio.",
     "series.ver-todas": "Ver todas",
@@ -7820,14 +7848,17 @@ function alternar(n, origen) {
   anunciar(i >= 0 ? "N.° " + n + " quitada de tu selección" : "N.° " + n + " sumada a tu selección, en " + detalleCuadro(n));
   // desde la grilla: se avisa con qué tamaño quedó y se ofrece probarla en la pared
   if (i < 0 && origen === "grilla") avisar("Sumaste la N.° " + n + " · " + detalleCuadro(n) + ".", { texto: texto("pared.boton", "Ver en mi pared"), fn: () => abrirPared(n, { desde: "pagina", lista: estado.lista }) });
+  marcarTarjeta(n);
+  refrescarSeleccion();
+}
+function marcarTarjeta(n) {
+  const f = porNumero.get(n), elegida = seleccion.indexOf(n) >= 0;
   $$('.foto[data-n="' + n + '"]').forEach((card) => {
-    const elegida = seleccion.indexOf(n) >= 0;
     card.classList.toggle("elegida", elegida);
     const b = $(".foto-sumar", card);
     b.setAttribute("aria-pressed", String(elegida));
     b.setAttribute("aria-label", etiquetaSumar(f, elegida));
   });
-  refrescarSeleccion();
 }
 function refrescarSeleccion() {
   const k = seleccion.length;
@@ -7917,6 +7948,14 @@ function mensajeFoto(f) {
     plantilla = plantilla.indexOf("{enlace}") >= 0 ? plantilla.replace("{enlace}", "Cuadro: {medida} · marco {marco}\n{enlace}") : plantilla + "\nCuadro: {medida} · marco {marco}";
   }
   return limpiar(rellenar(plantilla, { nombre: CONFIG.nombre, n: f.n, titulo: f.titulo, lugar: f.lugar || "", enlace: enlaceFoto(f), medida: textoMedida(o.medida), marco: o.marco.nombre.toLowerCase() }));
+}
+function mensajeComposicion(fs) {
+  const o = opcionDe(fs[0].n);
+  const lista = fs.map((g) => "• N.° " + g.n + " — " + g.titulo + (g.lugar ? " (" + g.lugar + ")" : "")).join("\n");
+  const plantilla = texto("whatsapp.composicion", "¡Hola {nombre}! Me gustaría armar {composicion} de cuadros de {medida}, con marco {marco}:\n\n{lista}\n\n¿Me pasás el precio?\n{enlace}");
+  let m = rellenar(plantilla, { nombre: CONFIG.nombre, composicion: fs.length === 2 ? "una dupla" : "un trío", medida: textoMedida(o.medida), marco: o.marco.nombre.toLowerCase(), lista: lista, enlace: enlaceVista() });
+  if (plantilla.indexOf("{lista}") < 0) m += "\n\n" + lista;
+  return limpiar(m);
 }
 const MENSAJES = {
   general: () => limpiar(rellenar(texto("whatsapp.general", "¡Hola {nombre}! Vi tus fotos en la web y quería hacerte una consulta."), { nombre: CONFIG.nombre })),
@@ -8009,13 +8048,14 @@ function leerHash() {
     importarSeleccion(h.slice(10));
     return;
   }
-  // #pared-012 (o #pared-012_40x60_negro_clara) · abre la foto directamente en la pared
+  // #pared-012 (o #pared-012_40x60_negro_clara, o con compañeras: …_clara_c034-056) · abre la foto directamente en la pared
   if (h.indexOf("pared-") === 0) {
     const d = h.slice(6).split("_"), n = d[0];
     if (!porNumero.has(n)) return;
     if (ESCENAS.some((e) => e.id === d[3])) pared.escena = d[3];
     abrirVisor(n, FOTOS);
-    abrirPared(n, { desde: "visor", lista: estado.visorLista, medida: d[1], marco: d[2] });
+    const compa = /^c/.test(d[4] || "") ? d[4].slice(1).split("-") : [];
+    abrirPared(n, { desde: "visor", lista: estado.visorLista, medida: d[1], marco: d[2], compa: compa });
     return;
   }
   if (h.indexOf("foto-") === 0) { const n = h.slice(5); if (porNumero.has(n)) abrirVisor(n, FOTOS); return; }
@@ -8282,21 +8322,93 @@ function muebleDormitorio() {
     R(o - 3, 16, 166, 37, "#F0EBE2", 4) + R(o - 3, 43, 166, 10, "#E4DDD1", 3) + R(o - 3, 22, 166, 9, "#C47A61", 1);
   return { ancho: W, svg: lienzo(0, W, H, luzDef("luz-dormitorio") + mesita(0) + cama + mesita(221)) };
 }
-/* base: altura del mueble (el cuadro se cuelga 22 cm arriba) · ver: cuántos cm de ancho se ven · fila: ancho máximo de una fila de cuadros */
+/* base: altura del mueble (el cuadro se cuelga 22 cm arriba) · ver: cuántos cm de ancho se ven · fila: ancho máximo de una fila de cuadros
+   libre y salto: si los cuadros ocupan más que el hueco entre las lámparas (libre), se cuelgan más alto (salto cm sobre el mueble) */
 const ESCENAS = [
   { id: "clara", nombre: "Clara", pared: "#EFE9E0", pared2: "#E2D9CC", piso: "#C29C77", piso2: "#A9845F", zocalo: "#F8F4EE", cota: "#4B3D36", luz: .4, base: 84, ver: 330, verCelu: 190, fila: 200,
     ref: "Referencia: el sillón mide 2 m de ancho.", mueble: muebleLiving, desc: "una pared clara, arriba de un sillón de 2 m" },
-  { id: "calida", nombre: "Cálida", pared: "#E9C8AC", pared2: "#DDB597", piso: "#976F50", piso2: "#7F5B40", zocalo: "#F1DDC9", cota: "#55362A", luz: .32, base: 79, ver: 250, verCelu: 175, fila: 150,
+  { id: "calida", nombre: "Cálida", pared: "#E9C8AC", pared2: "#DDB597", piso: "#976F50", piso2: "#7F5B40", zocalo: "#F1DDC9", cota: "#55362A", luz: .32, base: 79, ver: 250, verCelu: 175, fila: 150, libre: 86, salto: 64,
     ref: "Referencia: el aparador mide 1,60 m de ancho.", mueble: muebleAparador, desc: "una pared cálida, arriba de un aparador de 1,60 m" },
   { id: "oscura", nombre: "Oscura", pared: "#2F4848", pared2: "#263B3B", piso: "#785A43", piso2: "#624935", zocalo: "#3A5555", cota: "#F0E6D6", luz: .14, base: 104, ver: 300, verCelu: 200, fila: 170,
     ref: "Referencia: la cama mide 1,60 m de ancho.", mueble: muebleDormitorio, desc: "una pared oscura, arriba de una cama de 1,60 m" }
 ];
 const PISO_CM = 18, SOBRE_MUEBLE = 22, GAP_CUADROS = 8, MAX_EN_PARED = 12;
-const pared = { modo: "una", lista: [], i: 0, activo: null, escena: "clara", cerca: false, cotas: true, foto: "", ancho: 300, pos: { x: .5, y: .42 }, desde: "pagina", foco: null };
+const pared = { modo: "una", lista: [], i: 0, activo: null, escena: "clara", cerca: false, cotas: true, foto: "", ancho: 300, pos: { x: .5, y: .42 }, desde: "pagina", foco: null, comp: 1, compa: [], cursor: 0 };
 const dibujosMueble = {};
 let muebleActual = "";
 const escenaActual = () => ESCENAS.find((e) => e.id === pared.escena) || ESCENAS[0];
-const fotosPared = () => (pared.modo === "todas" ? seleccion.map((n) => porNumero.get(n)).filter(Boolean).slice(0, MAX_EN_PARED) : [pared.lista[pared.i]].filter(Boolean));
+const fotosPared = () => (pared.modo === "todas" ? seleccion.map((n) => porNumero.get(n)).filter(Boolean).slice(0, MAX_EN_PARED) : [pared.lista[pared.i]].filter(Boolean).concat(pared.comp > 1 ? companeras() : []));
+/* ---------- Composiciones: la foto con una o dos compañeras, del mismo tamaño y marco ----------
+   Se sugieren fotos con la misma orientación y colores parecidos (y, si es de una serie, primero las de su serie). */
+const rgb = (h) => { const v = parseInt(String(h).slice(1), 16); return isFinite(v) ? [v >> 16 & 255, v >> 8 & 255, v & 255] : null; };
+function distanciaPaleta(a, b) {
+  const A = (a || []).slice(0, 3).map(rgb).filter(Boolean), B = (b || []).map(rgb).filter(Boolean);
+  if (!A.length || !B.length) return 200;
+  return A.reduce((t, x) => t + Math.min.apply(null, B.map((y) => Math.hypot(x[0] - y[0], x[1] - y[1], x[2] - y[2]))), 0) / A.length;
+}
+const sugeridas = new Map();
+function candidatasComp(f) {
+  if (sugeridas.has(f.n)) return sugeridas.get(f.n);
+  const horizontal = proporcion(f) >= 1;
+  const mismas = FOTOS.filter((g) => g.n !== f.n && (proporcion(g) >= 1) === horizontal);
+  const base = mismas.length >= 2 ? mismas : FOTOS.filter((g) => g.n !== f.n);
+  const puntaje = (g) => distanciaPaleta(f.paleta, g.paleta) + distanciaPaleta(g.paleta, f.paleta) - (f.serie && g.serie === f.serie ? 90 : 0) - (f.lugar && g.lugar === f.lugar ? 10 : 0);
+  const l = base.map((g) => ({ n: g.n, p: puntaje(g) })).sort((a, b) => a.p - b.p).map((x) => x.n);
+  sugeridas.set(f.n, l);
+  return l;
+}
+/* Siempre hay dos compañeras listas, así pasar de dupla a trío no cambia la primera */
+function companeras() {
+  const f = pared.lista[pared.i];
+  if (!f) return [];
+  const l = candidatasComp(f);
+  pared.compa = pared.compa.filter((n, i, a) => n !== f.n && porNumero.has(n) && a.indexOf(n) === i);
+  while (pared.compa.length < 2 && pared.cursor < l.length) { const n = l[pared.cursor++]; if (pared.compa.indexOf(n) < 0) pared.compa.push(n); }
+  return pared.compa.slice(0, pared.comp - 1).map((n) => porNumero.get(n));
+}
+function cambiarCompanera(k) {
+  const f = pared.lista[pared.i], l = f ? candidatasComp(f) : [];
+  if (l.length <= pared.compa.length) return;
+  let n, vueltas = 0;
+  do { if (pared.cursor >= l.length) pared.cursor = 0; n = l[pared.cursor++]; } while (pared.compa.indexOf(n) >= 0 && ++vueltas <= l.length);
+  pared.compa[k] = n;
+  pintarPanelPared();
+  pintarPared();
+  const g = porNumero.get(n);
+  anunciar("Ahora la acompaña la N.° " + n + (g ? ", " + g.titulo : ""));
+}
+const enComposicion = () => pared.modo === "una" && pared.comp > 1;
+const nombreComp = (k) => (k === 2 ? "dupla" : "trío");
+/* «la dupla», «un trío», «esta dupla»… */
+const compCon = (k, art) => ({ el: k === 2 ? "la" : "el", un: k === 2 ? "una" : "un", este: k === 2 ? "esta" : "este" })[art] + " " + nombreComp(k);
+const metros = (v) => (v / 100).toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + "\u00a0m";
+/* El tamaño y el marco los manda la foto principal: las compañeras van iguales */
+const opcionPared = (f) => opcionDe(pared.modo === "una" && pared.lista[pared.i] ? pared.lista[pared.i].n : f.n);
+function anchoGrupo(fotos, m) {
+  return fotos.reduce((a, f) => { const d = enCuadro(f, m); return a + d.w + 2 * d.m; }, 0) + GAP_CUADROS * (fotos.length - 1);
+}
+function elegirComp(k) {
+  pared.comp = Math.max(1, Math.min(3, k));
+  pared.cerca = false;
+  pintarPanelPared();
+  pintarPared();
+  anunciar(pared.comp === 1 ? "Un cuadro solo" : compCon(pared.comp, "un") + " de cuadros");
+}
+function sumarComposicion() {
+  const fs = fotosPared();
+  if (!fs.length) return;
+  const o = opcionDe(fs[0].n), dentro = fs.every((g) => seleccion.indexOf(g.n) >= 0);
+  fs.forEach((g) => {
+    const i = seleccion.indexOf(g.n);
+    if (dentro) seleccion.splice(i, 1);
+    else { opciones[g.n] = { t: o.t, m: o.m }; if (i < 0) seleccion.push(g.n); }
+  });
+  guardarLocal(CLAVE_OP, opciones);
+  guardarLocal(CLAVE, seleccion);
+  fs.forEach((g) => marcarTarjeta(g.n));
+  anunciar(dentro ? "Quitaste " + compCon(fs.length, "el") + " de tu selección" : "Sumaste las " + fs.length + " fotos a tu selección, en " + detalleCuadro(fs[0].n));
+  refrescarSeleccion();
+}
 function activaPared() { const l = fotosPared(); return l.find((f) => f.n === pared.activo) || l[0]; }
 /* Acomoda varios cuadros en filas parejas, centradas y alineadas por el medio */
 function disponer(items, maxFila) {
@@ -8324,8 +8436,9 @@ function disponer(items, maxFila) {
   });
   return { items: items, ancho: Math.max.apply(null, filas.map((f) => f.ancho)), alto: alto };
 }
+const sobreMueble = (e, ancho) => (e.libre && ancho > e.libre ? e.salto : SOBRE_MUEBLE);
 function escalaPared(e, W, H, grupo) {
-  const tope = e.base + SOBRE_MUEBLE + grupo.alto + 26 + PISO_CM;
+  const tope = e.base + sobreMueble(e, grupo.ancho) + grupo.alto + 26 + PISO_CM;
   const ver = Math.max(W / H < 1.05 ? e.verCelu : e.ver, grupo.ancho * 1.3);
   return Math.min(W / ver, H / tope);
 }
@@ -8342,8 +8455,11 @@ function pintarPared(sinTransicion) {
   escena.classList.toggle("grupo", todas && fotos.length > 1);
   escena.classList.toggle("sin-cotas", !pared.cotas);
   escena.classList.toggle("cerca", pared.cerca);
-  const items = fotos.map((f) => { const o = opcionDe(f.n), d = enCuadro(f, o.medida); return { f: f, o: o, w: d.w, h: d.h, m: d.m, W: d.w + 2 * d.m, H: d.h + 2 * d.m }; });
-  const lay = disponer(items, mia ? pared.ancho * .7 : e.fila);
+  const comp = enComposicion() && fotos.length > 1;
+  escena.classList.toggle("comp", comp);
+  const items = fotos.map((f) => { const o = opcionPared(f), d = enCuadro(f, o.medida); return { f: f, o: o, w: d.w, h: d.h, m: d.m, W: d.w + 2 * d.m, H: d.h + 2 * d.m }; });
+  if (comp && items.length === 3) items.splice(0, 2, items[1], items[0]); // en el trío, la principal va al medio
+  const lay = disponer(items, comp ? Infinity : mia ? pared.ancho * .7 : e.fila);
   let s, ox, oy, base;
   if (mia) {
     s = W / pared.ancho;
@@ -8351,10 +8467,11 @@ function pintarPared(sinTransicion) {
     oy = (1 - pared.pos.y) * H - lay.alto * s / 2;
     base = 0;
   } else {
-    s = escalaPared(e, W, H, todas ? { ancho: lay.ancho, alto: lay.alto } : GRUPO_MAYOR);
+    // con una composición, la escala se calcula con el tamaño más grande: así, al cambiar de tamaño, el mueble no se mueve
+    s = escalaPared(e, W, H, todas ? { ancho: lay.ancho, alto: lay.alto } : comp ? { ancho: Math.max(lay.ancho, anchoGrupo(fotos, MEDIDA_MAYOR)), alto: GRUPO_MAYOR.alto } : GRUPO_MAYOR);
     ox = W / 2;
     oy = PISO_CM * s;
-    base = e.base + SOBRE_MUEBLE;
+    base = e.base + sobreMueble(e, lay.ancho);
     if (muebleActual !== e.id) {
       if (!dibujosMueble[e.id]) dibujosMueble[e.id] = e.mueble();
       $("#escena-mueble").innerHTML = dibujosMueble[e.id].svg;
@@ -8391,6 +8508,9 @@ function pintarPared(sinTransicion) {
     $(".cota-v span", el).textContent = cm(it.h) + " cm";
   });
   viejos.forEach((el) => el.remove());
+  const total = $("#escena-total");
+  [["--x", (-lay.ancho / 2).toFixed(2)], ["--w", lay.ancho.toFixed(2)], ["--y", (base + lay.alto).toFixed(2)]].forEach((p) => total.style.setProperty(p[0], p[1]));
+  $("span", total).textContent = cm(Math.round(lay.ancho)) + " cm en total";
   // «De cerca»: el cuadro activo pasa al centro y se agranda
   const mundo = $("#escena-mundo");
   const act = lay.items.find((it) => it.f.n === (activaPared() || {}).n) || lay.items[0];
@@ -8401,7 +8521,7 @@ function pintarPared(sinTransicion) {
     mundo.style.setProperty("--oy", cy.toFixed(1) + "px");
     mundo.style.transform = "translate(" + (W / 2 - cx).toFixed(1) + "px, " + (H / 2 - cy).toFixed(1) + "px) scale(" + z.toFixed(3) + ")";
   } else mundo.style.transform = "";
-  mundo.setAttribute("aria-label", "Vista a escala: " + lay.items.map((it) => "N.° " + it.f.n + " en " + textoMedida(it.o.medida) + ", marco " + it.o.marco.nombre.toLowerCase()).join("; ") + (mia ? ", sobre la foto de tu pared." : ", en " + e.desc + "."));
+  mundo.setAttribute("aria-label", "Vista a escala" + (comp ? " de " + compCon(fotos.length, "un") + " de " + cm(Math.round(lay.ancho)) + " cm de ancho" : "") + ": " + lay.items.map((it) => "N.° " + it.f.n + " en " + textoMedida(it.o.medida) + ", marco " + it.o.marco.nombre.toLowerCase()).join("; ") + (mia ? ", sobre la foto de tu pared." : ", en " + e.desc + "."));
   if (sinTransicion) { void escena.offsetWidth; requestAnimationFrame(() => escena.classList.remove("quieta")); }
 }
 function pintarParedes() {
@@ -8428,15 +8548,23 @@ function pintarPanelPared(soloEstado) {
     tira.innerHTML = todas ? fotos.map((g) => '<button type="button" data-tira="' + esc(g.n) + '" aria-pressed="' + (g.n === f.n) + '" aria-label="Cambiar la N.° ' + esc(g.n) + ", " + esc(g.titulo) + '"><img src="' + esc(rutaMini(g)) + '" alt="" draggable="false"><span>' + esc(g.n) + "</span></button>").join("") : "";
   } else $$("[data-tira]", tira).forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.tira === f.n)));
   pintarRecorte($("#pared-recorte"), f);
+  // composición (solo con una foto principal)
+  const comp = enComposicion() && fotos.length > 1, cs = comp ? fotos.slice(1) : [];
+  $("#pared-comp").hidden = todas;
+  $$("[data-comp]").forEach((x) => x.setAttribute("aria-pressed", String(+x.dataset.comp === (comp ? fotos.length : 1))));
+  const ancho = comp ? anchoGrupo(fotos, opcionDe(f.n).medida) : 0;
+  $("#pared-comp-valor").textContent = comp ? (fotos.length === 2 ? "Dupla" : "Trío") + " · " + metros(ancho) + " de ancho" : "Un cuadro";
+  $("#pared-compas").hidden = !comp;
+  $("#pared-compas-tira").innerHTML = cs.map((g, j) => '<button type="button" data-compa="' + j + '" aria-label="Cambiar la N.° ' + esc(g.n) + ", " + esc(g.titulo) + ', por otra foto"><img src="' + esc(rutaMini(g)) + '" alt="" draggable="false"><span>N.° ' + esc(g.n) + "</span></button>").join("");
   $("#pared-ref").textContent = pared.escena === "mia"
     ? "El cuadro se muestra según el ancho de pared que indicaste."
-    : escenaActual().ref + (todas && k > fotos.length ? " Se ven los primeros " + fotos.length + " cuadros." : "");
-  const elegida = seleccion.indexOf(f.n) >= 0, b = $("#pared-sumar");
+    : escenaActual().ref + (comp ? " " + compCon(fotos.length, "el").replace(/^./, (c) => c.toUpperCase()) + " ocupa " + metros(ancho) + "." : "") + (todas && k > fotos.length ? " Se ven los primeros " + fotos.length + " cuadros." : "");
+  const b = $("#pared-sumar"), elegida = comp ? fotos.every((g) => seleccion.indexOf(g.n) >= 0) : seleccion.indexOf(f.n) >= 0;
   b.hidden = todas;
   b.setAttribute("aria-pressed", String(elegida));
-  $(".txt", b).textContent = elegida ? "En tu selección · Quitar" : "Sumar a mi selección";
+  $(".txt", b).textContent = comp ? (elegida ? "En tu selección · Quitar las " + fotos.length : "Sumar las " + fotos.length + " a mi selección") : elegida ? "En tu selección · Quitar" : "Sumar a mi selección";
   $("use", b).setAttribute("href", elegida ? "#i-ok" : "#i-mas");
-  $("#pared-wa").href = enlaceWhatsApp(todas ? mensajeSeleccion() : mensajeFoto(f));
+  $("#pared-wa").href = enlaceWhatsApp(todas ? mensajeSeleccion() : comp ? mensajeComposicion(fotos) : mensajeFoto(f));
   $(".txt", $("#pared-wa")).textContent = todas ? "Pedir estos cuadros" : "Consultar por WhatsApp";
   $(".txt", $("#pared-compartir")).textContent = todas ? "Compartir mi selección" : "Compartir cómo queda";
   $("#pared-compartir").hidden = !direccionSitio();
@@ -8458,6 +8586,9 @@ function abrirPared(n, ops) {
     pared.lista = L;
     pared.i = L.findIndex((f) => f.n === n);
     pared.activo = n;
+    pared.compa = (ops.compa || []).filter((c) => c !== n && porNumero.has(c)).slice(0, 2);
+    pared.cursor = 0;
+    pared.comp = pared.compa.length ? pared.compa.length + 1 : ops.comp || 1;
     if (ops.medida && medidaPorId(ops.medida)) ponerOpcion(n, "t", ops.medida);
     if (ops.marco && marcoPorId(ops.marco)) ponerOpcion(n, "m", ops.marco);
   }
@@ -8493,19 +8624,26 @@ function cerrarPared() {
   if (pared.foco && document.contains(pared.foco)) pared.foco.focus({ preventScroll: true });
 }
 /* Un link que abre esta foto en la pared, con el mismo tamaño, marco y pared (#pared-012_40x60_negro_clara) */
+function enlaceVista() {
+  const fs = fotosPared(), f = fs[0];
+  if (!f || !direccionSitio()) return "";
+  const o = opcionDe(f.n), comp = enComposicion() && fs.length > 1, esc_ = pared.escena !== "mia" ? pared.escena : "";
+  return direccionSitio() + "#pared-" + f.n + "_" + o.t + "_" + o.m + (comp ? "_" + (esc_ || "clara") + "_c" + fs.slice(1).map((g) => g.n).join("-") : esc_ ? "_" + esc_ : "");
+}
 function compartirVista() {
   if (pared.modo === "todas") { compartirSeleccion(); return; }
-  const f = activaPared();
-  if (!f || !direccionSitio()) return;
-  const o = opcionDe(f.n);
-  const url = direccionSitio() + "#pared-" + f.n + "_" + o.t + "_" + o.m + (pared.escena !== "mia" ? "_" + pared.escena : "");
-  compartirOCopiar({ title: "N.° " + f.n + " — " + f.titulo, text: "Mirá cómo queda en " + textoMedida(o.medida) + ", con marco " + o.marco.nombre.toLowerCase() + ":", url: url },
-    "Link copiado: abre esta foto en la pared, con el mismo tamaño y marco.");
+  const fs = fotosPared(), f = fs[0], url = enlaceVista();
+  if (!url) return;
+  const o = opcionDe(f.n), comp = enComposicion() && fs.length > 1;
+  compartirOCopiar({ title: "N.° " + f.n + " — " + f.titulo, text: "Mirá cómo queda " + (comp ? compCon(fs.length, "este") + " " : "") + "en " + textoMedida(o.medida) + ", con marco " + o.marco.nombre.toLowerCase() + ":", url: url },
+    comp ? "Link copiado: abre " + compCon(fs.length, "este") + " en la pared, con el mismo tamaño y marco." : "Link copiado: abre esta foto en la pared, con el mismo tamaño y marco.");
 }
 function moverPared(paso) {
   if (pared.modo !== "una" || pared.lista.length < 2) return;
   pared.i = (pared.i + paso + pared.lista.length) % pared.lista.length;
   pared.activo = pared.lista[pared.i].n;
+  pared.compa = [];
+  pared.cursor = 0;
   pintarPanelPared();
   pintarPared();
   ponerHash("pared-" + pared.activo);
@@ -8571,7 +8709,7 @@ const formatoMetros = (v) => (v / 100).toLocaleString("es-AR", { maximumFraction
   $("#pared-next").addEventListener("click", () => moverPared(1));
   $("#pared-cotas").addEventListener("click", () => { pared.cotas = !pared.cotas; pintarPanelPared(true); pintarPared(); });
   $("#pared-cerca").addEventListener("click", () => { pared.cerca = !pared.cerca; pintarPanelPared(true); pintarPared(); });
-  $("#pared-sumar").addEventListener("click", () => { const f = activaPared(); if (f) alternar(f.n); });
+  $("#pared-sumar").addEventListener("click", () => { if (enComposicion()) { sumarComposicion(); return; } const f = activaPared(); if (f) alternar(f.n); });
   $("#pared-compartir").addEventListener("click", compartirVista);
   $("#mi-pared-otra").addEventListener("click", () => $("#mi-pared-archivo").click());
   $("#mi-pared-archivo").addEventListener("change", (e) => {
@@ -8669,11 +8807,27 @@ document.addEventListener("click", (e) => {
   const opMedida = t.closest("[data-op-medida]"), opMarco = t.closest("[data-op-marco]");
   if (opMedida || opMarco) {
     const g = (opMedida || opMarco).closest("[data-op-n]");
-    if (g) ponerOpcion(g.dataset.opN, opMedida ? "t" : "m", opMedida ? opMedida.dataset.opMedida : opMarco.dataset.opMarco);
+    if (!g) return;
+    const campo = opMedida ? "t" : "m", valor = opMedida ? opMedida.dataset.opMedida : opMarco.dataset.opMarco;
+    // en una composición, las compañeras que ya están en la selección cambian junto con la principal
+    let otras = false;
+    if (g.closest("#pared-opciones") && enComposicion()) companeras().forEach((c) => {
+      if (seleccion.indexOf(c.n) < 0) return;
+      const o = opcionDe(c.n);
+      opciones[c.n] = { t: o.t, m: o.m };
+      opciones[c.n][campo] = valor;
+      otras = true;
+    });
+    ponerOpcion(g.dataset.opN, campo, valor);
+    if (otras) renderCajon();
     return;
   }
   const escenaB = t.closest("[data-escena]");
   if (escenaB) { elegirEscena(escenaB.dataset.escena); return; }
+  const comp = t.closest("[data-comp]");
+  if (comp) { elegirComp(+comp.dataset.comp); return; }
+  const compa = t.closest("[data-compa]");
+  if (compa) { cambiarCompanera(+compa.dataset.compa); return; }
   const tira = t.closest("[data-tira]");
   if (tira) { pared.activo = tira.dataset.tira; pintarPanelPared(); pintarPared(); return; }
   const item = t.closest("[data-pared-item]");

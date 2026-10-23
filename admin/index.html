@@ -889,6 +889,7 @@ function extraerContenido(html) {
 const TEXTOS_NUEVOS = {
   "archivo.ver-todo": "Ver todo", "archivo.ver-menos": "Ver menos", "series.ver-todas": "Ver todas", "series.ver-menos": "Ver menos",
   "pared.boton": "Ver en mi pared",
+  "whatsapp.composicion": "¡Hola {nombre}! Me gustaría armar {composicion} de cuadros de {medida}, con marco {marco}:\n\n{lista}\n\n¿Me pasás el precio?\n{enlace}",
   "medidas.etiqueta": "Tamaños y marcos",
   "medidas.titulo": "Elegí la medida para tu pared",
   "medidas.texto": "Así se ven los tamaños, uno al lado del otro y a escala. La medida es la de la foto: el marco suma unos centímetros por lado.",
@@ -2204,7 +2205,8 @@ const ESQUEMA = [
     ["whatsapp.general", "Consulta general", "texto", true],
     ["whatsapp.trabajo", "Consulta por un trabajo", "texto", true],
     ["whatsapp.foto", "Consulta por una foto", "texto", true, "Podés usar {n} (número), {titulo}, {lugar}, {medida} (el tamaño que eligieron), {marco} y {enlace} (link directo a la foto)."],
-    ["whatsapp.seleccion", "Consulta por una selección", "texto", true, "{lista} es la lista de fotos elegidas, cada una con su tamaño y su marco (y el comentario, si dejan uno). {enlace} es un link que te abre esa misma selección en la página."]
+    ["whatsapp.seleccion", "Consulta por una selección", "texto", true, "{lista} es la lista de fotos elegidas, cada una con su tamaño y su marco (y el comentario, si dejan uno). {enlace} es un link que te abre esa misma selección en la página."],
+    ["whatsapp.composicion", "Consulta por una dupla o un trío", "texto", true, "Se manda desde el visor de pared cuando eligen una dupla o un trío. {composicion} dice «una dupla» o «un trío»; {lista}, las fotos; {medida} y {marco}, los que eligieron para todas; {enlace} abre esa misma composición en la pared."]
   ] },
   { grupo: "Google y links compartidos", ayuda: "Cómo aparece la página en Google y en la vista previa cuando mandás el link por WhatsApp o Instagram.", campos: [
     ["seo.titulo", "Título", "linea", true, "Ideal: menos de 60 letras."],
