@@ -449,14 +449,15 @@ section[id] { scroll-margin-top: 84px; }
   padding: calc(env(safe-area-inset-top, 0px) + 20px) clamp(16px, 3vw, 40px) calc(env(safe-area-inset-bottom, 0px) + 24px);
   animation: aparecer .25s ease;
 }
-.visor-caja { max-width: 1320px; min-height: 100%; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 40px; align-items: center; padding-block: 48px 8px; }
-.visor-escena { display: grid; justify-items: center; gap: 16px; min-width: 0; padding: 16px; }
+.visor-caja { max-width: 1320px; min-height: 100%; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 40px; align-items: start; padding-block: 48px 8px; }
+/* La foto queda quieta mientras se recorre la ficha */
+.visor-escena { position: sticky; top: 0; display: grid; justify-items: center; gap: 16px; min-width: 0; padding: 16px; }
 .visor-barra { width: 100%; display: flex; justify-content: space-between; gap: 12px; font: 500 11px/1 var(--titulo); letter-spacing: .28em; text-transform: uppercase; color: var(--tinta); }
 .visor-lamina {
   position: relative; max-width: 100%; aspect-ratio: var(--ar, 1.5); background: var(--fondo-foto, var(--linea));
   box-shadow: 0 0 0 12px var(--superficie), 0 0 0 13px var(--linea-fuerte);
-  width: min(100%, calc((100vh - 170px) * var(--ar, 1.5)));
-  width: min(100%, calc((100dvh - 170px) * var(--ar, 1.5)));
+  width: min(100%, calc((100vh - 240px) * var(--ar, 1.5)));
+  width: min(100%, calc((100dvh - 240px) * var(--ar, 1.5)));
   overflow: hidden;
   -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
 }
@@ -506,6 +507,7 @@ section[id] { scroll-margin-top: 84px; }
 .ficha-compartir .ico { width: 15px; height: 15px; }
 @media (max-width: 860px) {
   .visor-caja { grid-template-columns: minmax(0, 1fr); align-items: start; gap: 26px; padding-top: 52px; }
+  .visor-escena { position: static; }
   .visor-lamina { width: 100%; }
   .visor .ficha { width: 100%; max-width: 560px; justify-self: center; }
 }
@@ -583,6 +585,260 @@ section[id] { scroll-margin-top: 84px; }
 }
 .aviso button { padding: 8px 12px; border: 1px solid currentColor; background: none; color: inherit; cursor: pointer; font: 500 10.5px/1 var(--titulo); letter-spacing: .2em; text-transform: uppercase; }
 
+/* ============ Cuadros: tamaño, marco y pared ============ */
+/* Opciones (ficha del visor, visor de pared y guía de tamaños) */
+.opciones { display: grid; gap: 18px; text-align: left; }
+.opcion { display: grid; gap: 10px; }
+.opcion-cabeza { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.opcion-cabeza .foto-num { color: var(--tinta); }
+.opcion-valor { font-size: 13px; line-height: 1.3; color: var(--tinta-2); text-align: right; }
+.medidas { display: grid; grid-template-columns: repeat(auto-fit, minmax(76px, 1fr)); gap: 8px; }
+.medida {
+  display: grid; justify-items: center; align-content: end; gap: 9px; min-height: 84px; padding: 12px 6px 10px; cursor: pointer;
+  background: transparent; color: var(--tinta); border: 1px solid var(--linea-fuerte);
+  transition: background-color .15s, color .15s, border-color .15s;
+}
+.medida:hover { border-color: var(--tinta); }
+.medida[aria-pressed="true"] { background: var(--relleno); border-color: var(--relleno); color: var(--sobre-relleno); }
+.medida-dibujo { display: block; width: calc(var(--w) * .62px); height: calc(var(--h) * .62px); border: 1.5px solid currentColor; transition: width .3s, height .3s; }
+.medida[aria-pressed="true"] .medida-dibujo { background: rgba(255, 255, 255, .16); }
+.medida-txt { font: 500 12.5px/1 var(--titulo); letter-spacing: .06em; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.medida-txt small { margin-left: 3px; font-size: 9px; letter-spacing: .16em; text-transform: uppercase; }
+.marcos, .paredes { display: flex; flex-wrap: wrap; gap: 8px; }
+.op {
+  display: inline-flex; align-items: center; gap: 10px; min-height: 42px; padding: 0 14px 0 8px; cursor: pointer;
+  background: transparent; color: var(--tinta); border: 1px solid var(--linea-fuerte);
+  font: 500 11px/1.2 var(--titulo); letter-spacing: .14em; text-transform: uppercase; text-align: left;
+  transition: border-color .15s, box-shadow .15s, background-color .15s;
+}
+.op:hover { border-color: var(--tinta); }
+.op[aria-pressed="true"] { border-color: var(--tinta); box-shadow: inset 0 0 0 1px var(--tinta); background: var(--fondo); }
+.op .ico { width: 18px; height: 18px; }
+/* Muestra del marco: un cuadradito con la moldura y un color de la foto adentro */
+.muestra-marco { position: relative; width: 26px; height: 26px; flex: none; background-color: var(--c); box-shadow: 0 0 0 1px rgba(0, 0, 0, .16), inset 0 0 0 1px rgba(255, 255, 255, .2); }
+.muestra-marco::after { content: ""; position: absolute; inset: 6px; background: var(--img, none) center / cover no-repeat var(--fondo-foto, var(--bloque-1)); box-shadow: inset 0 1px 2px rgba(0, 0, 0, .4); }
+.muestra-pared { width: 26px; height: 26px; flex: none; border-radius: 50%; background: linear-gradient(var(--c) 0 70%, var(--p) 70%); box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .16); }
+/* En la ficha y en el visor de pared, marcos y paredes van en columnas parejas, como los tamaños */
+.opciones .marcos, .pared-panel .paredes { display: grid; grid-template-columns: repeat(auto-fit, minmax(66px, 1fr)); }
+.opciones .op, .pared-panel .paredes .op { flex-direction: column; justify-content: center; gap: 9px; min-height: 80px; padding: 11px 6px 10px; text-align: center; font-size: 10.5px; letter-spacing: .12em; }
+.opciones .muestra-marco { width: 32px; height: 32px; }
+.opciones .muestra-marco::after { inset: 6px; }
+.pared-panel .paredes .op .ico { width: 22px; height: 22px; margin-block: 2px; }
+.nota-recorte { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; font-size: 13px; line-height: 1.45; text-align: left; color: var(--tinta); background: var(--bloque-2); transition: background-color .45s ease; }
+.nota-recorte .ico { width: 16px; height: 16px; margin-top: 1px; }
+
+/* Botón «Ver en mi pared» debajo de la foto grande */
+.btn-pared { background: var(--superficie); border-color: var(--tinta); color: var(--tinta); }
+.btn-pared:hover { background: var(--relleno); border-color: var(--relleno); color: var(--sobre-relleno); }
+.btn-pared .ico { width: 21px; height: 21px; }
+.ficha .ficha-cuadro { display: grid; gap: 14px; margin-top: 22px; }
+.ficha .ficha-datos { margin-top: 4px; }
+.ficha .ornamento.ficha-mas { margin: 28px 0 10px; }
+
+/* ---------- Un cuadro dibujado a escala (lo usan la pared y la guía) ----------
+   --s es cuántos píxeles mide un centímetro; --w y --h, la foto en cm; --m, la moldura en cm */
+.cp {
+  --M: calc(var(--s) * var(--m));
+  position: absolute; left: calc(var(--s) * var(--x, 0)); bottom: calc(var(--s) * var(--y, 0));
+  width: calc(var(--s) * (var(--w) + var(--m) * 2)); height: calc(var(--s) * (var(--h) + var(--m) * 2));
+  transform: translateX(-50%);
+  box-shadow: 0 calc(var(--s) * 1.5) calc(var(--s) * 2.8) rgba(25, 14, 8, .3), 0 calc(var(--s) * .35) calc(var(--s) * .6) rgba(25, 14, 8, .26);
+  transition: width .5s cubic-bezier(.2, .7, .2, 1), height .5s cubic-bezier(.2, .7, .2, 1), left .5s cubic-bezier(.2, .7, .2, 1), bottom .5s cubic-bezier(.2, .7, .2, 1);
+}
+.cp-lado { position: absolute; background-color: var(--c); transition: background-color .3s ease; }
+/* La luz viene de arriba: cada lado de la moldura tiene su tono, con las esquinas a inglete */
+.cp-sup { top: 0; left: 0; right: 0; height: var(--M); clip-path: polygon(0 0, 100% 0, calc(100% - var(--M)) 100%, var(--M) 100%); background-image: linear-gradient(rgba(255, 255, 255, .17), rgba(255, 255, 255, .17)); }
+.cp-inf { bottom: 0; left: 0; right: 0; height: var(--M); clip-path: polygon(var(--M) 0, calc(100% - var(--M)) 0, 100% 100%, 0 100%); background-image: linear-gradient(rgba(0, 0, 0, .2), rgba(0, 0, 0, .2)); }
+.cp-izq { top: 0; bottom: 0; left: 0; width: var(--M); clip-path: polygon(0 0, 100% var(--M), 100% calc(100% - var(--M)), 0 100%); background-image: linear-gradient(rgba(255, 255, 255, .07), rgba(255, 255, 255, .07)); }
+.cp-der { top: 0; bottom: 0; right: 0; width: var(--M); clip-path: polygon(0 var(--M), 100% 0, 100% 100%, 0 calc(100% - var(--M))); background-image: linear-gradient(rgba(0, 0, 0, .12), rgba(0, 0, 0, .12)); }
+.cp, .muestra-marco {
+  --veta-h: repeating-linear-gradient(0deg, rgba(112, 70, 32, .17) 0 1px, transparent 1px 3px), repeating-linear-gradient(0deg, rgba(255, 238, 205, .15) 0 1px, transparent 1px 5px);
+  --veta-v: repeating-linear-gradient(90deg, rgba(112, 70, 32, .17) 0 1px, transparent 1px 3px), repeating-linear-gradient(90deg, rgba(255, 238, 205, .15) 0 1px, transparent 1px 5px);
+}
+.cp.madera .cp-sup { background-image: linear-gradient(rgba(255, 255, 255, .17), rgba(255, 255, 255, .17)), var(--veta-h); }
+.cp.madera .cp-inf { background-image: linear-gradient(rgba(0, 0, 0, .2), rgba(0, 0, 0, .2)), var(--veta-h); }
+.cp.madera .cp-izq { background-image: linear-gradient(rgba(255, 255, 255, .07), rgba(255, 255, 255, .07)), var(--veta-v); }
+.cp.madera .cp-der { background-image: linear-gradient(rgba(0, 0, 0, .12), rgba(0, 0, 0, .12)), var(--veta-v); }
+.muestra-marco.madera { background-image: var(--veta-h); }
+.cp-ventana { position: absolute; inset: var(--M); overflow: hidden; background: var(--fondo-foto, #cfc8bf); }
+.cp-ventana img { display: block; width: 100%; height: 100%; object-fit: cover; pointer-events: none; -webkit-user-drag: none; }
+.cp-ventana::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  box-shadow: inset 0 calc(var(--s) * .3) calc(var(--s) * .55) rgba(0, 0, 0, .38), inset 0 0 0 1px rgba(0, 0, 0, .18);
+  background: linear-gradient(115deg, rgba(255, 255, 255, .14) 0%, rgba(255, 255, 255, 0) 34%, rgba(255, 255, 255, 0) 66%, rgba(255, 255, 255, .07) 100%);
+}
+/* Cotas: la medida de la foto, como en un plano */
+.cota { position: absolute; color: var(--cota, var(--tinta)); pointer-events: none; font: 500 10px/1 var(--titulo); letter-spacing: .16em; text-transform: uppercase; white-space: nowrap; transition: opacity .3s ease; }
+/* la cota del ancho va arriba del cuadro, donde la pared siempre está libre */
+.cota-h { left: var(--M); right: var(--M); bottom: calc(100% + 8px); height: 9px; border-left: 1px solid; border-right: 1px solid; }
+.cota-h::before { content: ""; position: absolute; left: 0; right: 0; top: 4px; border-top: 1px solid; }
+.cota-h span { position: absolute; left: 50%; bottom: 13px; transform: translateX(-50%); }
+.cota-v { top: var(--M); bottom: var(--M); left: calc(100% + 8px); width: 9px; border-top: 1px solid; border-bottom: 1px solid; }
+.cota-v::before { content: ""; position: absolute; top: 0; bottom: 0; left: 4px; border-left: 1px solid; }
+.cota-v span { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); }
+
+/* ============ Visor de pared ============ */
+.pared {
+  position: fixed; inset: 0; z-index: 75; overflow-y: auto; overscroll-behavior: contain; background: var(--fondo);
+  padding: calc(env(safe-area-inset-top, 0px) + 20px) clamp(16px, 3vw, 40px) calc(env(safe-area-inset-bottom, 0px) + 24px);
+  animation: aparecer .25s ease;
+}
+.pared-caja { max-width: 1360px; min-height: 100%; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 36px; align-items: start; padding-block: 48px 8px; }
+.pared-izq { position: sticky; top: 0; display: grid; justify-items: center; gap: 14px; min-width: 0; }
+.pared-izq .visor-barra { max-width: calc((100vh - 190px) * 1.3333); max-width: calc((100dvh - 190px) * 1.3333); }
+.escena {
+  --s: 2px; --piso-px: 36px;
+  position: relative; width: 100%; max-width: calc((100vh - 190px) * 1.3333); max-width: calc((100dvh - 190px) * 1.3333);
+  aspect-ratio: 4 / 3; overflow: hidden; isolation: isolate; background: var(--pared, #EFE9E0);
+  box-shadow: 0 0 0 10px var(--superficie), 0 0 0 11px var(--linea-fuerte);
+  -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
+}
+.escena-mundo { position: absolute; inset: 0; transform-origin: var(--ox, 50%) var(--oy, 50%); transition: transform .65s cubic-bezier(.2, .7, .2, 1); }
+.escena-fondo {
+  position: absolute; inset: 0; transition: background .5s ease;
+  background: radial-gradient(58% 52% at 50% var(--luz-y, 38%), rgba(255, 249, 238, var(--luz, .25)), transparent 72%), linear-gradient(180deg, var(--pared) 0%, var(--pared-2) 100%);
+}
+.escena-zocalo { position: absolute; left: 0; right: 0; bottom: var(--piso-px); height: calc(var(--s) * 9); background: var(--zocalo); box-shadow: inset 0 calc(var(--s) * 1.4) 0 rgba(255, 255, 255, .2), 0 -1px 0 rgba(0, 0, 0, .08); transition: background-color .5s ease; }
+.escena-piso {
+  position: absolute; left: 0; right: 0; bottom: 0; height: var(--piso-px); transition: background-color .5s ease;
+  background-color: var(--piso);
+  background-image: linear-gradient(180deg, rgba(0, 0, 0, .16), rgba(0, 0, 0, 0) 30%), repeating-linear-gradient(90deg, transparent 0 calc(var(--s) * 21 - 1px), rgba(0, 0, 0, .1) calc(var(--s) * 21 - 1px) calc(var(--s) * 21)), linear-gradient(180deg, var(--piso), var(--piso-2));
+}
+.escena-sombra { position: absolute; left: 50%; bottom: calc(var(--piso-px) - var(--s) * 4); width: calc(var(--s) * var(--mw, 200) * 1.04); height: calc(var(--s) * 8); transform: translateX(-50%); background: radial-gradient(closest-side, rgba(0, 0, 0, .3), transparent); }
+.escena-origen { position: absolute; left: 50%; bottom: var(--piso-px); width: 0; height: 0; }
+.escena-mueble { position: absolute; left: 0; bottom: 0; width: calc(var(--s) * var(--mw, 200)); transform: translateX(-50%); }
+.escena-mueble svg { display: block; width: 100%; height: auto; overflow: visible; }
+.escena-foto { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+.escena-grupo { position: absolute; left: 0; bottom: 0; width: 0; height: 0; }
+.escena.mia .escena-fondo, .escena.mia .escena-zocalo, .escena.mia .escena-piso, .escena.mia .escena-sombra, .escena.mia .escena-mueble { display: none; }
+.escena.mia .cp { cursor: grab; touch-action: none; }
+.escena.mia.arrastrando .cp { cursor: grabbing; }
+.escena.mia .cota { color: #fff; filter: drop-shadow(0 0 1.5px rgba(0, 0, 0, .9)); }
+.escena.arrastrando .cp, .escena.quieta .cp, .escena.quieta .escena-mundo { transition: none; }
+.escena.grupo .cp { cursor: pointer; }
+.escena.grupo .cota { opacity: 0; }
+.escena.grupo .cp.activo::before { content: ""; position: absolute; inset: -7px; border: 1.5px dashed var(--cota, var(--tinta)); pointer-events: none; }
+.escena.sin-cotas .cota, .escena.cerca .cota { opacity: 0; }
+.escena .visor-nav { z-index: 3; }
+.escena-herr { position: absolute; z-index: 3; top: 10px; right: 10px; display: flex; gap: 8px; }
+.escena-boton {
+  display: inline-flex; align-items: center; gap: 7px; min-height: 36px; padding: 0 12px 0 10px; cursor: pointer;
+  background: var(--superficie); color: var(--tinta); border: 1px solid var(--tinta);
+  font: 500 10.5px/1 var(--titulo); letter-spacing: .18em; text-transform: uppercase;
+}
+.escena-boton .ico { width: 15px; height: 15px; }
+.escena-boton[aria-pressed="true"] { background: var(--relleno); border-color: var(--relleno); color: var(--sobre-relleno); }
+.escena-pista {
+  position: absolute; z-index: 3; left: 50%; bottom: 14px; transform: translateX(-50%); max-width: calc(100% - 24px);
+  padding: 9px 14px; background: rgba(22, 16, 14, .66); color: #fff; font-size: 13px; line-height: 1.35; text-align: center;
+  pointer-events: none; animation: aparecer .3s ease;
+}
+.pared-ref { max-width: 60ch; font-size: 13.5px; line-height: 1.45; color: var(--tinta-2); text-align: center; }
+.pared-panel { display: grid; gap: 20px; background: var(--superficie); padding: 34px 28px 28px; outline: 1px solid var(--linea-fuerte); outline-offset: -10px; }
+.pared-cabeza { display: grid; justify-items: center; gap: 6px; text-align: center; }
+.pared-cabeza h2 { margin-top: 8px; font: 500 21px/1.3 var(--titulo); letter-spacing: .16em; margin-right: -.16em; text-transform: uppercase; }
+.pared-cabeza .foto-en { font-size: 18px; }
+.tira { display: flex; gap: 8px; overflow-x: auto; padding: 3px 2px 6px; scrollbar-width: thin; }
+.tira button { flex: none; width: 70px; padding: 3px; background: var(--fondo); border: 1px solid var(--linea-fuerte); cursor: pointer; }
+.tira button[aria-pressed="true"] { border-color: var(--tinta); box-shadow: inset 0 0 0 1px var(--tinta); }
+.tira img { display: block; width: 100%; aspect-ratio: 3 / 2; object-fit: cover; pointer-events: none; }
+.tira span { display: block; margin-top: 4px; font: 500 9.5px/1 var(--titulo); letter-spacing: .14em; color: var(--tinta-2); text-align: center; }
+.mi-pared { display: grid; gap: 10px; padding: 14px 16px 12px; background: var(--fondo); text-align: left; }
+.mi-pared label { display: flex; justify-content: space-between; gap: 10px; font: 500 10.5px/1.3 var(--titulo); letter-spacing: .2em; text-transform: uppercase; }
+.mi-pared label strong { font-weight: 500; letter-spacing: .06em; text-transform: none; font-size: 13px; }
+.mi-pared input[type="range"] { width: 100%; margin: 0; accent-color: var(--acento); }
+.mi-pared p { font-size: 13px; line-height: 1.45; color: var(--tinta-2); }
+.mi-pared .btn-texto { justify-self: start; }
+.pared-acciones { display: grid; gap: 10px; }
+.pared-acciones .btn { width: 100%; padding-inline: 16px; letter-spacing: .14em; }
+.pared-acciones .btn-texto { justify-self: center; display: inline-flex; align-items: center; gap: 8px; margin-top: 4px; }
+.pared-acciones .btn-texto .ico { width: 15px; height: 15px; }
+#pared-sumar[aria-pressed="true"] { background: var(--relleno); border-color: var(--relleno); color: var(--sobre-relleno); }
+@media (max-width: 860px) {
+  /* En el celu la pared queda fija arriba: se ve cada cambio mientras se eligen las opciones */
+  .pared { padding-top: 0; }
+  .pared-caja { grid-template-columns: minmax(0, 1fr); align-items: start; gap: 18px; padding-top: 0; }
+  .pared-izq {
+    position: sticky; top: 0; z-index: 2; gap: 8px; background: var(--fondo);
+    margin-inline: calc(-1 * clamp(16px, 3vw, 40px)); padding: calc(env(safe-area-inset-top, 0px) + 66px) clamp(16px, 3vw, 40px) 10px;
+    box-shadow: 0 14px 18px -18px rgba(0, 0, 0, .5);
+  }
+  .pared-izq .visor-barra { display: none; }
+  .escena { aspect-ratio: 1 / 1; max-width: max(260px, 46vh); max-width: max(260px, 46dvh); }
+  .pared-ref { font-size: 12.5px; }
+  .pared-panel { width: 100%; max-width: 560px; justify-self: center; padding: 24px 20px 22px; gap: 18px; }
+  .pared-cabeza h2 { margin-top: 4px; font-size: 17px; }
+  .pared-cabeza .foto-en { display: none; }
+}
+@media (max-width: 480px) {
+  .escena { box-shadow: 0 0 0 6px var(--superficie), 0 0 0 7px var(--linea-fuerte); }
+  .escena-boton { min-height: 34px; padding: 0 10px 0 9px; letter-spacing: .12em; }
+  .escena-boton .txt { display: none; }
+}
+
+/* ============ Guía de tamaños (capítulo Cuadros) ============ */
+.guia { display: grid; justify-items: center; gap: 28px; margin-top: clamp(56px, 7vw, 92px); text-align: center; }
+.guia-cabeza { display: grid; justify-items: center; gap: 10px; }
+.guia-cabeza h3, .preguntas-cabeza h3 { font: 500 clamp(22px, 3vw, 30px)/1.2 var(--titulo); letter-spacing: .14em; margin-right: -.14em; text-transform: uppercase; }
+.guia-cabeza p:not(.versal) { max-width: 54ch; color: var(--tinta-2); }
+.repisa { --s: 3px; position: relative; display: grid; grid-auto-flow: column; justify-content: center; align-items: end; column-gap: clamp(18px, 4vw, 64px); row-gap: 0; width: 100%; padding: 10px 12px 0; overflow-x: auto; overflow-y: hidden; }
+.repisa::before { content: ""; grid-row: 1; grid-column: 1 / -1; align-self: end; height: 9px; margin: 0 -12px; background: var(--tinta); box-shadow: 0 12px 18px -12px rgba(0, 0, 0, .5); transition: background-color .45s ease; }
+.guia-cuadro { position: relative; grid-row: 1; align-self: end; display: block; margin-bottom: 9px; padding: 0; background: none; border: 0; cursor: zoom-in; width: calc(var(--s) * (var(--w) + var(--m) * 2)); height: calc(var(--s) * (var(--h) + var(--m) * 2)); transition: transform .35s cubic-bezier(.2, .7, .2, 1); }
+.guia-cuadro .cp { left: 50%; bottom: 0; }
+.guia-cuadro:hover { transform: translateY(-4px); }
+.guia-txt { grid-row: 2; align-self: start; display: grid; justify-items: center; align-content: start; gap: 7px; max-width: 24ch; padding-top: 24px; }
+.guia-txt .medida-txt { font-size: 15px; letter-spacing: .1em; }
+.guia-txt p { font-size: 14px; line-height: 1.45; color: var(--tinta-2); }
+.guia-foto { font-size: 13px; color: var(--tinta-2); }
+.guia-acciones { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 14px 22px; }
+#guia-marcos { justify-content: center; }
+@media (max-width: 600px) {
+  .repisa { column-gap: 14px; }
+  .guia-txt p { display: none; }
+  .guia-txt .medida-txt { font-size: 13px; }
+}
+
+/* ============ Preguntas frecuentes ============ */
+.preguntas { width: 100%; max-width: 780px; margin: clamp(56px, 7vw, 92px) auto 0; }
+.preguntas-cabeza { display: grid; justify-items: center; gap: 10px; margin-bottom: 28px; text-align: center; }
+.pregunta { border-bottom: 1px solid var(--linea-fuerte); }
+.pregunta:first-child { border-top: 1px solid var(--linea-fuerte); }
+.pregunta summary {
+  list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 20px 4px; cursor: pointer;
+  font: 500 14px/1.45 var(--titulo); letter-spacing: .14em; text-transform: uppercase; text-align: left;
+}
+.pregunta summary::-webkit-details-marker { display: none; }
+.pregunta summary::after { content: ""; flex: none; width: 8px; height: 8px; margin-right: 4px; border-right: 1.5px solid; border-bottom: 1.5px solid; transform: translateY(-3px) rotate(45deg); transition: transform .2s ease; }
+.pregunta[open] summary::after { transform: translateY(2px) rotate(-135deg); }
+.pregunta summary:hover { color: var(--acento); }
+.pregunta p { max-width: 66ch; padding: 0 4px 22px; color: var(--tinta-2); text-align: left; white-space: pre-line; }
+.cuadros-cta .btn-texto { display: inline-flex; align-items: center; gap: 8px; }
+
+/* ============ Selección: tamaño y marco de cada foto ============ */
+.cajon-lista li { align-items: start; row-gap: 10px; }
+.cajon-mini { display: block; padding: 0; background: none; border: 0; cursor: pointer; }
+.cajon-mini img { transition: transform .2s ease; }
+.cajon-mini:hover img { transform: scale(1.04); }
+.item-op { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 8px; }
+.selector { position: relative; display: flex; min-width: 0; }
+.selector select {
+  -webkit-appearance: none; appearance: none; width: 100%; min-height: 36px; padding: 0 28px 0 10px; cursor: pointer; text-overflow: ellipsis;
+  border: 1px solid var(--linea-fuerte); border-radius: 0; background: var(--fondo); color: var(--tinta);
+  font: 500 12px/1.2 var(--titulo); letter-spacing: .06em;
+}
+.selector select:hover { border-color: var(--tinta); }
+.selector select:focus-visible { outline: 2px solid var(--tinta); outline-offset: 2px; }
+.selector::after { content: ""; position: absolute; right: 11px; top: 50%; width: 6px; height: 6px; border-right: 1.5px solid var(--tinta); border-bottom: 1.5px solid var(--tinta); transform: translateY(-70%) rotate(45deg); pointer-events: none; }
+@media (pointer: coarse) { .selector select { font-size: 16px; min-height: 38px; } } /* en el celu, con 16px no se agranda la pantalla al tocar */
+.item-pared { display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; padding: 4px 0; background: none; border: 0; cursor: pointer; font: 500 10px/1.2 var(--titulo); letter-spacing: .18em; text-transform: uppercase; color: var(--tinta-2); text-decoration: underline; text-underline-offset: 4px; }
+.item-pared:hover { color: var(--tinta); }
+.item-pared .ico { width: 14px; height: 14px; }
+.cajon-resumen { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 12px; font-size: 13.5px; color: var(--tinta-2); }
+.cajon-acciones .btn-linea { background: transparent; }
+.cajon-chicos { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 22px; }
+.cajon-chicos .btn-texto { display: inline-flex; align-items: center; gap: 8px; }
+.cajon-chicos .ico { width: 15px; height: 15px; }
+
 /* Protección de imágenes */
 .protegida, .protegida img, .serie-marco, .serie-marco img, .pastilla img, .cajon-lista img {
   -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
@@ -619,6 +875,12 @@ section[id] { scroll-margin-top: 84px; }
   <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 5h16v11H10l-6 4z"/><path d="M8.5 10.5h7"/></symbol>
   <symbol id="i-copias" viewBox="0 0 24 24"><rect x="3" y="8" width="13" height="10"/><path d="M7.5 5H21v10"/></symbol>
   <symbol id="i-compartir" viewBox="0 0 24 24"><path d="M12 15V3M7.5 7.5L12 3l4.5 4.5"/><path d="M5 11v10h14V11"/></symbol>
+  <symbol id="i-pared" viewBox="0 0 24 24"><path d="M12 2.8v.4M7.5 8.5L12 3.6l4.5 4.9"/><rect x="3" y="8.5" width="18" height="12.5"/><path d="M6.5 18l4-4.6 2.8 3 2.2-2.2 2.5 3.8"/><circle cx="16.2" cy="11.8" r=".6"/></symbol>
+  <symbol id="i-regla" viewBox="0 0 24 24"><path d="M3.5 16.5L16.5 3.5l4 4-13 13z"/><path d="M7.5 12.5l2 2M10.5 9.5l2 2M13.5 6.5l2 2"/></symbol>
+  <symbol id="i-lupa" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21M10.5 8v5M8 10.5h5"/></symbol>
+  <symbol id="i-camara" viewBox="0 0 24 24"><path d="M3.5 8h3.5l2-3h6l2 3h3.5v11.5h-17z"/><circle cx="12" cy="13.5" r="3.5"/></symbol>
+  <symbol id="i-enlace" viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></symbol>
+  <symbol id="i-aviso" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5M12 16.2v.3"/></symbol>
 </svg>
 
 <div class="barra-paleta cambia">
@@ -701,7 +963,7 @@ section[id] { scroll-margin-top: 84px; }
         <p class="capitulo-n">Capítulo 1</p>
         <h2 id="archivo-titulo" data-t="archivo.titulo">El archivo</h2>
         <p class="foto-en" data-t="archivo.ingles">The Archive</p>
-        <p class="capitulo-nota" data-t="archivo.nota">Tocá una foto para verla grande con su paleta. Con ＋ la sumás a tu selección y después me la mandás por WhatsApp.</p>
+        <p class="capitulo-nota" data-t="archivo.nota">Tocá una foto para verla grande y probarla en tu pared. Con ＋ la sumás a tu selección y después me la mandás por WhatsApp.</p>
       </div>
       <div class="chips" id="chips" role="toolbar" aria-label="Categorías del archivo"></div>
       <div class="filtro-serie" id="filtro-serie" hidden>
@@ -745,19 +1007,44 @@ section[id] { scroll-margin-top: 84px; }
         <li class="paso">
           <span class="paso-n" aria-hidden="true">1</span>
           <strong><span class="sr">Paso 1: </span><span data-t="cuadros.paso1-titulo">Elegí tus fotos</span></strong>
-          <p data-t="cuadros.paso1-texto">Tocá ＋ en las que te gusten. Podés sumar varias a tu selección.</p>
+          <p data-t="cuadros.paso1-texto">Tocá ＋ en las que te gusten. Podés sumar todas las que quieras a tu selección.</p>
         </li>
         <li class="paso">
           <span class="paso-n" aria-hidden="true">2</span>
-          <strong><span class="sr">Paso 2: </span><span data-t="cuadros.paso2-titulo">Mandame la lista</span></strong>
-          <p data-t="cuadros.paso2-texto">Desde tu selección se arma un mensaje de WhatsApp con el número de cada foto. Lo revisás y lo enviás.</p>
+          <strong><span class="sr">Paso 2: </span><span data-t="cuadros.paso2-titulo">Probalas en tu pared</span></strong>
+          <p data-t="cuadros.paso2-texto">Elegí el tamaño y el marco de cada una, y mirá cómo queda colgada en una pared, a escala.</p>
         </li>
         <li class="paso">
           <span class="paso-n" aria-hidden="true">3</span>
-          <strong><span class="sr">Paso 3: </span><span data-t="cuadros.paso3-titulo">Coordinamos los detalles</span></strong>
-          <p data-t="cuadros.paso3-texto">Te paso tamaños, papel, marco y precio, y acordamos la entrega.</p>
+          <strong><span class="sr">Paso 3: </span><span data-t="cuadros.paso3-titulo">Mandame el pedido</span></strong>
+          <p data-t="cuadros.paso3-texto">Se arma un mensaje de WhatsApp con cada foto, su tamaño y su marco. Te paso el precio y coordinamos la entrega.</p>
         </li>
       </ol>
+
+      <div class="guia" id="guia" aria-labelledby="guia-titulo">
+        <div class="guia-cabeza">
+          <p class="versal" data-t="medidas.etiqueta">Tamaños y marcos</p>
+          <h3 id="guia-titulo" data-t="medidas.titulo">Elegí la medida para tu pared</h3>
+          <p data-t="medidas.texto">Así se ven los tamaños, uno al lado del otro y a escala. La medida es la de la foto: el marco suma unos centímetros por lado.</p>
+        </div>
+        <div class="repisa protegida" id="guia-repisa"></div>
+        <div class="marcos" id="guia-marcos" role="group" aria-label="Color del marco"></div>
+        <div class="guia-acciones">
+          <button type="button" class="btn btn-lleno" id="guia-pared"><svg class="ico" aria-hidden="true"><use href="#i-pared"/></svg><span data-t="medidas.boton">Probá esta foto en tu pared</span></button>
+          <button type="button" class="btn-texto" id="guia-otra">Ver con otra foto</button>
+        </div>
+        <p class="guia-foto" id="guia-foto"></p>
+      </div>
+
+      <div class="preguntas" id="preguntas" aria-labelledby="preguntas-titulo">
+        <div class="preguntas-cabeza">
+          <p class="versal" data-t="preguntas.etiqueta">Antes de pedir</p>
+          <h3 id="preguntas-titulo" data-t="preguntas.titulo">Preguntas frecuentes</h3>
+          <p class="foto-en" data-t="preguntas.ingles">Frequently asked questions</p>
+        </div>
+        <div id="preguntas-lista"></div>
+      </div>
+
       <div class="cuadros-cta">
         <a class="btn btn-lleno" data-wa="general" href="#" target="_blank" rel="noopener"><svg class="ico" aria-hidden="true"><use href="#i-chat"/></svg><span data-t="cuadros.boton">Escribime por WhatsApp</span></a>
       </div>
@@ -822,12 +1109,23 @@ section[id] { scroll-margin-top: 84px; }
         <button type="button" class="visor-nav prev" id="visor-prev" aria-label="Foto anterior"><svg class="ico" aria-hidden="true"><use href="#i-izq"/></svg></button>
         <button type="button" class="visor-nav next" id="visor-next" aria-label="Foto siguiente"><svg class="ico" aria-hidden="true"><use href="#i-der"/></svg></button>
       </div>
+      <button type="button" class="btn btn-pared" id="visor-pared"><svg class="ico" aria-hidden="true"><use href="#i-pared"/></svg><span data-t="pared.boton">Ver en mi pared</span></button>
     </div>
     <aside class="ficha">
       <p class="foto-num" id="ficha-num"></p>
       <h2 id="ficha-titulo"></h2>
       <p class="foto-en" id="ficha-en"></p>
       <div class="ornamento" aria-hidden="true"><span></span></div>
+      <div class="ficha-cuadro">
+        <div class="opciones" id="ficha-opciones"></div>
+        <p class="nota-recorte" id="ficha-recorte" hidden></p>
+      </div>
+      <div class="ficha-acciones">
+        <button type="button" class="btn btn-linea" id="ficha-sumar" aria-pressed="false"><svg class="ico" aria-hidden="true"><use href="#i-mas"/></svg><span class="txt">Sumar a mi selección</span></button>
+        <a class="btn btn-lleno" id="ficha-wa" href="#" target="_blank" rel="noopener"><svg class="ico" aria-hidden="true"><use href="#i-chat"/></svg>Consultar por WhatsApp</a>
+      </div>
+      <p class="ficha-nota" data-t="visor.nota">El precio y la entrega los coordinamos por WhatsApp.</p>
+      <div class="ornamento ficha-mas" aria-hidden="true"><span></span></div>
       <dl class="ficha-datos">
         <div><dt>Lugar</dt><dd id="ficha-lugar"></dd></div>
         <div><dt>Año</dt><dd id="ficha-anio"></dd></div>
@@ -842,11 +1140,6 @@ section[id] { scroll-margin-top: 84px; }
         <ol id="ficha-paleta"></ol>
         <p class="ficha-paleta-ayuda">Tocá un color para copiar su código.</p>
       </div>
-      <div class="ficha-acciones">
-        <button type="button" class="btn btn-linea" id="ficha-sumar" aria-pressed="false"><svg class="ico" aria-hidden="true"><use href="#i-mas"/></svg><span class="txt">Sumar a mi selección</span></button>
-        <a class="btn btn-lleno" id="ficha-wa" href="#" target="_blank" rel="noopener"><svg class="ico" aria-hidden="true"><use href="#i-chat"/></svg>Consultar por WhatsApp</a>
-      </div>
-      <p class="ficha-nota" data-t="visor.nota">Disponible como cuadro. Tamaños y terminaciones a consultar.</p>
       <button type="button" class="btn-texto ficha-compartir" id="ficha-compartir"><svg class="ico" aria-hidden="true"><use href="#i-compartir"/></svg>Compartir esta foto</button>
     </aside>
   </div>
@@ -859,21 +1152,84 @@ section[id] { scroll-margin-top: 84px; }
       <h2 id="cajon-titulo">Tu selección</h2>
       <button type="button" class="btn-redondo" id="cajon-cerrar" data-cerrar-cajon aria-label="Cerrar la selección"><svg class="ico" aria-hidden="true"><use href="#i-cerrar"/></svg></button>
     </div>
+    <p class="cajon-resumen" id="cajon-resumen" hidden></p>
     <ol class="cajon-lista" id="cajon-lista"></ol>
     <p class="cajon-vacio" id="cajon-vacio">Todavía no elegiste fotos. Tocá ＋ en las que te gusten.</p>
     <div class="campo">
       <label for="cajon-nota">Comentario (opcional)</label>
-      <textarea id="cajon-nota" rows="3" placeholder="Ej.: es para el living, algo de 40 × 60 cm."></textarea>
+      <textarea id="cajon-nota" rows="3" placeholder="Ej.: es para regalar, o lo quiero para el living."></textarea>
     </div>
     <details>
       <summary>Ver el mensaje que se envía</summary>
       <pre id="cajon-mensaje"></pre>
     </details>
     <div class="cajon-acciones">
+      <button type="button" class="btn btn-linea" id="cajon-pared" hidden><svg class="ico" aria-hidden="true"><use href="#i-pared"/></svg>Ver todo en mi pared</button>
       <a class="btn btn-lleno" id="cajon-wa" href="#" target="_blank" rel="noopener"><svg class="ico" aria-hidden="true"><use href="#i-chat"/></svg>Consultar por WhatsApp</a>
-      <button type="button" class="btn-texto" id="cajon-vaciar">Vaciar selección</button>
+      <div class="cajon-chicos">
+        <button type="button" class="btn-texto" id="cajon-compartir" hidden><svg class="ico" aria-hidden="true"><use href="#i-enlace"/></svg>Compartir mi selección</button>
+        <button type="button" class="btn-texto" id="cajon-vaciar">Vaciar selección</button>
+      </div>
     </div>
     <p class="nota-numero" id="nota-numero" hidden>El número de WhatsApp todavía no está cargado: al enviar, WhatsApp te va a pedir que elijas a quién mandarlo.</p>
+  </div>
+</div>
+
+<!-- Visor de pared: la foto colgada a escala, con su tamaño y su marco -->
+<div class="pared" id="pared" role="dialog" aria-modal="true" aria-labelledby="pared-titulo" hidden>
+  <button type="button" class="visor-cerrar" id="pared-cerrar"><svg class="ico" aria-hidden="true"><use href="#i-izq"/></svg><span id="pared-cerrar-txt">Volver</span></button>
+  <div class="pared-caja">
+    <div class="pared-izq">
+      <div class="visor-barra"><span id="pared-contador"></span><span id="pared-lugar"></span></div>
+      <div class="escena protegida" id="escena">
+        <div class="escena-mundo" id="escena-mundo" role="img">
+          <div class="escena-fondo"></div>
+          <img class="escena-foto" id="escena-foto" alt="" hidden draggable="false">
+          <div class="escena-zocalo"></div>
+          <div class="escena-piso"></div>
+          <div class="escena-sombra"></div>
+          <div class="escena-origen" id="escena-origen">
+            <div class="escena-mueble" id="escena-mueble" aria-hidden="true"></div>
+            <div class="escena-grupo" id="escena-grupo"></div>
+          </div>
+        </div>
+        <div class="escena-herr">
+          <button type="button" class="escena-boton" id="pared-cotas" aria-pressed="true" aria-label="Mostrar las medidas"><svg class="ico" aria-hidden="true"><use href="#i-regla"/></svg><span class="txt">Medidas</span></button>
+          <button type="button" class="escena-boton" id="pared-cerca" aria-pressed="false" aria-label="Ver el cuadro de cerca"><svg class="ico" aria-hidden="true"><use href="#i-lupa"/></svg><span class="txt">De cerca</span></button>
+        </div>
+        <button type="button" class="visor-nav prev" id="pared-prev" aria-label="Probar la foto anterior"><svg class="ico" aria-hidden="true"><use href="#i-izq"/></svg></button>
+        <button type="button" class="visor-nav next" id="pared-next" aria-label="Probar la foto siguiente"><svg class="ico" aria-hidden="true"><use href="#i-der"/></svg></button>
+        <p class="escena-pista" id="escena-pista" hidden></p>
+      </div>
+      <p class="pared-ref" id="pared-ref"></p>
+    </div>
+    <aside class="pared-panel">
+      <div class="pared-cabeza">
+        <p class="foto-num" id="pared-num"></p>
+        <h2 id="pared-titulo"></h2>
+        <p class="foto-en" id="pared-en"></p>
+      </div>
+      <div class="tira" id="pared-tira" role="group" aria-label="Elegí qué cuadro querés cambiar" hidden></div>
+      <div class="opciones" id="pared-opciones"></div>
+      <div class="opcion">
+        <div class="opcion-cabeza"><p class="foto-num">Pared</p><p class="opcion-valor" id="pared-valor"></p></div>
+        <div class="paredes" id="pared-paredes" role="group" aria-label="Pared"></div>
+      </div>
+      <div class="mi-pared" id="mi-pared" hidden>
+        <label for="mi-pared-ancho">Ancho que se ve <strong id="mi-pared-valor">3 m</strong></label>
+        <input type="range" id="mi-pared-ancho" min="100" max="800" step="10" value="300">
+        <p>Mové el cuadro con el dedo o el mouse. Para que la escala sea real, indicá cuánto mide de ancho la pared que se ve en tu foto (una puerta mide unos 80 cm).</p>
+        <p>Tu foto no se sube a internet: queda solo en este dispositivo.</p>
+        <button type="button" class="btn-texto" id="mi-pared-otra">Usar otra foto</button>
+      </div>
+      <input type="file" id="mi-pared-archivo" accept="image/*" hidden>
+      <p class="nota-recorte" id="pared-recorte" hidden></p>
+      <div class="pared-acciones">
+        <button type="button" class="btn btn-linea" id="pared-sumar" aria-pressed="false"><svg class="ico" aria-hidden="true"><use href="#i-mas"/></svg><span class="txt">Sumar a mi selección</span></button>
+        <a class="btn btn-lleno" id="pared-wa" href="#" target="_blank" rel="noopener"><svg class="ico" aria-hidden="true"><use href="#i-chat"/></svg><span class="txt">Consultar por WhatsApp</span></a>
+        <button type="button" class="btn-texto" id="pared-compartir"><svg class="ico" aria-hidden="true"><use href="#i-compartir"/></svg><span class="txt">Compartir cómo queda</span></button>
+      </div>
+    </aside>
   </div>
 </div>
 
@@ -919,7 +1275,43 @@ section[id] { scroll-margin-top: 84px; }
       "012",
       "006"
     ],
-    "compartirFoto": "139"
+    "compartirFoto": "139",
+    "cuadros": {
+      "medidas": [
+        {
+          "corto": 20,
+          "largo": 30,
+          "uso": "Para estantes, escritorios y rincones."
+        },
+        {
+          "corto": 30,
+          "largo": 40,
+          "uso": "Para el dormitorio, un pasillo o una pared chica."
+        },
+        {
+          "corto": 40,
+          "largo": 60,
+          "uso": "Para arriba del sillón, de la cama o de un aparador."
+        }
+      ],
+      "marcos": [
+        {
+          "nombre": "Negro",
+          "color": "#24201E"
+        },
+        {
+          "nombre": "Blanco",
+          "color": "#F2EEE6"
+        },
+        {
+          "nombre": "Madera clara",
+          "color": "#CDA877",
+          "madera": true
+        }
+      ],
+      "medidaInicial": "30x40",
+      "marcoInicial": "negro"
+    }
   },
   "textos": {
     "marca.nombre": "ojodecristi",
@@ -937,7 +1329,7 @@ section[id] { scroll-margin-top: 84px; }
     "portada.dato": "Cuadros por encargo",
     "archivo.titulo": "El archivo",
     "archivo.ingles": "The Archive",
-    "archivo.nota": "Tocá una foto para verla grande con su paleta. Con ＋ la sumás a tu selección y después me la mandás por WhatsApp.",
+    "archivo.nota": "Tocá una foto para verla grande y probarla en tu pared. Con ＋ la sumás a tu selección y después me la mandás por WhatsApp.",
     "archivo.todo": "Todo",
     "archivo.ver-todo": "Ver todo",
     "archivo.ver-menos": "Ver menos",
@@ -950,11 +1342,11 @@ section[id] { scroll-margin-top: 84px; }
     "cuadros.ingles": "How to order a print",
     "cuadros.nota": "Todas las fotos se pueden pedir impresas. El pedido se arma acá y se coordina por WhatsApp, sin pagos en la web.",
     "cuadros.paso1-titulo": "Elegí tus fotos",
-    "cuadros.paso1-texto": "Tocá ＋ en las que te gusten. Podés sumar varias a tu selección.",
-    "cuadros.paso2-titulo": "Mandame la lista",
-    "cuadros.paso2-texto": "Desde tu selección se arma un mensaje de WhatsApp con el número de cada foto. Lo revisás y lo enviás.",
-    "cuadros.paso3-titulo": "Coordinamos los detalles",
-    "cuadros.paso3-texto": "Te paso tamaños, papel, marco y precio, y acordamos la entrega.",
+    "cuadros.paso1-texto": "Tocá ＋ en las que te gusten. Podés sumar todas las que quieras a tu selección.",
+    "cuadros.paso2-titulo": "Probalas en tu pared",
+    "cuadros.paso2-texto": "Elegí el tamaño y el marco de cada una, y mirá cómo queda colgada en una pared, a escala.",
+    "cuadros.paso3-titulo": "Mandame el pedido",
+    "cuadros.paso3-texto": "Se arma un mensaje de WhatsApp con cada foto, su tamaño y su marco. Te paso el precio y coordinamos la entrega.",
     "cuadros.boton": "Escribime por WhatsApp",
     "sobre.titulo": "Sobre mí",
     "sobre.ingles": "About me",
@@ -965,15 +1357,24 @@ section[id] { scroll-margin-top: 84px; }
     "trabajos.boton": "Consultar por un trabajo",
     "pie.texto": "Cristian Torrecillas · Fotografía de autor. Mar del Plata, Argentina.",
     "pie.legal": "Las fotos se muestran en baja resolución y con marca de agua. © {año}, todos los derechos reservados. Para usar o imprimir una imagen, escribime.",
-    "visor.nota": "Disponible como cuadro. Tamaños y terminaciones a consultar.",
+    "visor.nota": "El precio y la entrega los coordinamos por WhatsApp.",
     "whatsapp.general": "¡Hola {nombre}! Vi tus fotos en la web y quería hacerte una consulta.",
     "whatsapp.trabajo": "¡Hola {nombre}! Vi tu web y quería consultarte por un trabajo de fotos.",
-    "whatsapp.foto": "¡Hola {nombre}! Vi la foto N.° {n} — {titulo} ({lugar}) y me interesa como cuadro. ¿Me pasás tamaños y precios?\n{enlace}",
-    "whatsapp.seleccion": "¡Hola {nombre}! Vi tus fotos en la web y me gustaría pedir como cuadro:\n\n{lista}\n\n¿Me pasás tamaños y precios?",
+    "whatsapp.foto": "¡Hola {nombre}! Vi la foto N.° {n} — {titulo} ({lugar}) y me interesa como cuadro de {medida}, con marco {marco}. ¿Me pasás el precio?\n{enlace}",
+    "whatsapp.seleccion": "¡Hola {nombre}! Vi tus fotos en la web y me gustaría pedir estos cuadros:\n\n{lista}\n\n¿Me pasás el precio?\n\nMi selección: {enlace}",
     "seo.titulo": "Cristian Torrecillas · Fotografía de autor — ojodecristi",
     "seo.descripcion": "Fotografía de autor de Cristian Torrecillas en Mar del Plata y de cada lugar que recorro. Cada foto tiene su número único, y cualquiera puede avivar tu espacio.",
     "series.ver-todas": "Ver todas",
-    "series.ver-menos": "Ver menos"
+    "series.ver-menos": "Ver menos",
+    "pared.boton": "Ver en mi pared",
+    "medidas.etiqueta": "Tamaños y marcos",
+    "medidas.titulo": "Elegí la medida para tu pared",
+    "medidas.texto": "Así se ven los tamaños, uno al lado del otro y a escala. La medida es la de la foto: el marco suma unos centímetros por lado.",
+    "medidas.boton": "Probá esta foto en tu pared",
+    "preguntas.etiqueta": "Antes de pedir",
+    "preguntas.titulo": "Preguntas frecuentes",
+    "preguntas.ingles": "Frequently asked questions",
+    "preguntas.texto": "¿Cuánto cuesta un cuadro?\nDepende del tamaño y del marco. Armá tu selección y mandámela por WhatsApp: te paso el precio sin compromiso.\n\n¿Qué tamaños y marcos hay?\nLas fotos se piden en {medidas}, con marco {marcos}. La medida es la de la foto: el marco suma unos centímetros por lado.\n\n¿La foto se recorta?\nCada tamaño tiene su proporción. Si no coincide con la de la foto, se recorta un poco en los bordes. En «Ver en mi pared» la ves tal cual va a quedar.\n\n¿El cuadro lleva la marca de agua?\nNo. En la web las fotos se muestran en baja resolución y con marca de agua; el cuadro se imprime desde el archivo original.\n\n¿Puedo pedir varias fotos?\nSí. Sumá todas las que quieras a tu selección; cada una puede ir en su tamaño y su marco. Con «Ver todo en mi pared» las ves juntas antes de pedir.\n\n¿Cómo se paga y cómo me llega?\nEn la web no se paga nada. El pago y la entrega los coordinamos por WhatsApp."
   },
   "categorias": [
     {
@@ -7193,7 +7594,7 @@ function irACarrusel(i) { girarCarrusel(Math.round(desvio(i, carr.meta, carr.lis
   // gira sola despacito cuando nadie la está usando
   setInterval(() => {
     if (pocoMovimiento || $("#carrusel").hidden || carr.encima || carr.foco || carr.arrastre || !carr.visible) return;
-    if (document.visibilityState !== "visible" || !$("#visor").hidden) return;
+    if (document.visibilityState !== "visible" || !$("#visor").hidden || !$("#pared").hidden) return;
     if (performance.now() - carr.ultimoMov < 4000) return;
     girarCarrusel(1);
   }, 4500);
@@ -7366,6 +7767,7 @@ function mostrarEnVisor(direccion) {
   $("#visor-contador").textContent = String(estado.indice + 1).padStart(2, "0") + " / " + String(L.length).padStart(2, "0");
   $("#visor-lugar").textContent = ciudad(f.lugar);
   $("#visor-prev").hidden = $("#visor-next").hidden = L.length < 2;
+  pintarFichaCuadro(f);
   actualizarFicha();
   ponerHash("foto-" + f.n);
   [estado.indice + 1, estado.indice - 1].forEach((j) => { const g = L[(j + L.length) % L.length]; if (g) { const p = new Image(); p.src = rutaWeb(g); } });
@@ -7410,12 +7812,14 @@ function cerrarVisor() {
 })();
 
 /* ---------- Selección ---------- */
-function alternar(n) {
+function alternar(n, origen) {
   const i = seleccion.indexOf(n);
-  if (i >= 0) seleccion.splice(i, 1); else seleccion.push(n);
+  if (i >= 0) seleccion.splice(i, 1); else { seleccion.push(n); fijarOpcion(n); }
   guardarLocal(CLAVE, seleccion);
   const f = porNumero.get(n);
-  anunciar(i >= 0 ? "N.° " + n + " quitada de tu selección" : "N.° " + n + " sumada a tu selección");
+  anunciar(i >= 0 ? "N.° " + n + " quitada de tu selección" : "N.° " + n + " sumada a tu selección, en " + detalleCuadro(n));
+  // desde la grilla: se avisa con qué tamaño quedó y se ofrece probarla en la pared
+  if (i < 0 && origen === "grilla") avisar("Sumaste la N.° " + n + " · " + detalleCuadro(n) + ".", { texto: texto("pared.boton", "Ver en mi pared"), fn: () => abrirPared(n, { desde: "pagina", lista: estado.lista }) });
   $$('.foto[data-n="' + n + '"]').forEach((card) => {
     const elegida = seleccion.indexOf(n) >= 0;
     card.classList.toggle("elegida", elegida);
@@ -7436,21 +7840,42 @@ function refrescarSeleccion() {
   $("#pastilla-fotos").innerHTML = seleccion.slice(-3).map((n) => { const f = porNumero.get(n); return f ? '<img src="' + esc(rutaMini(f)) + '" alt="" draggable="false">' : ""; }).join("");
   renderCajon();
   actualizarFicha();
+  if (!$("#pared").hidden) pintarPanelPared(true);
 }
 function renderCajon() {
   const fotos = seleccion.map((n) => porNumero.get(n)).filter(Boolean);
-  $("#cajon-lista").innerHTML = fotos.map((f) =>
-    '<li><img src="' + esc(rutaMini(f)) + '" alt="" draggable="false" style="--mat:' + colorMat(f.paleta) + '">' +
-      '<div><span class="foto-num">N.° ' + esc(f.n) + '</span><strong>' + esc(f.titulo) + '</strong><span class="lugar">' + esc(f.lugar) + '</span></div>' +
+  $("#cajon-lista").innerHTML = fotos.map((f) => {
+    const o = opcionDe(f.n);
+    const medidas = CUADROS.medidas.map((m) => '<option value="' + esc(m.id) + '"' + (m.id === o.t ? " selected" : "") + ">" + esc(textoMedida(m)) + "</option>").join("");
+    const marcos = CUADROS.marcos.map((m) => '<option value="' + esc(m.id) + '"' + (m.id === o.m ? " selected" : "") + ">Marco " + esc(m.nombre.toLowerCase()) + "</option>").join("");
+    return '<li><button type="button" class="cajon-mini" data-pared-item="' + esc(f.n) + '" tabindex="-1" aria-hidden="true"><img src="' + esc(rutaMini(f)) + '" alt="" draggable="false" style="--mat:' + colorMat(f.paleta) + '"></button>' +
+      '<div><span class="foto-num">N.° ' + esc(f.n) + '</span><strong>' + esc(f.titulo) + '</strong><span class="lugar">' + esc(f.lugar) + '</span>' +
+        '<button type="button" class="item-pared" data-pared-item="' + esc(f.n) + '"><svg class="ico" aria-hidden="true"><use href="#i-pared"/></svg>' + esc(texto("pared.boton", "Ver en mi pared")) + "</button>" +
+      "</div>" +
       '<button type="button" class="quitar" data-quitar="' + esc(f.n) + '" aria-label="Quitar N.° ' + esc(f.n) + ' de tu selección"><svg class="ico" aria-hidden="true"><use href="#i-cerrar"/></svg></button>' +
-    '</li>').join("");
+      '<div class="item-op">' +
+        '<label class="selector"><span class="sr">Tamaño de la N.° ' + esc(f.n) + '</span><select data-cajon-medida="' + esc(f.n) + '">' + medidas + "</select></label>" +
+        '<label class="selector"><span class="sr">Marco de la N.° ' + esc(f.n) + '</span><select data-cajon-marco="' + esc(f.n) + '">' + marcos + "</select></label>" +
+      "</div>" +
+    "</li>";
+  }).join("");
   $("#cajon-lista").hidden = !fotos.length;
   $("#cajon-vacio").hidden = fotos.length > 0;
+  const r = $("#cajon-resumen");
+  r.hidden = !fotos.length;
+  r.textContent = fotos.length ? (fotos.length === 1 ? "1 cuadro" : fotos.length + " cuadros") + " · Elegí el tamaño y el marco de cada uno." : "";
+  $("#cajon-pared").hidden = !fotos.length;
+  $("#cajon-pared").lastChild.textContent = fotos.length > 1 ? "Ver todo en mi pared" : texto("pared.boton", "Ver en mi pared");
+  $("#cajon-compartir").hidden = !fotos.length || !direccionSitio();
+  actualizarMensajeCajon();
+}
+function actualizarMensajeCajon() {
+  const hay = seleccion.some((n) => porNumero.has(n));
   const wa = $("#cajon-wa");
-  if (fotos.length) { wa.href = enlaceWhatsApp(mensajeSeleccion()); wa.removeAttribute("aria-disabled"); }
+  if (hay) { wa.href = enlaceWhatsApp(mensajeSeleccion()); wa.removeAttribute("aria-disabled"); }
   else { wa.href = "#"; wa.setAttribute("aria-disabled", "true"); }
-  $("#cajon-mensaje").textContent = fotos.length ? mensajeSeleccion() : "(Elegí al menos una foto)";
-  $("#cajon-vaciar").hidden = !fotos.length;
+  $("#cajon-mensaje").textContent = hay ? mensajeSeleccion() : "(Elegí al menos una foto)";
+  $("#cajon-vaciar").hidden = !hay;
 }
 let focoCajon = null;
 function abrirCajon() {
@@ -7467,7 +7892,7 @@ function cerrarCajon() {
 }
 
 /* ---------- WhatsApp ---------- */
-function lineaFoto(f) { return "• N.° " + f.n + " — " + f.titulo + (f.lugar ? " (" + f.lugar + ")" : ""); }
+function lineaFoto(f) { return "• N.° " + f.n + " — " + f.titulo + (f.lugar ? " (" + f.lugar + ")" : "") + " · " + detalleCuadro(f.n); }
 /* Dirección de la página sin el #, para armar enlaces a cada foto */
 function direccionSitio() {
   const base = CONFIG.sitio || (location.protocol.indexOf("http") === 0 ? location.href.split("#")[0] : "");
@@ -7479,14 +7904,19 @@ function mensajeSeleccion() {
   const fotos = seleccion.map((n) => porNumero.get(n)).filter(Boolean);
   const nota = $("#cajon-nota").value.trim();
   const lista = fotos.map(lineaFoto).join("\n") + (nota ? "\n\nComentario: " + nota : "");
-  const plantilla = texto("whatsapp.seleccion", "¡Hola {nombre}! Vi tus fotos en la web y me gustaría pedir como cuadro:\n\n{lista}\n\n¿Me pasás tamaños y precios?");
-  let m = rellenar(plantilla, { nombre: CONFIG.nombre, lista: lista });
+  const plantilla = texto("whatsapp.seleccion", "¡Hola {nombre}! Vi tus fotos en la web y me gustaría pedir estos cuadros:\n\n{lista}\n\n¿Me pasás el precio?\n\nMi selección: {enlace}");
+  let m = rellenar(plantilla, { nombre: CONFIG.nombre, lista: lista, enlace: enlaceSeleccion() });
   if (plantilla.indexOf("{lista}") < 0) m += "\n\n" + lista;
   return limpiar(m);
 }
 function mensajeFoto(f) {
-  const plantilla = texto("whatsapp.foto", "¡Hola {nombre}! Vi la foto N.° {n} — {titulo} ({lugar}) y me interesa como cuadro. ¿Me pasás tamaños y precios?\n{enlace}");
-  return limpiar(rellenar(plantilla, { nombre: CONFIG.nombre, n: f.n, titulo: f.titulo, lugar: f.lugar || "", enlace: enlaceFoto(f) }));
+  const o = opcionDe(f.n);
+  let plantilla = texto("whatsapp.foto", "¡Hola {nombre}! Vi la foto N.° {n} — {titulo} ({lugar}) y me interesa como cuadro de {medida}, con marco {marco}. ¿Me pasás el precio?\n{enlace}");
+  // un mensaje sin {medida} ni {marco} igual lleva el cuadro que se eligió
+  if (plantilla.indexOf("{medida}") < 0 && plantilla.indexOf("{marco}") < 0) {
+    plantilla = plantilla.indexOf("{enlace}") >= 0 ? plantilla.replace("{enlace}", "Cuadro: {medida} · marco {marco}\n{enlace}") : plantilla + "\nCuadro: {medida} · marco {marco}";
+  }
+  return limpiar(rellenar(plantilla, { nombre: CONFIG.nombre, n: f.n, titulo: f.titulo, lugar: f.lugar || "", enlace: enlaceFoto(f), medida: textoMedida(o.medida), marco: o.marco.nombre.toLowerCase() }));
 }
 const MENSAJES = {
   general: () => limpiar(rellenar(texto("whatsapp.general", "¡Hola {nombre}! Vi tus fotos en la web y quería hacerte una consulta."), { nombre: CONFIG.nombre })),
@@ -7545,8 +7975,13 @@ function compartirFoto() {
   if (!f) return;
   const url = enlaceFoto(f) || location.href;
   const datos = { title: "N.° " + f.n + " — " + f.titulo, text: f.titulo + (f.title ? " · " + f.title : ""), url: url };
-  if (navigator.share) { navigator.share(datos).catch(() => {}); return; }
-  copiarTexto(url).then(() => avisar("Enlace a la foto copiado. Ya lo podés pegar donde quieras."), () => avisar(url));
+  compartirOCopiar(datos, "Enlace a la foto copiado. Ya lo podés pegar donde quieras.");
+}
+/* Abre el menú de compartir del celu; si no hay (o falla), copia el link */
+function compartirOCopiar(datos, copiado) {
+  const copiar = () => copiarTexto(datos.url).then(() => avisar(copiado), () => avisar(datos.url));
+  if (navigator.share) navigator.share(datos).catch((e) => { if (!e || e.name !== "AbortError") copiar(); });
+  else copiar();
 }
 
 /* ---------- Avisos ---------- */
@@ -7568,6 +8003,21 @@ function leerHash() {
   let h = "";
   try { h = decodeURIComponent(location.hash.slice(1)); } catch (_) {}
   if (!h) return;
+  // #seleccion=012_30x40_negro~045_20x30_blanco · un link que abre una selección compartida
+  if (h.indexOf("seleccion=") === 0) {
+    try { history.replaceState(null, "", location.pathname + location.search); } catch (_) {}
+    importarSeleccion(h.slice(10));
+    return;
+  }
+  // #pared-012 (o #pared-012_40x60_negro_clara) · abre la foto directamente en la pared
+  if (h.indexOf("pared-") === 0) {
+    const d = h.slice(6).split("_"), n = d[0];
+    if (!porNumero.has(n)) return;
+    if (ESCENAS.some((e) => e.id === d[3])) pared.escena = d[3];
+    abrirVisor(n, FOTOS);
+    abrirPared(n, { desde: "visor", lista: estado.visorLista, medida: d[1], marco: d[2] });
+    return;
+  }
   if (h.indexOf("foto-") === 0) { const n = h.slice(5); if (porNumero.has(n)) abrirVisor(n, FOTOS); return; }
   if (CATEGORIAS.some((c) => c.id === h)) { aplicarFiltro({ tipo: "cat", id: h }, { desplazar: true, hash: false }); return; }
   if (SERIES.some((s) => s.id === h)) aplicarFiltro({ tipo: "serie", id: h }, { desplazar: true, hash: false });
@@ -7575,6 +8025,634 @@ function leerHash() {
 
 /* ---------- Menú del celular ---------- */
 function cerrarMenu() { $("#nav-movil").hidden = true; $("#btn-menu").setAttribute("aria-expanded", "false"); }
+
+/* ==============================================================
+   CUADROS · tamaños, marcos y el visor de pared
+   Los tamaños y los marcos se editan desde el panel (Ajustes → Cuadros).
+   Si faltan, se usan estos.
+   ============================================================== */
+const CUADROS_FABRICA = {
+  medidas: [
+    { corto: 20, largo: 30, uso: "Para estantes, escritorios y rincones." },
+    { corto: 30, largo: 40, uso: "Para el dormitorio, un pasillo o una pared chica." },
+    { corto: 40, largo: 60, uso: "Para arriba del sillón, de la cama o de un aparador." }
+  ],
+  marcos: [
+    { nombre: "Negro", color: "#24201E" },
+    { nombre: "Blanco", color: "#F2EEE6" },
+    { nombre: "Madera clara", color: "#CDA877", madera: true }
+  ],
+  medidaInicial: "30x40",
+  marcoInicial: "negro"
+};
+const idMarco = (nombre) => String(nombre || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+const cm = (v) => String(v).replace(".", ","); // 29.7 → «29,7»
+function leerCuadros(c, fabrica) {
+  c = c && typeof c === "object" ? c : {};
+  const num = (v) => { const x = parseFloat(String(v == null ? "" : v).replace(",", ".")); return isFinite(x) && x > 0 && x <= 400 ? Math.round(x * 10) / 10 : 0; };
+  const medidas = [], marcos = [];
+  (Array.isArray(c.medidas) ? c.medidas : []).forEach((m) => {
+    let a = num(m && m.corto), b = num(m && m.largo);
+    if (!a || !b) return;
+    if (a > b) { const x = a; a = b; b = x; }
+    const id = a + "x" + b;
+    if (!medidas.some((o) => o.id === id)) medidas.push({ id: id, corto: a, largo: b, uso: String((m && m.uso) || "").trim() });
+  });
+  (Array.isArray(c.marcos) ? c.marcos : []).forEach((m) => {
+    const nombre = String((m && m.nombre) || "").trim(), color = String((m && m.color) || "").trim(), id = idMarco(nombre);
+    if (!id || !/^#[0-9a-f]{6}$/i.test(color) || marcos.some((o) => o.id === id)) return;
+    marcos.push({ id: id, nombre: nombre, color: color, madera: !!m.madera });
+  });
+  if ((!medidas.length || !marcos.length) && !fabrica) {
+    const f = leerCuadros(CUADROS_FABRICA, true);
+    if (!medidas.length) medidas.push.apply(medidas, f.medidas);
+    if (!marcos.length) marcos.push.apply(marcos, f.marcos);
+  }
+  return {
+    medidas: medidas, marcos: marcos,
+    medidaInicial: medidas.some((o) => o.id === c.medidaInicial) ? c.medidaInicial : medidas[Math.floor((medidas.length - 1) / 2)].id,
+    marcoInicial: marcos.some((o) => o.id === c.marcoInicial) ? c.marcoInicial : marcos[0].id
+  };
+}
+const CUADROS = leerCuadros(AJUSTES.cuadros);
+const medidaPorId = (id) => CUADROS.medidas.find((m) => m.id === id);
+const marcoPorId = (id) => CUADROS.marcos.find((m) => m.id === id);
+const textoMedida = (m) => cm(m.corto) + " × " + cm(m.largo) + " cm";
+const unirO = (l) => (l.length < 2 ? l.join("") : l.slice(0, -1).join(", ") + " o " + l[l.length - 1]);
+const listaMedidas = () => unirO(CUADROS.medidas.map((m) => cm(m.corto) + " × " + cm(m.largo))) + " cm";
+const listaMarcos = () => unirO(CUADROS.marcos.map((m) => m.nombre.toLowerCase()));
+/* Ancho de la moldura (en cm): un poco más gruesa en los cuadros grandes */
+const moldura = (m) => Math.min(3.4, Math.max(1.8, Math.round((1.4 + m.largo * .025) * 10) / 10));
+/* La foto dentro de un tamaño: la orientación sale de la foto */
+function enCuadro(f, m) {
+  const horizontal = proporcion(f) >= 1;
+  return { w: horizontal ? m.largo : m.corto, h: horizontal ? m.corto : m.largo, m: moldura(m) };
+}
+/* Si la proporción del tamaño no es la de la foto, se avisa qué parte se recorta */
+function recorte(f, m) {
+  const r = Math.max(proporcion(f), 1 / proporcion(f)), t = m.largo / m.corto;
+  if (Math.abs(t - r) / r < .035) return "";
+  const lados = (t < r) === (proporcion(f) >= 1) ? "a los costados" : "arriba y abajo";
+  return "En " + textoMedida(m) + " la foto se recorta un poco " + lados + ".";
+}
+const MEDIDA_MAYOR = CUADROS.medidas.reduce((a, m) => (m.largo > a.largo ? m : a), CUADROS.medidas[0]);
+const GRUPO_MAYOR = { ancho: MEDIDA_MAYOR.largo + 2 * moldura(MEDIDA_MAYOR), alto: MEDIDA_MAYOR.largo + 2 * moldura(MEDIDA_MAYOR) };
+
+/* ---------- Tamaño y marco elegidos para cada foto (se guardan en este dispositivo) ---------- */
+const CLAVE_OP = "ojodecristi-cuadros";
+let opciones = leerLocal(CLAVE_OP, {});
+if (!opciones || typeof opciones !== "object" || Array.isArray(opciones)) opciones = {};
+let ultimaOp = leerLocal(CLAVE_OP + "-ultima", null);
+if (!ultimaOp || typeof ultimaOp !== "object") ultimaOp = {};
+/* Una foto sin elección propia muestra la última que se eligió (o la inicial) */
+function opcionDe(n) {
+  const o = opciones[n] || {};
+  const t = medidaPorId(o.t) ? o.t : medidaPorId(ultimaOp.t) ? ultimaOp.t : CUADROS.medidaInicial;
+  const m = marcoPorId(o.m) ? o.m : marcoPorId(ultimaOp.m) ? ultimaOp.m : CUADROS.marcoInicial;
+  return { t: t, m: m, medida: medidaPorId(t), marco: marcoPorId(m) };
+}
+/* Al sumar una foto a la selección, su tamaño y su marco quedan fijos */
+function fijarOpcion(n) {
+  if (opciones[n] && medidaPorId(opciones[n].t) && marcoPorId(opciones[n].m)) return;
+  const o = opcionDe(n);
+  opciones[n] = { t: o.t, m: o.m };
+  guardarLocal(CLAVE_OP, opciones);
+}
+function ponerOpcion(n, campo, valor, origen) {
+  if (!porNumero.has(n) || (campo === "t" ? !medidaPorId(valor) : !marcoPorId(valor))) return;
+  const o = opcionDe(n);
+  const nueva = { t: o.t, m: o.m };
+  nueva[campo] = valor;
+  opciones[n] = nueva;
+  ultimaOp = { t: nueva.t, m: nueva.m };
+  guardarLocal(CLAVE_OP, opciones);
+  guardarLocal(CLAVE_OP + "-ultima", ultimaOp);
+  alCambiarOpcion(n, origen);
+}
+const detalleCuadro = (n) => { const o = opcionDe(n); return textoMedida(o.medida) + " · marco " + o.marco.nombre.toLowerCase(); };
+const valorMedida = (f, m) => textoMedida(m) + " · " + (proporcion(f) >= 1 ? "horizontal" : "vertical");
+
+/* Botones de tamaño y de marco (en la ficha y en el visor de pared) */
+function htmlOpciones(f) {
+  const o = opcionDe(f.n), horizontal = proporcion(f) >= 1, fondo = ((f.paleta || [])[0] || "") + ';--img:url("' + rutaMini(f).replace(/["\\]/g, "") + '")';
+  const medidas = CUADROS.medidas.map((m) =>
+    '<button type="button" class="medida" data-op-medida="' + esc(m.id) + '" aria-pressed="' + (m.id === o.t) + '" aria-label="' + esc(textoMedida(m)) + '">' +
+      '<span class="medida-dibujo" style="--w:' + (horizontal ? m.largo : m.corto) + ';--h:' + (horizontal ? m.corto : m.largo) + '" aria-hidden="true"></span>' +
+      '<span class="medida-txt" aria-hidden="true">' + esc(cm(m.corto) + " × " + cm(m.largo)) + '<small>cm</small></span>' +
+    '</button>').join("");
+  const marcos = CUADROS.marcos.map((m) =>
+    '<button type="button" class="op" data-op-marco="' + esc(m.id) + '" aria-pressed="' + (m.id === o.m) + '">' +
+      '<span class="muestra-marco' + (m.madera ? " madera" : "") + '" style="--c:' + esc(m.color) + ";--fondo-foto:" + esc(fondo) + '" aria-hidden="true"></span>' + esc(m.nombre) +
+    '</button>').join("");
+  return '<div class="opcion" data-op-n="' + esc(f.n) + '">' +
+      '<div class="opcion-cabeza"><p class="foto-num">Tamaño</p><p class="opcion-valor" data-op-valor="t">' + esc(valorMedida(f, o.medida)) + '</p></div>' +
+      '<div class="medidas" role="group" aria-label="Tamaño del cuadro">' + medidas + '</div>' +
+    '</div>' +
+    '<div class="opcion" data-op-n="' + esc(f.n) + '">' +
+      '<div class="opcion-cabeza"><p class="foto-num">Marco</p><p class="opcion-valor" data-op-valor="m">' + esc(o.marco.nombre) + '</p></div>' +
+      '<div class="marcos" role="group" aria-label="Marco">' + marcos + '</div>' +
+    '</div>';
+}
+/* Marca la opción elegida sin volver a dibujar los botones (así no se pierde el foco) */
+function marcarOpciones(n) {
+  const f = porNumero.get(n);
+  if (!f) return;
+  const o = opcionDe(n);
+  $$('[data-op-n="' + n + '"]').forEach((g) => {
+    $$("[data-op-medida]", g).forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.opMedida === o.t)));
+    $$("[data-op-marco]", g).forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.opMarco === o.m)));
+    const vt = $('[data-op-valor="t"]', g); if (vt) vt.textContent = valorMedida(f, o.medida);
+    const vm = $('[data-op-valor="m"]', g); if (vm) vm.textContent = o.marco.nombre;
+  });
+}
+function pintarRecorte(el, f, extra) {
+  const t = recorte(f, opcionDe(f.n).medida);
+  el.hidden = !t;
+  el.innerHTML = t ? '<svg class="ico" aria-hidden="true"><use href="#i-aviso"/></svg><span>' + esc(t + (extra || "")) + '</span>' : "";
+}
+function pintarFichaCuadro(f) {
+  $("#ficha-opciones").innerHTML = htmlOpciones(f);
+  pintarRecorte($("#ficha-recorte"), f, " En «" + texto("pared.boton", "Ver en mi pared") + "» la ves tal cual queda.");
+}
+function alCambiarOpcion(n, origen) {
+  marcarOpciones(n);
+  const f = porNumero.get(n);
+  if (!$("#visor").hidden && fotoActual() && fotoActual().n === n) {
+    pintarRecorte($("#ficha-recorte"), f, " En «" + texto("pared.boton", "Ver en mi pared") + "» la ves tal cual queda.");
+    $("#ficha-wa").href = enlaceWhatsApp(mensajeFoto(f));
+  }
+  if (!$("#pared").hidden) { pintarPanelPared(true); pintarPared(); }
+  if (seleccion.indexOf(n) >= 0) { if (origen === "cajon") actualizarMensajeCajon(); else renderCajon(); }
+}
+
+/* ---------- Selección compartida: un link que abre los mismos cuadros ---------- */
+const codigoSeleccion = () => seleccion.map((n) => { const o = opcionDe(n); return n + "_" + o.t + "_" + o.m; }).join("~");
+const enlaceSeleccion = () => (direccionSitio() && seleccion.length ? direccionSitio() + "#seleccion=" + codigoSeleccion() : "");
+function importarSeleccion(codigo) {
+  const items = String(codigo || "").split("~").map((p) => {
+    const d = p.split("_");
+    return porNumero.has(d[0]) ? { n: d[0], t: medidaPorId(d[1]) ? d[1] : null, m: marcoPorId(d[2]) ? d[2] : null } : null;
+  }).filter(Boolean);
+  if (!items.length) return;
+  const antes = { sel: seleccion.slice(), op: JSON.parse(JSON.stringify(opciones)) };
+  let nuevas = 0;
+  items.forEach((it) => {
+    if (seleccion.indexOf(it.n) < 0) { seleccion.push(it.n); nuevas++; }
+    const o = opcionDe(it.n);
+    opciones[it.n] = { t: it.t || o.t, m: it.m || o.m };
+  });
+  const guardarTodo = () => { guardarLocal(CLAVE, seleccion); guardarLocal(CLAVE_OP, opciones); aplicarFiltro(estado.filtro, { hash: false, conservar: true }); refrescarSeleccion(); };
+  guardarTodo();
+  abrirCajon();
+  const k = items.length;
+  avisar(nuevas ? "Abriste una selección compartida: " + (k === 1 ? "1 cuadro" : k + " cuadros") + "." : "Ya tenías estos cuadros en tu selección.",
+    nuevas ? { texto: "Deshacer", fn: () => { seleccion = antes.sel; opciones = antes.op; guardarTodo(); } } : null);
+}
+function compartirSeleccion() {
+  const url = enlaceSeleccion();
+  if (!url) return;
+  compartirOCopiar({ title: "Mi selección · " + (TEXTOS["marca.nombre"] || "ojodecristi"), text: "Estos son los cuadros que elegí:", url: url },
+    "Link copiado. Quien lo abra ve tu selección con sus tamaños y marcos.");
+}
+
+/* ---------- Visor de pared: la foto colgada a escala ----------
+   Cada escena se dibuja en centímetros (ver --s en el CSS): el mueble sirve de referencia. */
+function rectangulos(H) {
+  return (x, y, w, h, c, rx, mas) => '<rect x="' + x + '" y="' + (H - y - h) + '" width="' + w + '" height="' + h + '"' + (rx ? ' rx="' + rx + '"' : "") + ' fill="' + c + '"' + (mas || "") + "/>";
+}
+const lienzo = (x0, W, H, cuerpo) => '<svg viewBox="' + x0 + " 0 " + W + " " + H + '" xmlns="http://www.w3.org/2000/svg" focusable="false">' + cuerpo + "</svg>";
+const luzDef = (id) => '<defs><radialGradient id="' + id + '"><stop offset="0" stop-color="#FFE7B3" stop-opacity=".55"/><stop offset="1" stop-color="#FFE7B3" stop-opacity="0"/></radialGradient></defs>';
+/* Living: sillón de 2 m entre dos mesitas */
+function muebleLiving() {
+  const W = 300, H = 112, R = rectangulos(H);
+  const sofa = (o) => [
+    R(o + 14, 0, 6, 10, "#5E4636", 1), R(o + 180, 0, 6, 10, "#5E4636", 1),
+    R(o + 6, 36, 188, 48, "#90A087", 9),
+    R(o + 26, 42, 72, 37, "#A0AE96", 7), R(o + 102, 42, 72, 37, "#A0AE96", 7),
+    R(o + 20, 9, 160, 26, "#84937B", 3),
+    R(o + 22, 31, 78, 15, "#A8B59E", 4), R(o + 100, 31, 78, 15, "#A8B59E", 4),
+    R(o, 9, 25, 52, "#899780", 10), R(o + 175, 9, 25, 52, "#899780", 10),
+    R(o + 33, 45, 30, 27, "#DDB05E", 6, ' transform="rotate(-7 ' + (o + 48) + " " + (H - 58) + ')"'),
+    R(o + 137, 45, 30, 27, "#DDB05E", 6, ' transform="rotate(7 ' + (o + 152) + " " + (H - 58) + ')"')
+  ].join("");
+  const mesa = (o) => {
+    const cx = o + 22.5, b = H - 75;
+    const hojas = [[19, 83], [16.2, 90], [13.6, 97], [22.3, 85], [22.4, 93], [22.2, 101], [26, 83], [28.8, 90], [31.4, 96]].map((p, i) =>
+      '<ellipse cx="' + (o + p[0]) + '" cy="' + (H - p[1]) + '" rx="2.2" ry="1.3" fill="#7D8C64" transform="rotate(' + (i % 2 ? 35 : -35) + " " + (o + p[0]) + " " + (H - p[1]) + ')"/>').join("");
+    return R(o + 19, 0, 7, 50, "#A2774F", 1) + R(o + 9, 0, 27, 3, "#8E6440", 1.5) + R(o, 49, 45, 4, "#B4895E", 2) +
+      '<path d="M' + cx + " " + b + " q-5 -12 -10.5 -24 M" + cx + " " + b + " q.8 -15 -.4 -29 M" + cx + " " + b + ' q6 -11 10.5 -23" stroke="#6E7B57" stroke-width=".8" fill="none" stroke-linecap="round"/>' + hojas +
+      '<ellipse cx="' + cx + '" cy="' + (H - 61) + '" rx="7.5" ry="8.2" fill="#D3735A"/>' + R(cx - 3, 67, 6, 8, "#C4664F", 1);
+  };
+  return { ancho: W, svg: lienzo(0, W, H, mesa(0) + sofa(50) + mesa(255)) };
+}
+/* Comedor: aparador de 1,60 m con dos lámparas */
+function muebleAparador() {
+  const W = 168, H = 134, R = rectangulos(H), pw = 36.5;
+  let s = R(6, 0, 4, 17, "#5B3A26", 1) + R(150, 0, 4, 17, "#5B3A26", 1) + R(0, 15, 160, 61, "#8B5B3C", 2);
+  for (let i = 0; i < 4; i++) {
+    const x = 4 + i * 38.5;
+    s += R(x, 19, pw, 53, "#976646", 1);
+    for (let k = 1; k < 7; k++) s += R((x + k * pw / 7 - .25).toFixed(2), 21, .5, 49, "#7F5236");
+  }
+  [4 + pw - 3.5, 4 + 38.5 + 3.5, 4 + 77 + pw - 3.5, 4 + 115.5 + 3.5].forEach((x) => { s += '<circle cx="' + x + '" cy="' + (H - 46) + '" r="1.5" fill="#D9B67A"/>'; });
+  // tapa y, en el centro, un frutero con limones
+  s += R(-2, 75, 164, 4, "#7A4E33", 1.5) +
+    [[73.5, 88.6], [80, 90.2], [86.5, 88.6]].map((p) => '<circle cx="' + p[0] + '" cy="' + (H - p[1]) + '" r="3.3" fill="#E8C35F"/>').join("") +
+    '<path d="M66 ' + (H - 87) + " h28 a14 8 0 0 1 -28 0 z" + '" fill="#BCCEC8"/>' + R(76, 79, 8, 1.2, "#A9BDB7", .6);
+  const lampara = (cx) => '<circle cx="' + cx + '" cy="' + (H - 117) + '" r="32" fill="url(#luz-aparador)"/>' +
+    '<ellipse cx="' + cx + '" cy="' + (H - 89.5) + '" rx="8.5" ry="10.5" fill="#EEE5D5"/>' + R(cx - 1.2, 99, 2.4, 8, "#B3955F") +
+    '<polygon points="' + (cx - 16) + "," + (H - 106) + " " + (cx + 16) + "," + (H - 106) + " " + (cx + 11) + "," + (H - 130) + " " + (cx - 11) + "," + (H - 130) + '" fill="#F2D9A6"/>';
+  return { ancho: W, svg: lienzo(-4, W, H, luzDef("luz-aparador") + s + lampara(20) + lampara(140)) };
+}
+/* Dormitorio: cama de 1,60 m con mesitas de luz */
+function muebleDormitorio() {
+  const W = 266, H = 112, R = rectangulos(H);
+  const mesita = (o) => {
+    const cx = o + 22.5;
+    return R(o + 3, 0, 3, 9, "#8A6A4B") + R(o + 39, 0, 3, 9, "#8A6A4B") + R(o, 8, 45, 43, "#C6A17A", 2) + R(o + 3, 30, 39, .7, "#A47F5A") +
+      '<circle cx="' + cx + '" cy="' + (H - 40) + '" r="1.5" fill="#86633F"/>' + R(o - 1, 50, 47, 3, "#B48F69", 1.5) +
+      '<circle cx="' + cx + '" cy="' + (H - 78) + '" r="26" fill="url(#luz-dormitorio)"/>' + R(cx - 5, 53, 10, 15, "#ECE3D5", 3) +
+      '<polygon points="' + (cx - 12) + "," + (H - 68) + " " + (cx + 12) + "," + (H - 68) + " " + (cx + 8) + "," + (H - 86) + " " + (cx - 8) + "," + (H - 86) + '" fill="#F1D6A2"/>';
+  };
+  const o = 53, almohada = ' stroke="#E2DACB" stroke-width=".8"';
+  let cama = R(o, 22, 160, 82, "#D4C1A6", 6);
+  for (let k = 1; k < 8; k++) cama += R(o + k * 20 - .4, 26, .8, 74, "#C2AC8D");
+  cama += R(o + 4, 0, 5, 8, "#7A614A") + R(o + 151, 0, 5, 8, "#7A614A") + R(o, 7, 160, 10, "#B19A7C", 2) +
+    R(o + 12, 50, 64, 24, "#FAF7F1", 8, almohada) + R(o + 84, 50, 64, 24, "#FAF7F1", 8, almohada) +
+    R(o - 3, 16, 166, 37, "#F0EBE2", 4) + R(o - 3, 43, 166, 10, "#E4DDD1", 3) + R(o - 3, 22, 166, 9, "#C47A61", 1);
+  return { ancho: W, svg: lienzo(0, W, H, luzDef("luz-dormitorio") + mesita(0) + cama + mesita(221)) };
+}
+/* base: altura del mueble (el cuadro se cuelga 22 cm arriba) · ver: cuántos cm de ancho se ven · fila: ancho máximo de una fila de cuadros */
+const ESCENAS = [
+  { id: "clara", nombre: "Clara", pared: "#EFE9E0", pared2: "#E2D9CC", piso: "#C29C77", piso2: "#A9845F", zocalo: "#F8F4EE", cota: "#4B3D36", luz: .4, base: 84, ver: 330, verCelu: 190, fila: 200,
+    ref: "Referencia: el sillón mide 2 m de ancho.", mueble: muebleLiving, desc: "una pared clara, arriba de un sillón de 2 m" },
+  { id: "calida", nombre: "Cálida", pared: "#E9C8AC", pared2: "#DDB597", piso: "#976F50", piso2: "#7F5B40", zocalo: "#F1DDC9", cota: "#55362A", luz: .32, base: 79, ver: 250, verCelu: 175, fila: 150,
+    ref: "Referencia: el aparador mide 1,60 m de ancho.", mueble: muebleAparador, desc: "una pared cálida, arriba de un aparador de 1,60 m" },
+  { id: "oscura", nombre: "Oscura", pared: "#2F4848", pared2: "#263B3B", piso: "#785A43", piso2: "#624935", zocalo: "#3A5555", cota: "#F0E6D6", luz: .14, base: 104, ver: 300, verCelu: 200, fila: 170,
+    ref: "Referencia: la cama mide 1,60 m de ancho.", mueble: muebleDormitorio, desc: "una pared oscura, arriba de una cama de 1,60 m" }
+];
+const PISO_CM = 18, SOBRE_MUEBLE = 22, GAP_CUADROS = 8, MAX_EN_PARED = 12;
+const pared = { modo: "una", lista: [], i: 0, activo: null, escena: "clara", cerca: false, cotas: true, foto: "", ancho: 300, pos: { x: .5, y: .42 }, desde: "pagina", foco: null };
+const dibujosMueble = {};
+let muebleActual = "";
+const escenaActual = () => ESCENAS.find((e) => e.id === pared.escena) || ESCENAS[0];
+const fotosPared = () => (pared.modo === "todas" ? seleccion.map((n) => porNumero.get(n)).filter(Boolean).slice(0, MAX_EN_PARED) : [pared.lista[pared.i]].filter(Boolean));
+function activaPared() { const l = fotosPared(); return l.find((f) => f.n === pared.activo) || l[0]; }
+/* Acomoda varios cuadros en filas parejas, centradas y alineadas por el medio */
+function disponer(items, maxFila) {
+  const n = items.length;
+  let filas = [];
+  for (let r = 1; r <= n; r++) {
+    filas = [];
+    const base = Math.floor(n / r), resto = n % r;
+    let k = 0;
+    for (let j = 0; j < r; j++) {
+      const cant = base + (j < resto ? 1 : 0);
+      const fila = items.slice(k, k + cant);
+      k += cant;
+      filas.push({ items: fila, ancho: fila.reduce((a, it) => a + it.W, 0) + GAP_CUADROS * (fila.length - 1), alto: Math.max.apply(null, fila.map((it) => it.H)) });
+    }
+    if (filas.every((f) => f.ancho <= maxFila)) break;
+  }
+  const alto = filas.reduce((a, f) => a + f.alto, 0) + GAP_CUADROS * (filas.length - 1);
+  let y = alto;
+  filas.forEach((f) => {
+    y -= f.alto;
+    let x = -f.ancho / 2;
+    f.items.forEach((it) => { it.x = x + it.W / 2; it.y = y + (f.alto - it.H) / 2; x += it.W + GAP_CUADROS; });
+    y -= GAP_CUADROS;
+  });
+  return { items: items, ancho: Math.max.apply(null, filas.map((f) => f.ancho)), alto: alto };
+}
+function escalaPared(e, W, H, grupo) {
+  const tope = e.base + SOBRE_MUEBLE + grupo.alto + 26 + PISO_CM;
+  const ver = Math.max(W / H < 1.05 ? e.verCelu : e.ver, grupo.ancho * 1.3);
+  return Math.min(W / ver, H / tope);
+}
+const HTML_CUADRO = '<span class="cp-lado cp-sup"></span><span class="cp-lado cp-inf"></span><span class="cp-lado cp-izq"></span><span class="cp-lado cp-der"></span><span class="cp-ventana"><img alt="" draggable="false"></span>';
+function pintarPared(sinTransicion) {
+  const escena = $("#escena");
+  if ($("#pared").hidden) return;
+  const W = escena.clientWidth, H = escena.clientHeight;
+  const fotos = fotosPared();
+  if (!W || !H || !fotos.length) return;
+  const mia = pared.escena === "mia" && !!pared.foto, todas = pared.modo === "todas", e = escenaActual();
+  if (sinTransicion) escena.classList.add("quieta");
+  escena.classList.toggle("mia", mia);
+  escena.classList.toggle("grupo", todas && fotos.length > 1);
+  escena.classList.toggle("sin-cotas", !pared.cotas);
+  escena.classList.toggle("cerca", pared.cerca);
+  const items = fotos.map((f) => { const o = opcionDe(f.n), d = enCuadro(f, o.medida); return { f: f, o: o, w: d.w, h: d.h, m: d.m, W: d.w + 2 * d.m, H: d.h + 2 * d.m }; });
+  const lay = disponer(items, mia ? pared.ancho * .7 : e.fila);
+  let s, ox, oy, base;
+  if (mia) {
+    s = W / pared.ancho;
+    ox = pared.pos.x * W;
+    oy = (1 - pared.pos.y) * H - lay.alto * s / 2;
+    base = 0;
+  } else {
+    s = escalaPared(e, W, H, todas ? { ancho: lay.ancho, alto: lay.alto } : GRUPO_MAYOR);
+    ox = W / 2;
+    oy = PISO_CM * s;
+    base = e.base + SOBRE_MUEBLE;
+    if (muebleActual !== e.id) {
+      if (!dibujosMueble[e.id]) dibujosMueble[e.id] = e.mueble();
+      $("#escena-mueble").innerHTML = dibujosMueble[e.id].svg;
+      muebleActual = e.id;
+    }
+    escena.style.setProperty("--mw", dibujosMueble[e.id].ancho);
+  }
+  const v = { "--s": s.toFixed(4) + "px", "--piso-px": (PISO_CM * s).toFixed(2) + "px", "--pared": e.pared, "--pared-2": e.pared2, "--piso": e.piso, "--piso-2": e.piso2, "--zocalo": e.zocalo, "--cota": e.cota, "--luz": e.luz,
+    "--luz-y": (100 * (H - oy - (base + lay.alto / 2) * s) / H).toFixed(1) + "%" };
+  Object.keys(v).forEach((k) => escena.style.setProperty(k, v[k]));
+  const origen = $("#escena-origen");
+  origen.style.left = ox.toFixed(1) + "px";
+  origen.style.bottom = oy.toFixed(1) + "px";
+  // los cuadros se reusan (por número) para que los cambios de tamaño se animen
+  const grupo = $("#escena-grupo");
+  const viejos = new Map($$(".cp", grupo).map((el) => [el.dataset.n, el]));
+  lay.items.forEach((it) => {
+    let el = viejos.get(it.f.n);
+    if (!el) {
+      el = document.createElement("div");
+      el.className = "cp";
+      el.dataset.n = it.f.n;
+      el.innerHTML = HTML_CUADRO + '<span class="cota cota-h"><span></span></span><span class="cota cota-v"><span></span></span>';
+      grupo.append(el);
+    }
+    viejos.delete(it.f.n);
+    el.classList.toggle("madera", !!it.o.marco.madera);
+    el.classList.toggle("activo", todas && it.f.n === (activaPared() || {}).n);
+    [["--w", it.w], ["--h", it.h], ["--m", it.m], ["--x", it.x.toFixed(2)], ["--y", (base + it.y).toFixed(2)], ["--c", it.o.marco.color], ["--fondo-foto", (it.f.paleta || [])[0] || "#cfc8bf"]]
+      .forEach((p) => el.style.setProperty(p[0], p[1]));
+    const img = $("img", el), src = items.length > 1 ? rutaMini(it.f) : rutaWeb(it.f);
+    if (img.getAttribute("src") !== src) img.setAttribute("src", src);
+    $(".cota-h span", el).textContent = cm(it.w) + " cm";
+    $(".cota-v span", el).textContent = cm(it.h) + " cm";
+  });
+  viejos.forEach((el) => el.remove());
+  // «De cerca»: el cuadro activo pasa al centro y se agranda
+  const mundo = $("#escena-mundo");
+  const act = lay.items.find((it) => it.f.n === (activaPared() || {}).n) || lay.items[0];
+  if (pared.cerca && act) {
+    const cx = ox + act.x * s, cy = H - oy - (base + act.y) * s - act.H * s / 2;
+    const z = Math.max(1.3, Math.min(4.5, H * .66 / (act.H * s), W * .72 / (act.W * s)));
+    mundo.style.setProperty("--ox", cx.toFixed(1) + "px");
+    mundo.style.setProperty("--oy", cy.toFixed(1) + "px");
+    mundo.style.transform = "translate(" + (W / 2 - cx).toFixed(1) + "px, " + (H / 2 - cy).toFixed(1) + "px) scale(" + z.toFixed(3) + ")";
+  } else mundo.style.transform = "";
+  mundo.setAttribute("aria-label", "Vista a escala: " + lay.items.map((it) => "N.° " + it.f.n + " en " + textoMedida(it.o.medida) + ", marco " + it.o.marco.nombre.toLowerCase()).join("; ") + (mia ? ", sobre la foto de tu pared." : ", en " + e.desc + "."));
+  if (sinTransicion) { void escena.offsetWidth; requestAnimationFrame(() => escena.classList.remove("quieta")); }
+}
+function pintarParedes() {
+  $("#pared-paredes").innerHTML = ESCENAS.map((e) =>
+    '<button type="button" class="op" data-escena="' + e.id + '" aria-pressed="' + (pared.escena === e.id) + '"><span class="muestra-pared" style="--c:' + e.pared + ";--p:" + e.piso + '" aria-hidden="true"></span>' + esc(e.nombre) + "</button>").join("") +
+    '<button type="button" class="op" data-escena="mia" aria-pressed="' + (pared.escena === "mia") + '"><svg class="ico" aria-hidden="true"><use href="#i-camara"/></svg>Mi pared</button>';
+  $("#pared-valor").textContent = pared.escena === "mia" ? "Tu foto" : "Pared " + escenaActual().nombre.toLowerCase();
+  $("#mi-pared").hidden = pared.escena !== "mia";
+  $("#escena-foto").hidden = pared.escena !== "mia";
+}
+function pintarPanelPared(soloEstado) {
+  const fotos = fotosPared(), f = activaPared();
+  if (!f) return;
+  const todas = pared.modo === "todas", k = seleccion.length;
+  $("#pared-num").textContent = todas && fotos.length > 1 ? "N.° " + f.n + " · " + (fotos.indexOf(f) + 1) + " de " + fotos.length : "N.° " + f.n;
+  $("#pared-titulo").textContent = f.titulo;
+  $("#pared-en").textContent = f.title || "";
+  $("#pared-contador").textContent = todas ? "Tu selección · " + (k === 1 ? "1 cuadro" : k + " cuadros") : String(pared.i + 1).padStart(2, "0") + " / " + String(pared.lista.length).padStart(2, "0");
+  $("#pared-lugar").textContent = pared.escena === "mia" ? "Tu pared" : "Pared " + escenaActual().nombre.toLowerCase();
+  const tira = $("#pared-tira");
+  if (!soloEstado) {
+    $("#pared-opciones").innerHTML = htmlOpciones(f);
+    tira.hidden = !(todas && fotos.length > 1);
+    tira.innerHTML = todas ? fotos.map((g) => '<button type="button" data-tira="' + esc(g.n) + '" aria-pressed="' + (g.n === f.n) + '" aria-label="Cambiar la N.° ' + esc(g.n) + ", " + esc(g.titulo) + '"><img src="' + esc(rutaMini(g)) + '" alt="" draggable="false"><span>' + esc(g.n) + "</span></button>").join("") : "";
+  } else $$("[data-tira]", tira).forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.tira === f.n)));
+  pintarRecorte($("#pared-recorte"), f);
+  $("#pared-ref").textContent = pared.escena === "mia"
+    ? "El cuadro se muestra según el ancho de pared que indicaste."
+    : escenaActual().ref + (todas && k > fotos.length ? " Se ven los primeros " + fotos.length + " cuadros." : "");
+  const elegida = seleccion.indexOf(f.n) >= 0, b = $("#pared-sumar");
+  b.hidden = todas;
+  b.setAttribute("aria-pressed", String(elegida));
+  $(".txt", b).textContent = elegida ? "En tu selección · Quitar" : "Sumar a mi selección";
+  $("use", b).setAttribute("href", elegida ? "#i-ok" : "#i-mas");
+  $("#pared-wa").href = enlaceWhatsApp(todas ? mensajeSeleccion() : mensajeFoto(f));
+  $(".txt", $("#pared-wa")).textContent = todas ? "Pedir estos cuadros" : "Consultar por WhatsApp";
+  $(".txt", $("#pared-compartir")).textContent = todas ? "Compartir mi selección" : "Compartir cómo queda";
+  $("#pared-compartir").hidden = !direccionSitio();
+  $("#pared-prev").hidden = $("#pared-next").hidden = todas || pared.lista.length < 2;
+  $("#pared-cotas").hidden = todas && fotos.length > 1; // con varios cuadros, las medidas se leen en el panel
+  $("#pared-cotas").setAttribute("aria-pressed", String(pared.cotas));
+  $("#pared-cerca").setAttribute("aria-pressed", String(pared.cerca));
+}
+function abrirPared(n, ops) {
+  ops = ops || {};
+  if (ops.todas) {
+    if (!seleccion.length) return;
+    pared.modo = "todas";
+    pared.activo = n && seleccion.indexOf(n) >= 0 ? n : seleccion[0];
+  } else {
+    if (!porNumero.has(n)) return;
+    const L = ops.lista && ops.lista.some((f) => f.n === n) ? ops.lista : FOTOS;
+    pared.modo = "una";
+    pared.lista = L;
+    pared.i = L.findIndex((f) => f.n === n);
+    pared.activo = n;
+    if (ops.medida && medidaPorId(ops.medida)) ponerOpcion(n, "t", ops.medida);
+    if (ops.marco && marcoPorId(ops.marco)) ponerOpcion(n, "m", ops.marco);
+  }
+  if (pared.escena === "mia" && !pared.foto) pared.escena = "clara";
+  pared.desde = ops.desde || "pagina";
+  pared.cerca = false;
+  if ($("#pared").hidden) pared.foco = document.activeElement;
+  $("#aviso").hidden = true;
+  $("#pared").hidden = false;
+  $("#pared").scrollTop = 0;
+  document.documentElement.classList.add("sin-scroll");
+  $("#pared-cerrar-txt").textContent = pared.desde === "pagina" ? "Cerrar" : "Volver";
+  $("#pared-cerrar use").setAttribute("href", pared.desde === "pagina" ? "#i-cerrar" : "#i-izq");
+  pintarParedes();
+  pintarPanelPared();
+  pintarPared(true);
+  if (pared.modo === "una") { ponerHash("pared-" + n); precargarPared(); }
+  $("#pared-cerrar").focus({ preventScroll: true });
+}
+function cerrarPared() {
+  $("#pared").hidden = true;
+  pared.cerca = false;
+  $("#escena-pista").hidden = true;
+  if ($("#visor").hidden && $("#cajon").hidden) document.documentElement.classList.remove("sin-scroll");
+  if (!$("#visor").hidden) {
+    // el visor queda en la última foto que se probó en la pared
+    const f = pared.modo === "una" ? pared.lista[pared.i] : null;
+    const j = f ? estado.visorLista.findIndex((g) => g.n === f.n) : -1;
+    if (j >= 0 && j !== estado.indice) { estado.indice = j; mostrarEnVisor(0); }
+    else { pintarFichaCuadro(fotoActual()); actualizarFicha(); ponerHash("foto-" + fotoActual().n); }
+  } else ponerHash(estado.filtro.tipo === "todo" ? "archivo" : estado.filtro.id);
+  if (!$("#cajon").hidden) renderCajon();
+  if (pared.foco && document.contains(pared.foco)) pared.foco.focus({ preventScroll: true });
+}
+/* Un link que abre esta foto en la pared, con el mismo tamaño, marco y pared (#pared-012_40x60_negro_clara) */
+function compartirVista() {
+  if (pared.modo === "todas") { compartirSeleccion(); return; }
+  const f = activaPared();
+  if (!f || !direccionSitio()) return;
+  const o = opcionDe(f.n);
+  const url = direccionSitio() + "#pared-" + f.n + "_" + o.t + "_" + o.m + (pared.escena !== "mia" ? "_" + pared.escena : "");
+  compartirOCopiar({ title: "N.° " + f.n + " — " + f.titulo, text: "Mirá cómo queda en " + textoMedida(o.medida) + ", con marco " + o.marco.nombre.toLowerCase() + ":", url: url },
+    "Link copiado: abre esta foto en la pared, con el mismo tamaño y marco.");
+}
+function moverPared(paso) {
+  if (pared.modo !== "una" || pared.lista.length < 2) return;
+  pared.i = (pared.i + paso + pared.lista.length) % pared.lista.length;
+  pared.activo = pared.lista[pared.i].n;
+  pintarPanelPared();
+  pintarPared();
+  ponerHash("pared-" + pared.activo);
+  precargarPared();
+}
+function precargarPared() {
+  const L = pared.lista;
+  if (L.length < 2) return;
+  [pared.i + 1, pared.i - 1].forEach((j) => { const g = L[(j + L.length) % L.length]; if (g) { const p = new Image(); p.src = rutaWeb(g); } });
+}
+let temporizadorPista = null;
+function pista(t) {
+  const p = $("#escena-pista");
+  p.textContent = t;
+  p.hidden = false;
+  clearTimeout(temporizadorPista);
+  temporizadorPista = setTimeout(() => { p.hidden = true; }, 4200);
+}
+function elegirEscena(id) {
+  if (id === "mia" && !pared.foto) { $("#mi-pared-archivo").click(); return; }
+  pared.escena = id;
+  if (id === "mia") pared.cerca = false;
+  pintarParedes();
+  pintarPanelPared(true);
+  pintarPared();
+  if (id === "mia") pista("Arrastrá el cuadro para ubicarlo en tu pared.");
+}
+const formatoMetros = (v) => (v / 100).toLocaleString("es-AR", { maximumFractionDigits: 2 }) + " m";
+(function () {
+  const escena = $("#escena");
+  let arrastre = null, toque = null;
+  escena.addEventListener("pointerdown", (e) => {
+    const cp = e.target.closest(".cp");
+    if (!cp) return;
+    if (pared.modo === "todas" && cp.dataset.n !== (activaPared() || {}).n) { pared.activo = cp.dataset.n; pintarPanelPared(); pintarPared(); }
+    if (pared.escena !== "mia") return;
+    e.preventDefault();
+    if (pared.cerca) { pared.cerca = false; pintarPanelPared(true); pintarPared(); }
+    arrastre = { id: e.pointerId, x: e.clientX, y: e.clientY, px: pared.pos.x, py: pared.pos.y };
+    try { escena.setPointerCapture(e.pointerId); } catch (_) {}
+    escena.classList.add("arrastrando");
+    $("#escena-pista").hidden = true;
+  });
+  escena.addEventListener("pointermove", (e) => {
+    if (!arrastre || arrastre.id !== e.pointerId) return;
+    pared.pos.x = Math.min(.97, Math.max(.03, arrastre.px + (e.clientX - arrastre.x) / escena.clientWidth));
+    pared.pos.y = Math.min(.96, Math.max(.04, arrastre.py + (e.clientY - arrastre.y) / escena.clientHeight));
+    pintarPared();
+  });
+  const soltar = (e) => { if (!arrastre || arrastre.id !== e.pointerId) return; arrastre = null; escena.classList.remove("arrastrando"); };
+  escena.addEventListener("pointerup", soltar);
+  escena.addEventListener("pointercancel", soltar);
+  // deslizar con el dedo para probar otra foto (en las paredes de ejemplo)
+  escena.addEventListener("touchstart", (e) => { const t = e.changedTouches[0]; toque = { x: t.clientX, y: t.clientY }; }, { passive: true });
+  escena.addEventListener("touchend", (e) => {
+    if (!toque || pared.escena === "mia" || pared.cerca) { toque = null; return; }
+    const t = e.changedTouches[0], dx = t.clientX - toque.x, dy = t.clientY - toque.y;
+    if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.3) moverPared(dx < 0 ? 1 : -1);
+    toque = null;
+  }, { passive: true });
+  $("#pared-cerrar").addEventListener("click", cerrarPared);
+  $("#pared-prev").addEventListener("click", () => moverPared(-1));
+  $("#pared-next").addEventListener("click", () => moverPared(1));
+  $("#pared-cotas").addEventListener("click", () => { pared.cotas = !pared.cotas; pintarPanelPared(true); pintarPared(); });
+  $("#pared-cerca").addEventListener("click", () => { pared.cerca = !pared.cerca; pintarPanelPared(true); pintarPared(); });
+  $("#pared-sumar").addEventListener("click", () => { const f = activaPared(); if (f) alternar(f.n); });
+  $("#pared-compartir").addEventListener("click", compartirVista);
+  $("#mi-pared-otra").addEventListener("click", () => $("#mi-pared-archivo").click());
+  $("#mi-pared-archivo").addEventListener("change", (e) => {
+    const a = e.target.files && e.target.files[0];
+    e.target.value = "";
+    if (!a) return;
+    const img = $("#escena-foto"), url = URL.createObjectURL(a);
+    img.onload = () => {
+      if (pared.foto && pared.foto !== url) URL.revokeObjectURL(pared.foto);
+      pared.foto = url;
+      pared.pos = { x: .5, y: .42 };
+      elegirEscena("mia");
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); avisar("No pude abrir esa foto. Probá con otra (JPG o PNG)."); if (pared.foto) img.src = pared.foto; };
+    img.src = url;
+  });
+  const rango = $("#mi-pared-ancho");
+  rango.addEventListener("input", () => {
+    pared.ancho = +rango.value || 300;
+    $("#mi-pared-valor").textContent = formatoMetros(pared.ancho);
+    escena.classList.add("quieta");
+    pintarPared();
+  });
+  rango.addEventListener("change", () => escena.classList.remove("quieta"));
+  $("#mi-pared-valor").textContent = formatoMetros(pared.ancho);
+  if ("ResizeObserver" in window) new ResizeObserver(() => pintarPared(true)).observe(escena);
+  else window.addEventListener("resize", () => pintarPared(true));
+})();
+
+/* ---------- Guía de tamaños: los tamaños uno al lado del otro, a escala ---------- */
+const guia = { i: 0, marco: null, foto: null, ancho: 0 };
+function fotosGuia() {
+  const vistas = new Set();
+  const l = CARRUSEL.concat(PORTADA).filter((n) => !vistas.has(n) && vistas.add(n)).map((n) => porNumero.get(n)).filter(Boolean);
+  const base = l.length ? l : FOTOS;
+  const horizontales = base.filter((f) => proporcion(f) >= 1.4);
+  return horizontales.length ? horizontales : base;
+}
+const cuadroGuia = (f, marco) => '<span class="cp' + (marco.madera ? " madera" : "") + '" style="--c:' + esc(marco.color) + ";--fondo-foto:" + esc((f.paleta || [])[0] || "#cfc8bf") + '">' +
+  HTML_CUADRO.replace('<img alt=""', '<img src="' + esc(rutaMini(f)) + '" alt="" loading="lazy"') + "</span>";
+function pintarGuia() {
+  const rep = $("#guia-repisa"), fotos = fotosGuia();
+  $("#guia").hidden = !fotos.length;
+  if (!fotos.length) return;
+  const f = fotos[((guia.i % fotos.length) + fotos.length) % fotos.length];
+  const marco = marcoPorId(guia.marco) || marcoPorId(CUADROS.marcoInicial);
+  guia.foto = f;
+  const W = rep.clientWidth || Math.min(window.innerWidth - 32, 1120);
+  const dims = CUADROS.medidas.map((m) => ({ m: m, d: enCuadro(f, m) }));
+  const hueco = W < 600 ? 14 : Math.min(64, W * .04);
+  const suma = dims.reduce((a, x) => a + x.d.w + 2 * x.d.m, 0);
+  const s = Math.max(1, Math.min(3.6, (W - 24 - hueco * (dims.length - 1)) / suma));
+  rep.style.setProperty("--s", s.toFixed(3) + "px");
+  rep.style.gridTemplateColumns = "repeat(" + dims.length + ", auto)";
+  rep.innerHTML = dims.map((x, i) =>
+    '<button type="button" class="guia-cuadro" data-guia-medida="' + esc(x.m.id) + '" style="grid-column:' + (i + 1) + ";--w:" + x.d.w + ";--h:" + x.d.h + ";--m:" + x.d.m + '" aria-label="Ver la foto en ' + esc(textoMedida(x.m)) + ' en mi pared">' + cuadroGuia(f, marco) + "</button>" +
+    '<div class="guia-txt" style="grid-column:' + (i + 1) + '"><span class="medida-txt">' + esc(cm(x.m.corto) + " × " + cm(x.m.largo)) + "<small>cm</small></span>" + (x.m.uso ? "<p>" + esc(x.m.uso) + "</p>" : "") + "</div>").join("");
+  $("#guia-marcos").innerHTML = CUADROS.marcos.map((m) =>
+    '<button type="button" class="op" data-guia-marco="' + esc(m.id) + '" aria-pressed="' + (m.id === marco.id) + '"><span class="muestra-marco' + (m.madera ? " madera" : "") + '" style="--c:' + esc(m.color) + ";--fondo-foto:" + esc((f.paleta || [])[0] || "") + '" aria-hidden="true"></span>' + esc(m.nombre) + "</button>").join("");
+  $("#guia-foto").textContent = "En la foto: N.° " + f.n + " · " + f.titulo + (f.lugar ? " · " + f.lugar : "");
+  $("#guia-otra").hidden = fotos.length < 2;
+}
+function paredDesdeGuia(medida) {
+  if (!guia.foto) return;
+  abrirPared(guia.foto.n, { desde: "pagina", lista: FOTOS, medida: medida, marco: guia.marco || null });
+}
+
+/* ---------- Preguntas frecuentes (se editan en el panel: pregunta en una línea y la respuesta abajo) ---------- */
+const PREGUNTAS_FABRICA = "¿Cuánto cuesta un cuadro?\nDepende del tamaño y del marco. Armá tu selección y mandámela por WhatsApp: te paso el precio sin compromiso.\n\n¿Qué tamaños y marcos hay?\nLas fotos se piden en {medidas}, con marco {marcos}. La medida es la de la foto: el marco suma unos centímetros por lado.";
+function pintarPreguntas() {
+  const v = TEXTOS["preguntas.texto"];
+  const vacio = typeof v === "string" && !v.trim(); // vacío en el panel = no se muestran
+  const bloques = vacio ? [] : rellenar(texto("preguntas.texto", PREGUNTAS_FABRICA), { medidas: listaMedidas(), marcos: listaMarcos(), nombre: CONFIG.nombre })
+    .split(/\n\s*\n/).map((b) => b.trim()).filter(Boolean);
+  $("#preguntas-lista").innerHTML = bloques.map((b) => {
+    const lineas = b.split("\n");
+    const p = lineas.shift().trim(), r = lineas.join("\n").trim();
+    return '<details class="pregunta"><summary>' + esc(p) + "</summary>" + (r ? "<p>" + esc(r) + "</p>" : "") + "</details>";
+  }).join("");
+  $("#preguntas").hidden = !bloques.length;
+}
 
 /* ---------- Eventos ---------- */
 document.addEventListener("click", (e) => {
@@ -7586,7 +8664,24 @@ document.addEventListener("click", (e) => {
   const abrir = t.closest("[data-abrir]");
   if (abrir) { abrirVisor(abrir.dataset.abrir); return; }
   const sumar = t.closest("[data-sumar]");
-  if (sumar) { alternar(sumar.dataset.sumar); return; }
+  if (sumar) { alternar(sumar.dataset.sumar, "grilla"); return; }
+  // tamaño y marco (ficha y visor de pared)
+  const opMedida = t.closest("[data-op-medida]"), opMarco = t.closest("[data-op-marco]");
+  if (opMedida || opMarco) {
+    const g = (opMedida || opMarco).closest("[data-op-n]");
+    if (g) ponerOpcion(g.dataset.opN, opMedida ? "t" : "m", opMedida ? opMedida.dataset.opMedida : opMarco.dataset.opMarco);
+    return;
+  }
+  const escenaB = t.closest("[data-escena]");
+  if (escenaB) { elegirEscena(escenaB.dataset.escena); return; }
+  const tira = t.closest("[data-tira]");
+  if (tira) { pared.activo = tira.dataset.tira; pintarPanelPared(); pintarPared(); return; }
+  const item = t.closest("[data-pared-item]");
+  if (item) { abrirPared(item.dataset.paredItem, { desde: "cajon", lista: seleccion.map((n) => porNumero.get(n)).filter(Boolean) }); return; }
+  const gMarco = t.closest("[data-guia-marco]");
+  if (gMarco) { guia.marco = gMarco.dataset.guiaMarco; pintarGuia(); return; }
+  const gMedida = t.closest("[data-guia-medida]");
+  if (gMedida) { paredDesdeGuia(gMedida.dataset.guiaMedida); return; }
   const cat = t.closest("[data-cat]");
   if (cat) {
     const id = cat.dataset.cat;
@@ -7631,6 +8726,19 @@ $("#visor-next").addEventListener("click", () => mover(1));
 $("#visor").addEventListener("click", (e) => { if (e.target === $("#visor") || e.target.classList.contains("visor-caja")) cerrarVisor(); });
 $("#ficha-sumar").addEventListener("click", () => alternar(fotoActual().n));
 $("#ficha-compartir").addEventListener("click", compartirFoto);
+$("#visor-pared").addEventListener("click", () => abrirPared(fotoActual().n, { desde: "visor", lista: estado.visorLista }));
+$("#cajon-pared").addEventListener("click", () => {
+  if (seleccion.length > 1) abrirPared(null, { todas: true, desde: "cajon" });
+  else if (seleccion.length) abrirPared(seleccion[0], { desde: "cajon" });
+});
+$("#cajon-compartir").addEventListener("click", compartirSeleccion);
+$("#guia-pared").addEventListener("click", () => paredDesdeGuia(null));
+$("#guia-otra").addEventListener("click", () => { guia.i++; pintarGuia(); });
+document.addEventListener("change", (e) => {
+  const t = e.target;
+  if (t.matches("[data-cajon-medida]")) ponerOpcion(t.dataset.cajonMedida, "t", t.value, "cajon");
+  else if (t.matches("[data-cajon-marco]")) ponerOpcion(t.dataset.cajonMarco, "m", t.value, "cajon");
+});
 $("#cajon-vaciar").addEventListener("click", () => {
   const antes = seleccion.slice();
   seleccion = [];
@@ -7649,17 +8757,25 @@ $("#cajon-wa").addEventListener("click", (e) => {
 });
 const nota = $("#cajon-nota");
 nota.value = leerLocal(CLAVE + "-nota", "");
-nota.addEventListener("input", () => { guardarLocal(CLAVE + "-nota", nota.value); renderCajon(); });
+nota.addEventListener("input", () => { guardarLocal(CLAVE + "-nota", nota.value); actualizarMensajeCajon(); });
 
 function focoAtrapado(e, contenedor) {
-  const foco = $$('a[href], button:not([disabled]), textarea, summary, [tabindex]:not([tabindex="-1"])', contenedor)
-    .filter((el) => !el.closest("[hidden]") && el.getClientRects().length > 0);
+  const foco = $$('a[href], button:not([disabled]), textarea, input:not([type="hidden"]), select, summary, [tabindex]:not([tabindex="-1"])', contenedor)
+    .filter((el) => !el.closest("[hidden]") && !el.hidden && el.getClientRects().length > 0);
   if (!foco.length) return;
   const primero = foco[0], ultimo = foco[foco.length - 1];
   if (e.shiftKey && document.activeElement === primero) { e.preventDefault(); ultimo.focus(); }
   else if (!e.shiftKey && document.activeElement === ultimo) { e.preventDefault(); primero.focus(); }
 }
 document.addEventListener("keydown", (e) => {
+  if (!$("#pared").hidden) {
+    const enCampo = e.target.closest && e.target.closest("input, select, textarea");
+    if (e.key === "Escape") cerrarPared();
+    else if (e.key === "ArrowRight" && !enCampo) moverPared(1);
+    else if (e.key === "ArrowLeft" && !enCampo) moverPared(-1);
+    else if (e.key === "Tab") focoAtrapado(e, $("#pared"));
+    return;
+  }
   if (!$("#cajon").hidden) {
     if (e.key === "Escape") cerrarCajon();
     else if (e.key === "Tab") focoAtrapado(e, $("#cajon"));
@@ -7697,12 +8813,18 @@ aplicarPaletaSitio(leerLocal("ojodecristi-paleta", "rayas"), false);
 $$("[data-wa]").forEach((a) => { a.href = enlaceWhatsApp(MENSAJES[a.dataset.wa]()); });
 $("#nota-numero").hidden = !!String(CONFIG.whatsapp || "").replace(/\D/g, "");
 $("#dato-fotos").textContent = FOTOS.length === 1 ? "1 fotografía" : FOTOS.length + " fotografías";
+seleccion.forEach(fijarOpcion); // las fotos que ya estaban elegidas quedan con su tamaño y su marco
 renderChips();
 renderPortada();
 renderSeries();
+pintarGuia();
+pintarPreguntas();
 numerarCapitulos();
 aplicarFiltro({ tipo: "todo" }, { hash: false });
 refrescarSeleccion();
+if ("ResizeObserver" in window) {
+  new ResizeObserver(() => { const w = $("#guia-repisa").clientWidth; if (Math.abs(w - guia.ancho) > 2) { guia.ancho = w; pintarGuia(); } }).observe($("#guia-repisa"));
+} else window.addEventListener("resize", pintarGuia);
 window.addEventListener("hashchange", leerHash);
 leerHash();
 })();
